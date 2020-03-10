@@ -25,14 +25,14 @@ const stores = {
     //utilStore
 };
 const Root = (
-    <Provider  { ...stores}>
+    // <Provider  { ...stores}>
         <HashRouter>
             <div>
                 {/*{init()}*/}
                 <App />
             </div>
         </HashRouter>
-    </Provider>
+    // </Provider>
 );
 
 ReactDOM.render(Root, document.getElementById('root'));

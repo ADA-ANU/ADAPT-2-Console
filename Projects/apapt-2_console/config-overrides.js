@@ -1,11 +1,16 @@
-const { addDecoratorsLegacy, override, disableEsLint, fixBabelImports } = require('customize-cra');
+const { override, fixBabelImports, addLessLoader } = require('customize-cra');
 
 module.exports = override(
     fixBabelImports('import', {
         libraryName: 'antd',
         libraryDirectory: 'es',
-        style: 'css',
+        style: true,
     }),
-    addDecoratorsLegacy(),
-    disableEsLint()
+    addLessLoader({
+        javascriptEnabled: true,
+        modifyVars: {
+            '@layout-trigger-background': '#ffffff',
+            '@layout-trigger-color': '#000000'
+        },
+    }),
 );

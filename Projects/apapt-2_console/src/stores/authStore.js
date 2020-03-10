@@ -4,21 +4,21 @@ import { observable, action, computed, reaction, createTransformer } from 'mobx'
 class AuthStore {
     //@observable currentUser = JSON.parse(window.localStorage.getItem('current'))||{};
     //@observable token = window.localStorage.getItem('jwt');
-    @observable isLoading = false;
-    @observable errors = undefined;
-    @observable ws = undefined;
-    @observable ns = observable.map();
+    //@observable isLoading = false;
+    //@observable errors = undefined;
+    //@observable ws = undefined;
+    //@observable ns = observable.map();
     // @observable notifications = [];
-    @observable notifications = observable.map();
-    @observable notifiTypes = [
-        "Order payment has been verified by Admin.",
-        "Order has been canceled by QA.",
-        "Order status has been modified by Admin.",
-        "Order has been assigned to Counsellor by Admin.",
-        "Order has been assigned to QA by Admin.",
-        "Unread message",
-        "Error!"
-    ]
+    //@observable notifications = observable.map();
+    // @observable notifiTypes = [
+    //     "Order payment has been verified by Admin.",
+    //     "Order has been canceled by QA.",
+    //     "Order status has been modified by Admin.",
+    //     "Order has been assigned to Counsellor by Admin.",
+    //     "Order has been assigned to QA by Admin.",
+    //     "Unread message",
+    //     "Error!"
+    // ]
 
     // constructor() {
     //     reaction(
@@ -33,8 +33,8 @@ class AuthStore {
     //     );
     // }
 
-    @action init(){
-        {
+    // @action init(){
+    //     {
 
             // if(this.currentUser.name){
             //     const URL = config.WS_URL;
@@ -64,7 +64,7 @@ class AuthStore {
             //             }
             //         })
             // }
-        }
+       // }
 
         // if(this.currentUser.name){
         //     const URL = config.WS_URL;
@@ -94,7 +94,7 @@ class AuthStore {
         //             }
         //         })
         // }
-    }
+    // }
 
 }
 

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Bellota:wght@700&display=swap');
+
 .App {
   text-align: center;
 }
@@ -35,4 +37,7 @@
   to {
     transform: rotate(360deg);
   }
+}
+.layout {
+  minHeight: '100vh'
 }
