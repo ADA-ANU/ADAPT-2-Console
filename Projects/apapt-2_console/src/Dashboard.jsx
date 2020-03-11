@@ -14,10 +14,7 @@ const { Title } = Typography;
 
 @inject('routingStore')
 @observer
-
 export default class Dashboard extends Component {
-
-
     render() {
         return(
                 <Spin spinning={false} tip="Loading...">
