@@ -2,8 +2,8 @@ import { observable, action, computed, reaction, createTransformer } from 'mobx'
 
 
 class AuthStore {
-    //@observable currentUser = JSON.parse(window.localStorage.getItem('current'))||{};
-    //@observable token = window.localStorage.getItem('jwt');
+    @observable currentUser = JSON.parse(window.localStorage.getItem('current'))||{};
+    @observable token = window.localStorage.getItem('jwt');
     //@observable isLoading = false;
     //@observable errors = undefined;
     //@observable ws = undefined;

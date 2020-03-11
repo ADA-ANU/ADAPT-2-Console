@@ -7,9 +7,7 @@ import Dashboard from "./Dashboard";
 class App extends Component {
   render() {
     return(
-        <>
             <Dashboard />
-        </>
     )
   }
 }

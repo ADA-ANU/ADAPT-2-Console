@@ -1,38 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { createHashHistory} from 'history';
+import { Provider } from 'mobx-react';
+import { syncHistoryWithStore } from 'mobx-react-router';
+import { Router } from 'react-router';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { HashRouter } from 'react-router-dom';
-import { Provider } from "mobx-react";
 import authStore from "./stores/authStore";
+import routingStore from './stores/routingStore'
 
 const stores = {
-    // articlesStore,
-    //ordersStore,
-    //courseStore,
-    // commentsStore,
-    authStore,
-    //priceRequestStore,
-    //customerStore,
-    //userStore,
-    //helperStore,
-    //statisticStore,
-    //exchangeRequestStore,
-    //exchangeReserveStore,
-    //qualityStore,
-    //orderResultStore,
-    //utilStore
-};
+    routingStore: routingStore,
+    authStore: authStore,
+    // systemStore: systemStore,
+    // statsStore: statsStore
+}
+
+const hashHistory = createHashHistory();
+const history = syncHistoryWithStore(hashHistory, stores.routingStore);
+
 const Root = (
-    // <Provider  { ...stores}>
-        <HashRouter>
-            <div>
-                {/*{init()}*/}
+    <Provider  { ...stores}>
+        <Router history={history}>
                 <App />
-            </div>
-        </HashRouter>
-    // </Provider>
+        </Router>
+    </Provider>
 );
 
 ReactDOM.render(Root, document.getElementById('root'));

@@ -15,6 +15,7 @@
     "less-loader": "^5.0.0",
     "mobx": "^5.15.4",
     "mobx-react": "^6.1.8",
+    "mobx-react-router": "^4.1.0",
     "react": "^16.12.0",
     "react-app-rewired": "^2.1.5",
     "react-dom": "^16.12.0",
@@ -28,7 +29,32 @@
     "eject": "react-app-rewired eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "parser": "babel-eslint",
+    "parserOptions": {
+      "ecmaFeatures": {
+        "legacyDecotators": true
+      }
+    }
+  },
+  "babel": {
+    "presets": [
+      "react-app"
+    ],
+    "plugins": [
+      [
+        "@babel/plugin-proposal-decorators",
+        {
+          "legacy": true
+        }
+      ],
+      [
+        "@babel/plugin-proposal-class-properties",
+        {
+          "loose": true
+        }
+      ]
+    ]
   },
   "browserslist": {
     "production": [
