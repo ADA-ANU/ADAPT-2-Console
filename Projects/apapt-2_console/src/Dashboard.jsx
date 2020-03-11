@@ -12,10 +12,12 @@ const { Header, Content, Sider } = Layout;
 const { Title } = Typography;
 
 
+
+
+export default
 @inject('routingStore')
 @observer
-
-export default class Dashboard extends Component {
+class Dashboard extends Component {
 
 
     render() {
@@ -24,7 +26,7 @@ export default class Dashboard extends Component {
                     <Layout style={{background: '#f0f2f5'}}>
                         <Header style={{ background: "white", width: '100%', height: '64px', lineHeight: '64px', padding: '0px' }}>
                             <div style={{float: 'left', marginLeft: '48px', marginRight: '36px'}}>
-                                <img className="logo" style={{ height: '48px', lineHeight: '64px' }} src={'https://ada.edu.au/wp-content/uploads/2018/03/ADA-PRIMARY-INLINE-300x49.jpg'}/>
+                                <img alt='LOGO' className="logo" style={{ height: '48px', lineHeight: '64px' }} src={'https://ada.edu.au/wp-content/uploads/2018/03/ADA-PRIMARY-INLINE-300x49.jpg'}/>
                             </div>
                             <Menu
                                 theme='light'
