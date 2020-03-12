@@ -28,24 +28,8 @@
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject"
   },
-  "babel": {
-    "presets": [
-      "react-app"
-    ],
-    "plugins": [
-      [
-        "@babel/plugin-proposal-decorators",
-        {
-          "legacy": true
-        }
-      ],
-      [
-        "@babel/plugin-proposal-class-properties",
-        {
-          "loose": true
-        }
-      ]
-    ]
+  "eslintConfig": {
+    "extends": "react-app"
   },
   "browserslist": {
     "production": [

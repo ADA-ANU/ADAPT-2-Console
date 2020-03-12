@@ -10,11 +10,12 @@ import * as serviceWorker from './serviceWorker';
 import { HashRouter } from 'react-router-dom';
 import authStore from "./stores/authStore";
 import routingStore from './stores/routingStore'
+import systemStore from "./stores/systemStore";
 
 const stores = {
     routingStore: routingStore,
     authStore: authStore,
-    // systemStore: systemStore,
+    systemStore: systemStore,
     // statsStore: statsStore
 }
 

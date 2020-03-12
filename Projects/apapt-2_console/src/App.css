@@ -41,3 +41,7 @@
 .layout {
   minHeight: '100vh'
 }
+hr{
+  border: 0.5px solid #e8e8e8;
+  /* margin: 3px 5px; */
+}
