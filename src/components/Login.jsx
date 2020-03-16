@@ -14,17 +14,17 @@ export default class Login extends Component{
 
     render() {
         return(
-            <div style={{background: '#fff', width: '95%', margin: 'auto', textAlign: 'center'}}>
-                <div style={{paddingTop: '20vh'}}>
+            <div style={{background: '#fff', textAlign: 'center'}}>
+                <div style={{paddingTop: '10%'}}>
                     <img className="logo" style={{ lineHeight: 'inherit'}} src={ADAlogo}/>
                 </div>
-                <div style={{paddingTop: '2vh'}}>
+                <div style={{paddingTop: '1%'}}>
                     <span >Welcome to the ADA Console, please log in through AAF below.</span>
                 </div>
-                <div style={{paddingTop: '5vh'}}>
-                    {/*<a href='https://ds.test.aaf.edu.au/discovery/aaf/XSa42sZ7UwhuALSYojGCEw?entityID=https%3A%2F%2Frapid.test.aaf.edu.au%2Fshibboleth&return=https%3A%2F%2Frapid.test.aaf.edu.au%2FShibboleth.sso%2FLogin%3FSAMLDS%3D1%26target%3D%252Flogin%252Fshibboleth%252Fdg6S7Mqyo338TOiY-3jBCPp77KqxBWL1'>*/}
-                        <img className="logo" style={{ lineHeight: 'inherit', cursor: 'pointer'}} src={aaf_login} onClick={()=>{this.props.history.push('/adapt2')}}/>
-                    {/*</a>*/}
+                <div style={{paddingTop: '4%'}}>
+                    <a href='https://ds.test.aaf.edu.au/discovery/aaf/XSa42sZ7UwhuALSYojGCEw?entityID=https%3A%2F%2Frapid.test.aaf.edu.au%2Fshibboleth&return=https%3A%2F%2Frapid.test.aaf.edu.au%2FShibboleth.sso%2FLogin%3FSAMLDS%3D1%26target%3D%252Flogin%252Fshibboleth%252Fdg6S7Mqyo338TOiY-3jBCPp77KqxBWL1'>
+                        <img className="logo" style={{ lineHeight: 'inherit', cursor: 'pointer'}} src={aaf_login} />
+                    </a>
                 </div>
                 <div style={{ paddingTop: '15vh'}}>
                 </div>
