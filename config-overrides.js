@@ -10,7 +10,9 @@ module.exports = override(
         javascriptEnabled: true,
         modifyVars: {
             '@layout-trigger-background': '#ffffff',
-            '@layout-trigger-color': '#000000'
+            '@layout-trigger-color': '#000000',
+            '@menu-item-color': '#5d6a35',
+            '@menu-highlight-color': '#5d6a35'
         },
     }),
     addDecoratorsLegacy(),

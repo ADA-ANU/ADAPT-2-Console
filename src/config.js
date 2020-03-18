@@ -9,15 +9,10 @@ const PROD_API_URL = {
 const DEV_API_URL = {
     ROOT_URL: DEV_ROOT,
     SITE: DEV_ROOT+'site',
-    QUERY_SITE: DEV_ROOT+'query'
+    QUERY_SITE: DEV_ROOT+'api/'
 }
 let API_URL = PROD_API_URL
-process.env.REACT_APP_MODE==='dev' ? API_URL = DEV_API_URL : API_URL = PROD_API_URL
 
-const DATASOURCE_PROVIDER_ENUM = {
-    Landscapes:'Landscapes',
-    SLGA: 'SLGA',
-    ASRIS:'ASRIS'
-}
+process.env.REACT_APP_MODE==='dev' ? API_URL = DEV_API_URL : API_URL = PROD_API_URL
 
 export default API_URL

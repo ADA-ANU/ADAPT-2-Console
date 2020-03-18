@@ -10,15 +10,7 @@ import aaf_login from '../static/img/aaf_login.png'
 
 @inject('routingStore', 'systemStore', 'authStore')
 @observer
-export default class Login extends Component{
-    componentDidMount() {
-        this.props.authStore.authenticate()
-            .then(res=>{
-                if(res === true){
-                    this.props.history.push('/dashboard')
-                }
-            })
-    }
+export default class UnauthorisedLogin extends Component{
 
     render() {
         const { authStore } = this.props
@@ -31,12 +23,11 @@ export default class Login extends Component{
                     <span >Welcome to the ADA Console, please log in through AAF below.</span>
                 </div>
                 <div style={{paddingTop: '1%', width:'20%', margin: 'auto', textAlign:'left'}}>
-                    {authStore.loginErrorMessage && authStore.loginErrorMessage.length>0?
-                        <Alert
-                            description={authStore.loginErrorMessage}
-                            type="error"
-                            showIcon
-                        />: ''}
+                    <Alert
+                        description='Sorry, you are unauthorised, please contact ada@anu.edu.au for assistance.'
+                        type="error"
+                        showIcon
+                    />
                 </div>
                 <div style={{paddingTop: '4%'}}>
                     <a href={authStore.aafLoginUrl}>
