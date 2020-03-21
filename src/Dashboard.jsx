@@ -71,7 +71,7 @@ export default class Dashboard extends Component {
                                     <Alert style={{textAlign: 'center'}} message={'Error, '+ authStore.networkErrorMessage} type="error" />
                                     : '' : ''
                             }
-                                <Route exact path='/dashboard' component={Overview} />
+                                <Route exact path='/dashboard' component={Adapt2} />
                                 <Route exact path='/dashboard/adapt2' component={Adapt2} />
                         </Content>
                         <Footer>

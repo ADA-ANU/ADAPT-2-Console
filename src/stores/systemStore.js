@@ -10,6 +10,13 @@ export class SystemStore{
     @action cancleValidationError(){
         this.jsonValidationError = false
     }
+
+    @action removeTempFile(fileName) {
+        return fetch(API_URL.QUERY_SITE + `deleteImg/${fileName}`)
+            .then(res => res.json())
+            .catch(err => err)
+        }
+
 }
 
 export default new SystemStore()
