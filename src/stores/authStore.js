@@ -10,6 +10,7 @@ class AuthStore {
     @observable networkErrorMessage = ''
     @observable siteLoading = false
     @observable isUserLoggedIn
+    @observable serverList = []
     //@observable isLoading = false;
     //@observable errors = undefined;
     //@observable ws = undefined;
@@ -42,24 +43,35 @@ class AuthStore {
 
     @action authenticate(){
         return fetch(API_URL.QUERY_SITE+'authenticate', {credentials: 'include'})
-            .then(res=>res.json())
-            .then(json=>{
+            .then(action(res=>res.json()))
+            .then(action(json=>{
                 if(json.success===true){
                     this.isUserLoggedIn = true
                     this.currentUser = json.user
-                    return true
+                    return this.getServerList(json.user.userID)
+                        .then(action(res=>{
+                            return true
+                        }))
+
+                    // fetch(API_URL.QUERY_SITE + `getServerList/${json.user.userID}`)
+                    //     .then(res => res.json())
+                    //     .then(json=>{
+                    //         this.serverList= json
+                    //         return true
+                    //     }).catch(err => err)
+
                 }
                 else {
                     this.isUserLoggedIn = false
                     this.loginErrorMessage = json.msg
                     return false
                 }
-            })
+            }))
     }
 
     @action loadSite(){
         return fetch(API_URL.QUERY_SITE+'site')
-            .then(res=>{
+            .then(action(res=>{
                 //console.log(res.status)
                 if (res.status === 200){
                     this.networkError = false
@@ -67,17 +79,26 @@ class AuthStore {
                 else {
                     this.networkError = true
                 }
-            })
+            }))
             .catch(err=>{
                 this.networkError = true
                 this.networkErrorMessage = err
             })
     }
+    @action getServerList(userid) {
+        return fetch(API_URL.QUERY_SITE + `getServerList/${userid}`)
+            .then(action(res => res.json()))
+            .then(action(json=>{
+                this.serverList= json
+                return json
+            })).catch(err => err)
+    }
 
     @action async init(){
         this.siteLoading = true
         await this.loadSite()
-        await this.authenticate()
+        const a = await this.authenticate()
+        console.log(a)
         this.siteLoading = false
 
        //  {

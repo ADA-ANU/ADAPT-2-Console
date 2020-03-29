@@ -6,14 +6,16 @@ export class SystemStore{
     @observable networkErrorInfo = []
     @observable jsonValidationError = false
     @observable jsonValidationErrorInfo = []
-    @observable serverList = []
+    @observable apiInputOpen = false
+    @observable failedAPI = []
+    @observable dataverseSubjects = []
 
     constructor() {
         this.init()
     }
-
+    //
     @action async init(){
-        await this.getServerList()
+        await this.getDataverseSubjects()
     }
     @action cancleValidationError(){
         this.jsonValidationError = false
@@ -21,14 +23,23 @@ export class SystemStore{
 
     @action removeTempFile(fileName) {
         return fetch(API_URL.QUERY_SITE + `deleteImg/${fileName}`)
-            .then(res => res.json())
+            .then(action(res => res.json()))
             .catch(err => err)
         }
 
-    @action getServerList() {
-        return fetch(API_URL.QUERY_SITE + `getServerList`)
-            .then(res => res.json())
-            .then(json=>this.serverList= json)
+    @action handleAPIInputModal(open) {
+        this.apiInputOpen = open
+    }
+    @action handleFailedAPI (api, type){
+        this.failedAPI.push({id:api, type:type})
+    }
+    @action clearFailedAPI(){
+        this.failedAPI = []
+    }
+    @action getDataverseSubjects(){
+        return fetch(API_URL.QUERY_SITE + `getSubjects`)
+            .then(action(res => res.json()))
+            .then(json=>this.dataverseSubjects = json)
             .catch(err => err)
     }
 

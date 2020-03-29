@@ -162,7 +162,7 @@ export default class Adapt2 extends Component{
                                 </p>
                                 <p className="ant-upload-text">Click or drag file to this area to upload</p>
                                 <p className="ant-upload-hint">
-                                    Support for a single or bulk upload.
+                                    Both single and multiple file uploading are supported.
                                 </p>
                             </Dragger>
                         </div>
