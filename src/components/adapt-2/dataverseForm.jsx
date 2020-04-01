@@ -1,7 +1,7 @@
 import React, {Component, useState} from 'react';
 import { Form, Input, Select, Switch, Button, ConfigProvider, Modal, Row, Col } from 'antd';
 import { inject, observer } from 'mobx-react';
-import API_URL from '../config'
+import API_URL from '../../config'
 import 'antd/es/spin/style/css';
 import APIInput from "./apiInput";
 import { toJS } from 'mobx'
@@ -15,7 +15,9 @@ export default class DataverseForm extends Component{
     state={
         createDataset: false,
         fileUploadSwitch: true,
-        modalOpen: false
+        modalOpen: false,
+        selectedServer: '',
+        selectedDataverse: ''
     }
 
     formRef = React.createRef();
@@ -26,6 +28,7 @@ export default class DataverseForm extends Component{
         })
     }
     createDatasetOnChange = (checked)=>{
+        console.log("create button value change to "+ checked)
         this.setState({
             createDataset: checked
         })
@@ -55,6 +58,16 @@ export default class DataverseForm extends Component{
         this.props.handleFormData(values)
         this.createDatasetOnChange(false)
     };
+    serverOnChange =(value) => {
+        console.log(`selected ${value}`);
+        this.formRef.current.setFieldsValue({
+            dataverse: undefined,
+        })
+        this.setState({
+            selectedServer: value
+        })
+
+    }
 
     dataverseOnChange =(value) => {
         console.log(`selected ${value}`);
@@ -81,8 +94,10 @@ export default class DataverseForm extends Component{
         const { authStore, systemStore } = this.props
         const serverList = toJS(authStore.serverList)
         const user = toJS(authStore.currentUser)
+        const dataverses = toJS(authStore.Dataverses)
         console.log(user)
         console.log(serverList)
+        console.log(this.state.selectedDataverse)
         return (
             <>
                 <Form
@@ -128,12 +143,13 @@ export default class DataverseForm extends Component{
                         <Select
                             placeholder="Select a server"
                             disabled={!this.state.createDataset}
+                            onChange={this.serverOnChange}
                         >
                             {
                                 serverList && serverList.length>0?
                                     serverList.map(server=>{
                                         return(
-                                            <Select.Option key={server.id} value={server.id}>{server.servername} ({server.url})</Select.Option>
+                                            <Select.Option key={server.id} value={server.alias}>{server.servername} ({server.url})</Select.Option>
                                         )
                                     }):<Select.Option value={0}>Loading</Select.Option>
 
@@ -159,33 +175,42 @@ export default class DataverseForm extends Component{
                             placeholder="Select a dataverse"
                             optionFilterProp="children"
                             onChange={this.dataverseOnChange}
-                            onFocus={this.dataverseOnFocus}
-                            onBlur={this.dataverseOnBlur}
-                            onSearch={this.dataverseOnSearch}
+                            // onFocus={this.dataverseOnFocus}
+                            // onBlur={this.dataverseOnBlur}
+                            // onSearch={this.dataverseOnSearch}
                             filterOption={(input, option) =>
                                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                             }
                         >
-                            <Select.Option value="jack">Jack</Select.Option>
-                            <Select.Option value="lucy">Lucy</Select.Option>
-                            <Select.Option value="tom">Tom</Select.Option>
+                            {
+                                dataverses && this.state.selectedServer?
+                                    dataverses[this.state.selectedServer].dataverses.map(dataverse=>{
+                                        return(
+                                            <Select.Option key={dataverse.id} value={dataverse.id}>{dataverse.title}</Select.Option>
+                                        )
+                                    }):<Select.Option value={0}>Loading</Select.Option>
+
+                            }
+                            {/*<Select.Option value="jack">Jack</Select.Option>*/}
+                            {/*<Select.Option value="lucy">Lucy</Select.Option>*/}
+                            {/*<Select.Option value="tom">Tom</Select.Option>*/}
                         </Select>
                     </Form.Item>
-                    <Form.Item
-                        label="Dataset DOI"
-                        name="doi"
-                        rules={[
-                            {
-                                required: this.state.createDataset,
-                                message: "Please input DOI.",
-                            },
-                        ]}
-                    >
-                        <Input
-                            placeholder="input doi"
-                            disabled={!this.state.createDataset}
-                        />
-                    </Form.Item>
+                    {/*<Form.Item*/}
+                    {/*    label="Dataset DOI"*/}
+                    {/*    name="doi"*/}
+                    {/*    rules={[*/}
+                    {/*        {*/}
+                    {/*            required: this.state.createDataset,*/}
+                    {/*            message: "Please input DOI.",*/}
+                    {/*        },*/}
+                    {/*    ]}*/}
+                    {/*>*/}
+                    {/*    <Input*/}
+                    {/*        placeholder="input doi"*/}
+                    {/*        disabled={!this.state.createDataset}*/}
+                    {/*    />*/}
+                    {/*</Form.Item>*/}
                     <Form.Item
                         label="Dataset Title"
                         name="title"

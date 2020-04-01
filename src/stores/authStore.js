@@ -11,6 +11,8 @@ class AuthStore {
     @observable siteLoading = false
     @observable isUserLoggedIn
     @observable serverList = []
+    @observable Dataverses ={}
+    @observable dataverseList = []
     //@observable isLoading = false;
     //@observable errors = undefined;
     //@observable ws = undefined;
@@ -53,13 +55,6 @@ class AuthStore {
                             return true
                         }))
 
-                    // fetch(API_URL.QUERY_SITE + `getServerList/${json.user.userID}`)
-                    //     .then(res => res.json())
-                    //     .then(json=>{
-                    //         this.serverList= json
-                    //         return true
-                    //     }).catch(err => err)
-
                 }
                 else {
                     this.isUserLoggedIn = false
@@ -89,16 +84,46 @@ class AuthStore {
         return fetch(API_URL.QUERY_SITE + `getServerList/${userid}`)
             .then(action(res => res.json()))
             .then(action(json=>{
+                this.networkError = false
                 this.serverList= json
                 return json
-            })).catch(err => err)
+            })).catch(err => {
+                this.networkError = true
+                this.networkErrorMessage = err
+            })
+    }
+
+    @action getAllDataverse(){
+
+        return fetch(API_URL.QUERY_SITE + `getDataverseLists`)
+            .then(action(res => {
+                if (res.status === 201){
+                    return res.json()
+                }
+                else {
+                    throw new Error('Unable to download dataverse list, please refresh the page to try again.')
+                }
+            }))
+            .then(json=>{
+
+                    this.networkError = false
+                    this.Dataverses = json.msg
+                })
+            .catch(err => {
+                this.networkError = true
+                this.networkErrorMessage = err
+            })
+    }
+    @action setDataverseList(value){
+        this.dataverseList = value
+
     }
 
     @action async init(){
         this.siteLoading = true
         await this.loadSite()
-        const a = await this.authenticate()
-        console.log(a)
+        await this.authenticate()
+        await this.getAllDataverse()
         this.siteLoading = false
 
        //  {

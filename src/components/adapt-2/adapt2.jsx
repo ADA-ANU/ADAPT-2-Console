@@ -1,7 +1,7 @@
 import React, {Component, useState} from 'react';
 import { inject, observer } from 'mobx-react';
 import { Switch, Route, withRouter, Link } from 'react-router-dom';
-import API_URL from '../config'
+import API_URL from '../../config'
 import 'antd/es/spin/style/css';
 import { Upload, Button, message, notification, Collapse, Popover,} from 'antd';
 import { UploadOutlined, InboxOutlined, InfoCircleOutlined } from '@ant-design/icons';
@@ -17,31 +17,59 @@ export default class Adapt2 extends Component{
 
     state = {
 
-        files: [],
+        fileList: [],
         uploading: false,
         adaID: '',
-        formdata:[]
+        formdata:[],
+        finalFiles: []
 
     };
 
-    handleFormData = (form)=>{
+    // handleFormData = (form)=>{
+    //     this.setState({
+    //         formdata: form
+    //     })
+    // }
+
+    handleUpload = (form) => {
+        const { newDataset, server, dataverse, title, author, authorFields, email, description, subject, uploadSwitch } = form
+        const { fileList } = this.state;
         this.setState({
             formdata: form
         })
-    }
 
-    handleUpload = () => {
-        const { files } = this.state;
-
-        const obj = {
-            doi: "aaaaaaa",
-            title: "bbbbb",
-            author: "ccccc",
-            email: "dddd@dd.com",
-            description: "eeeeeee",
-            subject: "fffffff",
-            userid: "1"
+        let obj ={}
+        if (newDataset === false){
+            obj = {
+                //doi: null,
+                title: null,
+                author: null,
+                email: null,
+                description: null,
+                subject: null,
+                server: null,
+                dataverse: null,
+                uploadSwitch: false,
+                userid: toJS(this.props.authStore.currentUser).userID
+            }
         }
+        else {
+            obj = {
+                //doi: doi,
+                newDataset: newDataset,
+                title: title,
+                author: author,
+                authorFields: authorFields,
+                email: email,
+                description: description,
+                subject: subject,
+                server: server,
+                dataverse: dataverse,
+                uploadSwitch: uploadSwitch,
+                userid: toJS(this.props.authStore.currentUser).userID
+            }
+        }
+
         const json = JSON.stringify(obj);
 
         this.setState({
@@ -55,18 +83,25 @@ export default class Adapt2 extends Component{
                 }
             }
         ).then(res=>{
-            if (res.status ===200){
+            if (res.status ===201){
                 console.log(res)
                 return res.data
             }
+            else if (res.status === 401){
+
+            }
         }).then(json=>{
             if (json.success === true){
-                this.setState({adaID: json.msg})
+                console.log(json)
+                this.setState({adaID: json.msg.adaid.adaID})
                 const formData = new FormData();
-                formData.set('adaid', json.msg)
+                formData.set('adaid', json.msg.adaid.adaID)
                 formData.set('userid', toJS(this.props.authStore.currentUser).userID)
+                formData.set('datasetid', json.msg.dataset.id)
+                formData.set('server', json.msg.dataverse)
+                formData.set('uploadSwitch', uploadSwitch)
 
-                files.forEach(file => {
+                fileList.forEach(file => {
                     formData.append('file', file);
                 });
                 axios({
@@ -74,13 +109,26 @@ export default class Adapt2 extends Component{
                     method: 'post',
                     data: formData,
                     config: { headers: {'Content-Type': 'multipart/form-data' }}
-                }).then(res=>{
-                    if (res.status ===200 && res.data.success === true){
-                        this.setState({
-                            uploading: false,
-                        });
-                    }
-                }).catch(err=>{
+                }).then(res=>res.data)
+                  .then(data=>{
+                      console.log(data)
+                      if (data.success ===true){
+                          console.log("recovering")
+                          this.setState({
+                              uploading: false,
+                              finalFiles: fileList,
+                              fileList: []
+                          });
+                      }
+                      else{
+                          this.setState({
+                              uploading: false,
+
+                          });
+                          this.openNotificationWithIcon('error','files', data.msg.message)
+                      }
+                    }).catch(err=>{
+                        console.log(err)
                     this.openNotificationWithIcon('error','files', err)
                 })
             }
@@ -122,17 +170,19 @@ export default class Adapt2 extends Component{
 
 
     render() {
-        const { uploading, files, formdata } = this.state;
+        const { uploading, fileList, formdata, finalFiles } = this.state;
         console.log(formdata)
-        // console.log(toJS(this.props.authStore.currentUser))
+        console.log(finalFiles)
+        console.log(fileList)
+
         const props = {
             onRemove: file => {
                 this.setState(state => {
-                    const index = state.files.indexOf(file);
-                    const newFileList = state.files.slice();
+                    const index = state.fileList.indexOf(file);
+                    const newFileList = state.fileList.slice();
                     newFileList.splice(index, 1);
                     return {
-                        files: newFileList,
+                        fileList: newFileList,
                     };
                 });
             },
@@ -140,11 +190,11 @@ export default class Adapt2 extends Component{
             listType: 'picture',
             beforeUpload: file => {
                 this.setState(state => ({
-                    files: [...state.files, file],
+                    fileList: [...state.fileList, file],
                 }));
                 return false;
             },
-            files,
+            fileList,
         };
         return (
             <div style={{background: 'white'}}>
@@ -168,7 +218,7 @@ export default class Adapt2 extends Component{
                         </div>
                     </Panel>
                     <Panel header="Dataset" key="2" extra={this.extraInfo("Create a dataset on dataverse")}>
-                        <DataverseForm handleFormData={this.handleFormData}/>
+                        <DataverseForm handleFormData={this.handleUpload}/>
                     </Panel>
 
                 </Collapse>

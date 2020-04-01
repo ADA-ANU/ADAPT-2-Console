@@ -13,7 +13,7 @@ import DVlogo from '../src/static/img/DVlogo.png'
 import Login from "./components/Login";
 import history from "./stores/routingStore"
 import Overview from "./components/overview"
-import Adapt2 from "./components/adapt2";
+import Adapt2 from "./components/adapt-2/adapt2";
 const logo = require('./static/img/ADAlogo.jpg')
 
 const { SubMenu } = Menu;
@@ -68,7 +68,7 @@ export default class Dashboard extends Component {
                         <Content style={{ padding: '1%'}}>
                             {
                                 authStore? authStore.networkError === true?
-                                    <Alert style={{textAlign: 'center'}} message={'Error, '+ authStore.networkErrorMessage} type="error" />
+                                    <Alert style={{textAlign: 'center'}} message={ authStore.networkErrorMessage.toString() } type="error" />
                                     : '' : ''
                             }
                                 <Route exact path='/dashboard' component={Adapt2} />

@@ -16,7 +16,7 @@ import {
 } from 'antd';
 import { UploadOutlined, InboxOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { inject, observer } from 'mobx-react';
-import API_URL from '../config'
+import API_URL from '../../config'
 import 'antd/es/spin/style/css';
 const { TextArea } = Input;
 import { toJS } from 'mobx'
