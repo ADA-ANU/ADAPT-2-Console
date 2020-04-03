@@ -37,6 +37,7 @@ export default class APIInput extends Component{
     }
     onCancel = ()=>{
         this.props.systemStore.handleAPIInputModal(false)
+        this.props.systemStore.clearFailedAPI()
         if(this.props.newDatasetSwitch){
             this.props.newDatasetSwitch(false)
         }
@@ -75,6 +76,7 @@ export default class APIInput extends Component{
                 this.openNotificationWithIcon('error','APIs', 'please try again.')
             }
         }).catch(err=>{
+            this.props.systemStore.handleAPIInputModal(false)
             this.props.systemStore.clearFailedAPI()
             this.handleLoading(false)
             this.openNotificationWithIcon('error','APIs', err)

@@ -9,6 +9,7 @@ export class SystemStore{
     @observable apiInputOpen = false
     @observable failedAPI = []
     @observable dataverseSubjects = []
+    @observable showfinalResult = false
 
 
     constructor() {
@@ -42,6 +43,9 @@ export class SystemStore{
             .then(action(res => res.json()))
             .then(json=>this.dataverseSubjects = json)
             .catch(err => err)
+    }
+    @action handleFinalResultOpen(open){
+        this.showfinalResult = open
     }
 
 

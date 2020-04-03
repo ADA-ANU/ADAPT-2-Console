@@ -23,8 +23,10 @@ function DynamicField(props) {
             {(fields, { add, remove }) => {
                 return (
                     <div style={{display: 'inline'}}>
-                        {fields.map((field, index) => (
-                            <Form.Item
+                        {fields.map((field, index) => {
+                            console.log(field)
+                            console.log(index)
+                            return (<Form.Item
                                 {...(formItemLayout)}
                                 label={`Author ${index+2}`}
                                 rules={[
@@ -61,7 +63,7 @@ function DynamicField(props) {
                                 />
 
                             </Form.Item>
-                        ))}
+                            )})}
                         {/*<Divider />*/}
                         <Row gutter={16}>
                             <Col className="gutter-row" span={5} />

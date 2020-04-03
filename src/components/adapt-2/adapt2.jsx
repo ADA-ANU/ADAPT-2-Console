@@ -8,6 +8,8 @@ import { UploadOutlined, InboxOutlined, InfoCircleOutlined } from '@ant-design/i
 import axios from 'axios'
 import { toJS } from 'mobx'
 import DataverseForm from "./dataverseForm";
+import systemStore from "../../stores/systemStore";
+import FinalResult from "./finalResult";
 const { Dragger } = Upload;
 const { Panel } = Collapse;
 
@@ -19,9 +21,11 @@ export default class Adapt2 extends Component{
 
         fileList: [],
         uploading: false,
-        adaID: '',
+        adaID: null,
         formdata:[],
-        finalFiles: []
+        finalFiles: [],
+        formReset:false,
+        doi :null
 
     };
 
@@ -30,10 +34,22 @@ export default class Adapt2 extends Component{
     //         formdata: form
     //     })
     // }
-
+    clearResult=()=>{
+        this.setState({
+            finalFiles: [],
+            adaID: null,
+            doi :null
+        })
+    }
     handleUpload = (form) => {
         const { newDataset, server, dataverse, title, author, authorFields, email, description, subject, uploadSwitch } = form
         const { fileList } = this.state;
+        console.log(authorFields)
+        const dataverseID = dataverse[1]
+        let subjectIDs =[]
+        for(let sub of subject){
+            subjectIDs.push(sub[1])
+        }
         this.setState({
             formdata: form
         })
@@ -62,9 +78,9 @@ export default class Adapt2 extends Component{
                 authorFields: authorFields,
                 email: email,
                 description: description,
-                subject: subject,
+                subject: subjectIDs,
                 server: server,
-                dataverse: dataverse,
+                dataverse: dataverseID,
                 uploadSwitch: uploadSwitch,
                 userid: toJS(this.props.authStore.currentUser).userID
             }
@@ -82,20 +98,13 @@ export default class Adapt2 extends Component{
                     'Content-Type': 'application/json',
                 }
             }
-        ).then(res=>{
-            if (res.status ===201){
-                console.log(res)
-                return res.data
-            }
-            else if (res.status === 401){
-
-            }
-        }).then(json=>{
+        ).then(res=>res.data)
+            .then(json=>{
             if (json.success === true){
                 console.log(json)
-                this.setState({adaID: json.msg.adaid.adaID})
+                this.setState({adaID: json.msg.adaid})
                 const formData = new FormData();
-                formData.set('adaid', json.msg.adaid.adaID)
+                formData.set('adaid', json.msg.adaid)
                 formData.set('userid', toJS(this.props.authStore.currentUser).userID)
                 formData.set('datasetid', json.msg.dataset.id)
                 formData.set('server', json.msg.dataverse)
@@ -114,26 +123,87 @@ export default class Adapt2 extends Component{
                       console.log(data)
                       if (data.success ===true){
                           console.log("recovering")
-                          this.setState({
-                              uploading: false,
-                              finalFiles: fileList,
-                              fileList: []
-                          });
+                          const datasetObj={
+                              datasetid:json.msg.dataset.id,
+                              server: server,
+                              userid:toJS(this.props.authStore.currentUser).userID
+                          }
+                          const jsonData = JSON.stringify(datasetObj);
+                          axios.post(`${API_URL.QUERY_SITE}getDatasetInfo`, jsonData, {
+                                  headers: {
+                                      'Content-Type': 'application/json',
+                                  }
+                              }
+                          ).then(r=>r.data)
+                              .then(info=>{
+                                  let doi = info.data.authority?info.data.authority+'/'+info.data.identifier:null
+                                  this.setState({
+                                      uploading: false,
+                                      finalFiles: fileList,
+                                      fileList: [],
+                                      formReset: true,
+                                      doi: doi
+                                  });
+                                  systemStore.handleFinalResultOpen(true)
+                              }).catch(err=>{
+                                    if (err.response) {
+                                      this.setState({
+                                          uploading: false,
+                                          finalFiles: fileList,
+                                          fileList: [],
+                                          formReset: true,
+
+                                      });
+                                        systemStore.handleFinalResultOpen(true)
+                                    }
+                          })
+
                       }
                       else{
                           this.setState({
                               uploading: false,
-
+                              fileList: [],
+                              formReset: true
                           });
                           this.openNotificationWithIcon('error','files', data.msg.message)
                       }
                     }).catch(err=>{
                         console.log(err)
+                    this.setState({
+                        uploading: false,
+                        fileList: [],
+                        formReset: true
+                    });
                     this.openNotificationWithIcon('error','files', err)
                 })
             }
         }).catch(err=>{
-            this.openNotificationWithIcon('error','files', err)
+            if (err.response) {
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+                this.setState({
+                    uploading: false,
+                    fileList: [],
+                    formReset: true
+                });
+                if (err.response.status ===401){
+                    const servers = toJS(this.props.authStore.serverList)
+                    for (let serv of servers){
+                        if (serv.alias === server){
+                            this.props.systemStore.handleFailedAPI(serv.id, 2)
+                            this.props.systemStore.handleAPIInputModal(true)
+                        }
+                    }
+
+                }
+                else {
+                    this.openNotificationWithIcon('error','files', `${err.response.data.message}, please refresh the page and retry.`)
+                }
+
+            }
+            else {this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)}
+
         })
 
 
@@ -170,11 +240,12 @@ export default class Adapt2 extends Component{
 
 
     render() {
-        const { uploading, fileList, formdata, finalFiles } = this.state;
+        const { uploading, fileList, formdata, finalFiles, formReset, adaID, doi } = this.state;
+        const { systemStore } = this.props
         console.log(formdata)
         console.log(finalFiles)
         console.log(fileList)
-
+        console.log(systemStore.showfinalResult)
         const props = {
             onRemove: file => {
                 this.setState(state => {
@@ -218,7 +289,7 @@ export default class Adapt2 extends Component{
                         </div>
                     </Panel>
                     <Panel header="Dataset" key="2" extra={this.extraInfo("Create a dataset on dataverse")}>
-                        <DataverseForm handleFormData={this.handleUpload}/>
+                        <DataverseForm handleFormData={this.handleUpload} files={fileList} formReset={formReset}/>
                     </Panel>
 
                 </Collapse>
@@ -235,6 +306,20 @@ export default class Adapt2 extends Component{
                             {uploading ? 'Uploading' : 'Go'}
                         </Button>
                     </div>
+                    <div style={{marginTop: '3%', paddingBottom: '3%', textAlign:'center'}}>
+                        <Button
+                            //form="createDataset"
+                            //key="submit"
+                            //htmlType="submit"
+                            type="primary"
+                            onClick={()=>{systemStore.handleFinalResultOpen(true)}}
+                            // disabled={fileList.length === 0}
+                            loading={uploading}
+                        >
+                            test
+                        </Button>
+                    </div>
+                    <FinalResult dataset={formdata} adaid={adaID} doi={doi} files={finalFiles} clearResult={this.clearResult}/>
                 </div>
 
             </div>

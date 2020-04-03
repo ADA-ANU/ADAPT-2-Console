@@ -7,6 +7,7 @@ import APIInput from "./apiInput";
 import { toJS } from 'mobx'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import DynamicField from "./dynamicFields";
+import FinalResult from "./finalResult";
 const { TextArea } = Input;
 
 @inject('routingStore', 'systemStore', 'authStore')
@@ -91,13 +92,14 @@ export default class DataverseForm extends Component{
 
 
     render() {
-        const { authStore, systemStore } = this.props
+        const { authStore, systemStore, files, formReset } = this.props
         const serverList = toJS(authStore.serverList)
         const user = toJS(authStore.currentUser)
         const dataverses = toJS(authStore.Dataverses)
         console.log(user)
         console.log(serverList)
         console.log(this.state.selectedDataverse)
+        console.log(files)
         return (
             <>
                 <Form
@@ -186,7 +188,7 @@ export default class DataverseForm extends Component{
                                 dataverses && this.state.selectedServer?
                                     dataverses[this.state.selectedServer].dataverses.map(dataverse=>{
                                         return(
-                                            <Select.Option key={dataverse.id} value={dataverse.id}>{dataverse.title}</Select.Option>
+                                            <Select.Option key={dataverse.id} value={[dataverse.title, dataverse.id]}>{dataverse.title}</Select.Option>
                                         )
                                     }):<Select.Option value={0}>Loading</Select.Option>
 
@@ -249,6 +251,7 @@ export default class DataverseForm extends Component{
                             {
                                 required: this.state.createDataset,
                                 message: "Please input email.",
+                                type: 'email'
                             },
                         ]}
                     >
@@ -298,7 +301,7 @@ export default class DataverseForm extends Component{
                             {
                                 systemStore.dataverseSubjects && systemStore.dataverseSubjects.length>0?
                                     systemStore.dataverseSubjects.map(subject=>
-                                            <Select.Option value={subject.id} key={subject.id} label={subject.subjectname}>
+                                            <Select.Option value={[subject.subjectname,subject.id]} key={subject.id} label={subject.subjectname}>
                                                 {subject.subjectname}
                                             </Select.Option>
                                     ):null
@@ -320,7 +323,7 @@ export default class DataverseForm extends Component{
                         <Switch
                             // defaultChecked={true}
                             //checked={this.state.fileUploadSwitch}
-                            disabled={!this.state.createDataset}
+                            disabled={!this.state.createDataset || files.length===0}
                             checkedChildren="Yes"
                             unCheckedChildren="No"
                             onChange={this.fileUploadSwitchOnChange}/>
