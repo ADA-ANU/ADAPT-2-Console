@@ -12,13 +12,14 @@ import {
     Button,
     ConfigProvider,
     Modal,
-    Popover, notification
+    Popover, notification, Typography, Alert
 } from 'antd';
 import { UploadOutlined, InboxOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { inject, observer } from 'mobx-react';
 import API_URL from '../../config'
 import 'antd/es/spin/style/css';
 const { TextArea } = Input;
+const { Text } = Typography;
 import { toJS } from 'mobx'
 import axios from "axios";
 
@@ -185,6 +186,9 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, i
                                     },
                                 ]}
                             >
+                                <div style={{paddingBottom:'2%'}}>
+                                    <Alert message={api.msg} type="warning" showIcon />
+                                </div>
                                 <Input
                                     placeholder={`API key for ${APIs[api.id-1].servername}`}
                                 />
@@ -193,10 +197,18 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, i
                 }
 
             </Form>
-            <Popover placement="topLeft" content={"Log into the specific dataverse, click your name on the top right corner and then click API token in the dropdown menu."} trigger="click">
-                {/*<InfoCircleOutlined />*/}
-                <span style={{marginLeft:'2%', color:'red',cursor:'pointer'}}>Where can I find the API key?</span>
-            </Popover>
+            <div>
+                <Popover placement="topLeft" content={"Log into the specific dataverse, click your name on the top right corner and then click API token in the dropdown menu."} trigger="click">
+                    {/*<InfoCircleOutlined />*/}
+                    <span style={{marginLeft:'2%', color:'red',cursor:'pointer'}}>Where can I find the API key?</span>
+                </Popover>
+            </div>
+            <div>
+                <Popover placement="topLeft" content={"It's either the API key you entered is wrong or your account does not have permission on that specific dataverse."} trigger="click">
+                    {/*<InfoCircleOutlined />*/}
+                    <span style={{marginLeft:'2%', color:'red',cursor:'pointer'}}>What does "Not Authorised" mean?</span>
+                </Popover>
+            </div>
         </Modal>
     );
 };

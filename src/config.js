@@ -4,7 +4,7 @@ const DEV_ROOT = 'http://localhost:3000/'
 const PROD_API_URL = {
     ROOT_URL: PROD_ROOT,
     SITE: PROD_ROOT+'site',
-    QUERY_SITE: PROD_ROOT+'query'
+    QUERY_SITE: PROD_ROOT+'api/'
 }
 const DEV_API_URL = {
     ROOT_URL: DEV_ROOT,

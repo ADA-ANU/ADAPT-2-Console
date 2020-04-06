@@ -32,8 +32,8 @@ export class SystemStore{
     @action handleAPIInputModal(open) {
         this.apiInputOpen = open
     }
-    @action handleFailedAPI (api, type){
-        this.failedAPI.push({id:api, type:type})
+    @action handleFailedAPI (api, type, msg){
+        this.failedAPI.push({id:api, type:type, msg:msg})
     }
     @action clearFailedAPI(){
         this.failedAPI = []

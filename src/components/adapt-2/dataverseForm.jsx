@@ -46,7 +46,7 @@ export default class DataverseForm extends Component{
         if (servers.length>0) {
             servers.map(server=>{
                 if(!server.API){
-                    this.props.systemStore.handleFailedAPI(server.id, 1)
+                    this.props.systemStore.handleFailedAPI(server.id, 1, 'No API found.')
                     this.props.systemStore.handleAPIInputModal(true)
                 }
             })

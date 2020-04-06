@@ -4,7 +4,7 @@ import { toJS } from 'mobx'
 import { Switch, Route, withRouter, Link } from 'react-router-dom';
 import './App.css';
 import 'antd/es/spin/style/css';
-import { Layout, Menu, Spin, Typography, Button, Tooltip, Alert, Row, Col, Badge } from 'antd';
+import { Layout, Menu, Spin, Typography, Button, Tooltip, Alert, Row, Col, Badge, Dropdown } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import ADAlogo from '../src/static/img/ADAlogo.jpg';
 import ANUlogo from '../src/static/img/ANUlogo.png';
@@ -34,8 +34,16 @@ export default class Dashboard extends Component {
     render() {
         const {routingStore, systemStore, authStore} = this.props
         const user = toJS(authStore.currentUser)
+        const menu = (
+            <Menu>
+                <Menu.Item key="0">
+                    <span style={{cursor:'pointer'}} onClick={()=>{authStore.logout()}}>Log out</span>
+
+                </Menu.Item>
+            </Menu>
+        )
         return(
-                <Spin spinning={authStore?authStore.siteLoading : true} tip="Loading...">
+                <Spin style={{ marginTop:'12%' }} spinning={authStore?authStore.siteLoading : true} tip="Loading..." >
 
                     <Layout style={{background: '#f0f2f5'}}>
                         <Header style={{ background: "white", width: '100%', height: '64px', lineHeight:'64px', padding: '0px',fontSize: '100', boxShadow: '0 1px 4px rgba(0,21,41,0.08'}}>
@@ -51,16 +59,18 @@ export default class Dashboard extends Component {
                                         selectedKeys={[routingStore? routingStore.history.location.pathname : '/']}
                                         style={{ lineHeight:'64px',height: '64px', borderBottom: '0px'}}
                                     >
-                                        <Menu.Item key='/dashboard'><Link to='/dashboard'>Over View</Link></Menu.Item>
-                                        <Menu.Item key='/dashboard/adapt2'><Link to='/dashboard/adapt2'>ADAPT 2</Link></Menu.Item>
-                                        <Menu.Item key='/dashboard/forcode'><Link to='/dashboard/forcode'>FOR Code</Link></Menu.Item>
-                                        <Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>
+                                        <Menu.Item key='/dashboard'><Link to='/dashboard'>ADAPT 2</Link></Menu.Item>
+                                        {/*<Menu.Item key='/dashboard/adapt2'><Link to='/dashboard/adapt2'>ADAPT 2</Link></Menu.Item>*/}
+                                        {/*<Menu.Item key='/dashboard/forcode'><Link to='/dashboard/forcode'>FOR Code</Link></Menu.Item>*/}
+                                        {/*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*/}
                                     </Menu>
                                 </Col>
                                 <Col span={4} >
-                                    <Badge count={5}>
-                                        <Button type='primary' shape="circle" icon={<UserOutlined />} />
-                                    </Badge>
+                                    <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+                                        <Badge count={0}>
+                                            <Button type='primary' shape="circle" icon={<UserOutlined />} />
+                                        </Badge>
+                                    </Dropdown>
                                     <span style={{paddingLeft: '4%'}}>{user? user.userName: ""}</span>
                                 </Col>
                             </Row>

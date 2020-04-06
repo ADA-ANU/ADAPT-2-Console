@@ -52,7 +52,7 @@ class AuthStore {
                     this.currentUser = json.user
                     return this.getServerList(json.user.userID)
                         .then(action(res=>{
-                            return true
+                            return this.getAllDataverse()
                         }))
 
                 }
@@ -62,6 +62,7 @@ class AuthStore {
                     return false
                 }
             }))
+            .catch(err=>window.location='/dashboard')
     }
 
     @action loadSite(){
@@ -118,12 +119,20 @@ class AuthStore {
         this.dataverseList = value
 
     }
+    @action logout(){
+        return fetch(API_URL.QUERY_SITE + `logout`,{credentials: 'include'})
+            .then(action(res=>{
+                if (res.status ===200){
+                    window.location = '/unauthorised'
+                }
+            }))
+    }
 
     @action async init(){
         this.siteLoading = true
         await this.loadSite()
         await this.authenticate()
-        await this.getAllDataverse()
+        //await this.getAllDataverse()
         this.siteLoading = false
 
        //  {

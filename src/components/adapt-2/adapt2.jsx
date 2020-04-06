@@ -25,8 +25,8 @@ export default class Adapt2 extends Component{
         formdata:[],
         finalFiles: [],
         formReset:false,
-        doi :null
-
+        doi :null,
+        returnedFiles:[]
     };
 
     // handleFormData = (form)=>{
@@ -38,26 +38,26 @@ export default class Adapt2 extends Component{
         this.setState({
             finalFiles: [],
             adaID: null,
-            doi :null
+            doi :null,
+            returnedFiles:[]
         })
     }
     handleUpload = (form) => {
         const { newDataset, server, dataverse, title, author, authorFields, email, description, subject, uploadSwitch } = form
         const { fileList } = this.state;
         console.log(authorFields)
-        const dataverseID = dataverse[1]
-        let subjectIDs =[]
-        for(let sub of subject){
-            subjectIDs.push(sub[1])
-        }
+
+
         this.setState({
             formdata: form
         })
 
         let obj ={}
+        let finalDemo = {}
         if (newDataset === false){
             obj = {
                 //doi: null,
+                newDataset: false,
                 title: null,
                 author: null,
                 email: null,
@@ -66,10 +66,16 @@ export default class Adapt2 extends Component{
                 server: null,
                 dataverse: null,
                 uploadSwitch: false,
-                userid: toJS(this.props.authStore.currentUser).userID
+                userid: toJS(this.props.authStore.currentUser).userID,
+
             }
         }
         else {
+            const dataverseID = dataverse[1]
+            let subjectIDs =[]
+            for(let sub of subject){
+                subjectIDs.push(sub[1])
+            }
             obj = {
                 //doi: doi,
                 newDataset: newDataset,
@@ -109,6 +115,7 @@ export default class Adapt2 extends Component{
                 formData.set('datasetid', json.msg.dataset.id)
                 formData.set('server', json.msg.dataverse)
                 formData.set('uploadSwitch', uploadSwitch)
+                formData.set('newDataset', newDataset)
 
                 fileList.forEach(file => {
                     formData.append('file', file);
@@ -123,30 +130,32 @@ export default class Adapt2 extends Component{
                       console.log(data)
                       if (data.success ===true){
                           console.log("recovering")
-                          const datasetObj={
-                              datasetid:json.msg.dataset.id,
-                              server: server,
-                              userid:toJS(this.props.authStore.currentUser).userID
-                          }
-                          const jsonData = JSON.stringify(datasetObj);
-                          axios.post(`${API_URL.QUERY_SITE}getDatasetInfo`, jsonData, {
-                                  headers: {
-                                      'Content-Type': 'application/json',
-                                  }
+                          this.setState({returnedFiles:data.files})
+                          if (newDataset){
+                              const datasetObj={
+                                  datasetid:json.msg.dataset.id,
+                                  server: server,
+                                  userid:toJS(this.props.authStore.currentUser).userID
                               }
-                          ).then(r=>r.data)
-                              .then(info=>{
-                                  let doi = info.data.authority?info.data.authority+'/'+info.data.identifier:null
-                                  this.setState({
-                                      uploading: false,
-                                      finalFiles: fileList,
-                                      fileList: [],
-                                      formReset: true,
-                                      doi: doi
-                                  });
-                                  systemStore.handleFinalResultOpen(true)
-                              }).catch(err=>{
-                                    if (err.response) {
+                              const jsonData = JSON.stringify(datasetObj);
+                              axios.post(`${API_URL.QUERY_SITE}getDatasetInfo`, jsonData, {
+                                      headers: {
+                                          'Content-Type': 'application/json',
+                                      }
+                                  }
+                              ).then(r=>r.data)
+                                  .then(info=>{
+                                      let doi = info.data.authority?info.data.authority+'/'+info.data.identifier:null
+                                      this.setState({
+                                          uploading: false,
+                                          finalFiles: fileList,
+                                          fileList: [],
+                                          formReset: true,
+                                          doi: doi
+                                      });
+                                      systemStore.handleFinalResultOpen(true)
+                                  }).catch(err=>{
+                                  if (err.response) {
                                       this.setState({
                                           uploading: false,
                                           finalFiles: fileList,
@@ -154,14 +163,26 @@ export default class Adapt2 extends Component{
                                           formReset: true,
 
                                       });
-                                        systemStore.handleFinalResultOpen(true)
-                                    }
-                          })
+                                      systemStore.handleFinalResultOpen(true)
+                                  }
+                              })
+                          }
+                            else{
+                              this.setState({
+                                  uploading: false,
+                                  finalFiles: fileList,
+                                  fileList: [],
+                                  formReset: true,
+                              });
+                              systemStore.handleFinalResultOpen(true)
+                          }
+
 
                       }
                       else{
                           this.setState({
                               uploading: false,
+                              finalFiles: fileList,
                               fileList: [],
                               formReset: true
                           });
@@ -171,6 +192,7 @@ export default class Adapt2 extends Component{
                         console.log(err)
                     this.setState({
                         uploading: false,
+                        finalFiles: fileList,
                         fileList: [],
                         formReset: true
                     });
@@ -184,6 +206,7 @@ export default class Adapt2 extends Component{
                 console.log(err.response.headers);
                 this.setState({
                     uploading: false,
+                    finalFiles: fileList,
                     fileList: [],
                     formReset: true
                 });
@@ -191,18 +214,28 @@ export default class Adapt2 extends Component{
                     const servers = toJS(this.props.authStore.serverList)
                     for (let serv of servers){
                         if (serv.alias === server){
-                            this.props.systemStore.handleFailedAPI(serv.id, 2)
+                            this.props.systemStore.handleFailedAPI(serv.id, 2, err.response.data)
                             this.props.systemStore.handleAPIInputModal(true)
                         }
                     }
 
                 }
                 else {
+
                     this.openNotificationWithIcon('error','files', `${err.response.data.message}, please refresh the page and retry.`)
                 }
 
             }
-            else {this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)}
+
+            else {
+                this.setState({
+                    uploading: false,
+                    finalFiles: fileList,
+                    fileList: [],
+                    formReset: true
+                })
+                this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
+            }
 
         })
 
@@ -240,8 +273,8 @@ export default class Adapt2 extends Component{
 
 
     render() {
-        const { uploading, fileList, formdata, finalFiles, formReset, adaID, doi } = this.state;
-        const { systemStore } = this.props
+        const { uploading, fileList, formdata, finalFiles, formReset, adaID, doi, returnedFiles } = this.state;
+        const { systemStore, authStore } = this.props
         console.log(formdata)
         console.log(finalFiles)
         console.log(fileList)
@@ -268,7 +301,7 @@ export default class Adapt2 extends Component{
             fileList,
         };
         return (
-            <div style={{background: 'white'}}>
+            <div style={{background: 'white', paddingTop:'2%'}}>
                 <div style={{width: '50%', margin: 'auto'}}>
                 <Collapse
                     defaultActiveKey={['1', '2']}
@@ -306,20 +339,8 @@ export default class Adapt2 extends Component{
                             {uploading ? 'Uploading' : 'Go'}
                         </Button>
                     </div>
-                    <div style={{marginTop: '3%', paddingBottom: '3%', textAlign:'center'}}>
-                        <Button
-                            //form="createDataset"
-                            //key="submit"
-                            //htmlType="submit"
-                            type="primary"
-                            onClick={()=>{systemStore.handleFinalResultOpen(true)}}
-                            // disabled={fileList.length === 0}
-                            loading={uploading}
-                        >
-                            test
-                        </Button>
-                    </div>
-                    <FinalResult dataset={formdata} adaid={adaID} doi={doi} files={finalFiles} clearResult={this.clearResult}/>
+
+                    <FinalResult dataset={formdata} adaid={adaID} doi={doi} files={returnedFiles} clearResult={this.clearResult}/>
                 </div>
 
             </div>
