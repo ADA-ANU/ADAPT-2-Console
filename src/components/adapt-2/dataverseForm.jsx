@@ -99,7 +99,7 @@ export default class DataverseForm extends Component{
         console.log(user)
         console.log(serverList)
         console.log(this.state.selectedDataverse)
-        console.log(files)
+        console.log(dataverses)
         return (
             <>
                 <Form

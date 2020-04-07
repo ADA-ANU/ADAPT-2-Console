@@ -62,7 +62,7 @@ class AuthStore {
                     return false
                 }
             }))
-            .catch(err=>window.location='/dashboard')
+            .catch(err=>window.location='/unauthorised')
     }
 
     @action loadSite(){
@@ -130,8 +130,11 @@ class AuthStore {
 
     @action async init(){
         this.siteLoading = true
+        console.log("loading site")
         await this.loadSite()
+        console.log("Authenticating")
         await this.authenticate()
+        console.log("finished")
         //await this.getAllDataverse()
         this.siteLoading = false
 
