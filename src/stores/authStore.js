@@ -62,7 +62,7 @@ class AuthStore {
                     return false
                 }
             }))
-            .catch(err=>window.location='/unauthorised')
+            .catch(err=>window.location='/#/unauthorised')
     }
 
     @action loadSite(){
@@ -123,7 +123,7 @@ class AuthStore {
         return fetch(API_URL.QUERY_SITE + `logout`,{credentials: 'include'})
             .then(action(res=>{
                 if (res.status ===200){
-                    window.location = '/unauthorised'
+                    window.location = '/#/unauthorised'
                 }
             }))
     }
