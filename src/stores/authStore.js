@@ -44,6 +44,7 @@ class AuthStore {
     }
 
     @action authenticate(){
+        console.log("Authenticating")
         return fetch(API_URL.QUERY_SITE+'authenticate', {credentials: 'include'})
             .then(action(res=>res.json()))
             .then(action(json=>{
@@ -53,6 +54,9 @@ class AuthStore {
                     return this.getServerList(json.user.userID)
                         .then(action(res=>{
                             return this.getAllDataverse()
+                                .then(action(res=>{
+                                    return true
+                                }))
                         }))
 
                 }
@@ -132,7 +136,6 @@ class AuthStore {
         this.siteLoading = true
         console.log("loading site")
         await this.loadSite()
-        console.log("Authenticating")
         await this.authenticate()
         console.log("finished")
         //await this.getAllDataverse()

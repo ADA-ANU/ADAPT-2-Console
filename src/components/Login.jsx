@@ -12,9 +12,11 @@ import aaf_login from '../static/img/aaf_login.png'
 @observer
 export default class Login extends Component{
     componentDidMount() {
+        console.log("authenticating")
         this.props.authStore.authenticate()
             .then(res=>{
                 if(res === true){
+                    console.log("authenticating YES")
                     this.props.history.push('/dashboard')
                 }
             })
