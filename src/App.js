@@ -1,6 +1,7 @@
 import React, { Component }from 'react';
 import logo from './logo.svg';
 import './App.css';
+import 'antd/es/spin/style/css';
 import Dashboard from "./Dashboard";
 import Login from "./components/Login";
 import UnauthorisedLogin from "./components/LoginFail";
@@ -8,6 +9,8 @@ import { Switch, Route, withRouter, Link } from 'react-router-dom';
 import {inject, observer} from "mobx-react";
 import PageNotFound from '../src/static/img/404.png'
 import history from "./stores/routingStore"
+import { Button } from 'antd';
+import { RollbackOutlined } from '@ant-design/icons';
 
 @inject('routingStore', 'systemStore', 'authStore')
 @observer
@@ -18,7 +21,9 @@ class App extends Component {
       const NotFound = () => (
           <div>
               <img src={PageNotFound} style={{ display: 'block', margin: 'auto', position: 'relative' }} />
-              <center><span style={{fontSize:'40px'}}><Link to="/">Return to Home Page</Link></span></center>
+              <center><Button type="primary" shape="round" icon={<RollbackOutlined />} size='large' onClick={()=>window.location='/#/dashboard'}>
+                  Return to Home Page
+              </Button></center>
           </div>
       );
     return(
