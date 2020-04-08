@@ -132,7 +132,7 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, i
             title="We need your API keys for operations on Dataverses."
             // okText="Submit"
             // cancelText="Cancel"
-            //onCancel={onCancel}
+            // onCancel={onCancel}
             // onOk={() => {
             //     form
             //         .validateFields()
@@ -149,8 +149,8 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, i
                     Return
                 </Button>,
                 <Button key="submit" type="primary" loading={isLoading} onClick={() => {
-                    form
-                        .validateFields()
+                    console.log(form.fields)
+                    form.validateFields()
                         .then(values => {
                             form.resetFields();
                             onCreate(values);
@@ -177,22 +177,27 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, i
                         NeededAPIs.map(api=>
                             <Form.Item
                                 key={api.id-1}
-                                name={api.id}
                                 label={APIs[api.id-1].servername}
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: `Please input the API key for ${APIs[api.id-1].servername}!`,
-                                    },
-                                ]}
                             >
                                 <div style={{paddingBottom:'2%'}}>
                                     <Alert message={api.msg} type="warning" showIcon />
                                 </div>
-                                <Input
+                                <Form.Item
+                                    name={api.id}
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: `Please input the API key for ${APIs[api.id-1].servername}!`,
+                                        },
+                                    ]}
+                                >
+                                    <Input
                                     placeholder={`API key for ${APIs[api.id-1].servername}`}
-                                />
+                                    />
+                                </Form.Item>
+
                             </Form.Item>
+
                         ): null
                 }
 
