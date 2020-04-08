@@ -5,7 +5,7 @@ import API_URL from '../config'
 class AuthStore {
     @observable currentUser = {};
     @observable loginErrorMessage = ''
-    @observable aafLoginUrl = 'https://rapid.test.aaf.edu.au/jwt/authnrequest/research/sr3HM5tqO9SC3suYKNF9iQ'
+    @observable aafLoginUrl = process.env.REACT_APP_MODE === 'dev'? 'https://rapid.test.aaf.edu.au/jwt/authnrequest/research/sr3HM5tqO9SC3suYKNF9iQ': 'https://rapid.test.aaf.edu.au/jwt/authnrequest/research/hA1-nlUYKWaacoFmaC5tag'
     @observable networkError = false
     @observable networkErrorMessage = ''
     @observable siteLoading = false
