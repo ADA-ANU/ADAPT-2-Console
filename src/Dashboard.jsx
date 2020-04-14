@@ -15,7 +15,7 @@ import history from "./stores/routingStore"
 import Overview from "./components/overview"
 import Adapt2 from "./components/adapt-2/adapt2";
 const logo = require('./static/img/ADAlogo.jpg')
-
+import NotFound from "./404page";
 const { SubMenu } = Menu;
 const { Header, Content, Footer } = Layout;
 const { Title } = Typography;
@@ -48,10 +48,11 @@ export default class Dashboard extends Component {
                     <Layout style={{background: '#f0f2f5'}}>
                         <Header style={{ background: "white", width: '100%', height: '64px', lineHeight:'64px', padding: '0px',fontSize: '100', boxShadow: '0 1px 4px rgba(0,21,41,0.08'}}>
                             <Row>
-                                <Col span={4} style={{marginLeft: '68px',marginTop:'auto', marginBottom:'auto', marginRight:'32px'}}>
-                                    <img alt='LOGO' className="logo" style={{ height: 'auto', cursor:'pointer'}} src={ADAlogo} onClick={()=>{history.push('/overview')}} />
+                                {/*marginLeft: '68px', marginRight:'32px' style={{marginTop:'auto', marginBottom:'auto'}}*/}
+                                <Col xs={{ span: 4, offset: 1 }} sm={{ span: 4, offset: 2 }} md={{ span: 4, offset: 1 }} lg={{ span: 4, offset: 1 }} xl={{ span: 4, offset: 1 }} xxl={{ span: 4, offset: 1 }} >
+                                    <img alt='LOGO' className="logo" style={{ width:'80%', cursor:'pointer'}} src={ADAlogo} onClick={()=>{history.push('/overview')}} />
                                 </Col>
-                                <Col span={14}>
+                                <Col xs={{ span: 16, offset: 0 }} sm={{ span: 12, offset: 0 }} md={{ span: 13, offset: 0 }} lg={{ span: 13, offset: 0 }} xl={{ span: 13, offset: 0 }} xxl={{ span: 13, offset: 0 }}>
                                     <Menu
                                         theme='light'
                                         mode='horizontal'
@@ -60,29 +61,34 @@ export default class Dashboard extends Component {
                                         style={{ lineHeight:'64px',height: '64px', borderBottom: '0px'}}
                                     >
                                         <Menu.Item key='/dashboard'><Link to='/dashboard'>ADAPT 2</Link></Menu.Item>
-                                        {/*<Menu.Item key='/dashboard/adapt2'><Link to='/dashboard/adapt2'>ADAPT 2</Link></Menu.Item>*/}
+                                        {/*<Menu.Item key='/dashboard/adapt2'><Link to='/dashboard/adapt2'>ADAPT 3</Link></Menu.Item>*/}
                                         {/*<Menu.Item key='/dashboard/forcode'><Link to='/dashboard/forcode'>FOR Code</Link></Menu.Item>*/}
                                         {/*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*/}
                                     </Menu>
                                 </Col>
-                                <Col span={4} >
-                                    <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
-                                        <Badge count={0}>
-                                            <Button type='primary' shape="circle" icon={<UserOutlined />} />
-                                        </Badge>
-                                    </Dropdown>
-                                    <span style={{paddingLeft: '4%'}}>{user? user.userName: ""}</span>
+                                <Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 0 }} md={{ span: 1, offset: 1 }} lg={{ span: 1, offset: 1 }} xl={{ span: 1, offset: 1 }} xxl={{ span: 1, offset: 1 }}>
+                                    <div style={{textAlign:'center'}}>
+                                        <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
+                                            <Badge count={0}>
+                                                <Button type='primary' shape="circle" icon={<UserOutlined />} />
+                                            </Badge>
+                                        </Dropdown>
+                                    </div>
+                                </Col>
+                                <Col xs={{ span: 0, offset: 1 }} sm={{ span: 4, offset: 1 }} md={{ span: 3, offset: 0 }} lg={{ span: 3, offset: 0 }} xl={{ span: 2, offset: 0 }} xxl={{ span: 2, offset: 0 }}>
+                                    <span>{user? user.userName: ""}</span>
                                 </Col>
                             </Row>
                         </Header>
                         <Content style={{ padding: '1%'}}>
-                            {
-                                authStore? authStore.networkError === true?
-                                    <Alert style={{textAlign: 'center'}} message={ authStore.networkErrorMessage.toString() } type="error" />
-                                    : '' : ''
-                            }
-                                <Route exact path='/dashboard' component={Adapt2} />
-                                <Route exact path='/dashboard/adapt2' component={Adapt2} />
+                                   {
+                                        authStore? authStore.networkError === true?
+                                            <Alert style={{textAlign: 'center'}} message={ authStore.networkErrorMessage.toString() } type="error" />
+                                            : '' : ''
+                                    }
+                                    <Route exact path='/dashboard' component={Adapt2} />
+                                    {/*<Route exact path='/dashboard/adapt2' component={Adapt2} />*/}
+
                         </Content>
                         <Footer>
                             <hr />

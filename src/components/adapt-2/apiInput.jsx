@@ -149,7 +149,7 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, i
                     Return
                 </Button>,
                 <Button key="submit" type="primary" loading={isLoading} onClick={() => {
-                    console.log(form.fields)
+                    //console.log(form.fields)
                     form.validateFields()
                         .then(values => {
                             form.resetFields();

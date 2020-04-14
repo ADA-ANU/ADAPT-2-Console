@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react';
 import { Switch, Route, withRouter, Link } from 'react-router-dom';
 import API_URL from '../../config'
 import 'antd/es/spin/style/css';
-import { Upload, Button, message, notification, Collapse, Popover,} from 'antd';
+import {Upload, Button, message, notification, Collapse, Popover, Col, Row,} from 'antd';
 import { UploadOutlined, InboxOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import axios from 'axios'
 import { toJS } from 'mobx'
@@ -302,45 +302,49 @@ export default class Adapt2 extends Component{
         };
         return (
             <div style={{background: 'white', paddingTop:'2%'}}>
-                <div style={{width: '50%', margin: 'auto'}}>
-                <Collapse
-                    defaultActiveKey={['1', '2']}
-                    // onChange={callback}
-                    // expandIconPosition={expandIconPosition}
-                >
-                    <Panel header="Files" key="1" extra={this.extraInfo("Select files to upload to ADA directory")}>
-                        <div >
-                            <Dragger {...props}>
-                                <p className="ant-upload-drag-icon">
-                                    <InboxOutlined />
-                                </p>
-                                <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                                <p className="ant-upload-hint">
-                                    Both single and multiple file uploading are supported.
-                                </p>
-                            </Dragger>
-                        </div>
-                    </Panel>
-                    <Panel header="Dataset" key="2" extra={this.extraInfo("Create a dataset on dataverse")}>
-                        <DataverseForm handleFormData={this.handleUpload} files={fileList} formReset={formReset}/>
-                    </Panel>
-
-                </Collapse>
-                    <div style={{marginTop: '3%', paddingBottom: '3%', textAlign:'center'}}>
-                        <Button
-                            form="createDataset"
-                            key="submit"
-                            htmlType="submit"
-                            type="primary"
-                            //onClick={this.handleUpload}
-                            // disabled={fileList.length === 0}
-                            loading={uploading}
+                <div style={{ margin: 'auto'}}>
+                    <Row>
+                        <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
+                            <Collapse
+                            defaultActiveKey={['1', '2']}
+                            // onChange={callback}
+                            // expandIconPosition={expandIconPosition}
                         >
-                            {uploading ? 'Uploading' : 'Go'}
-                        </Button>
-                    </div>
+                            <Panel header="Files" key="1" extra={this.extraInfo("Select files to upload to ADA directory")}>
+                                <div >
+                                    <Dragger {...props}>
+                                        <p className="ant-upload-drag-icon">
+                                            <InboxOutlined />
+                                        </p>
+                                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                                        <p className="ant-upload-hint">
+                                            Both single and multiple file uploading are supported.
+                                        </p>
+                                    </Dragger>
+                                </div>
+                            </Panel>
+                            <Panel header="Dataset" key="2" extra={this.extraInfo("Create a dataset on dataverse")}>
+                                <DataverseForm handleFormData={this.handleUpload} files={fileList} formReset={formReset}/>
+                            </Panel>
 
-                    <FinalResult dataset={formdata} adaid={adaID} doi={doi} files={returnedFiles} clearResult={this.clearResult}/>
+                        </Collapse>
+                            <div style={{marginTop: '3%', paddingBottom: '3%', textAlign:'center'}}>
+                                <Button
+                                    form="createDataset"
+                                    key="submit"
+                                    htmlType="submit"
+                                    type="primary"
+                                    //onClick={this.handleUpload}
+                                    // disabled={fileList.length === 0}
+                                    loading={uploading}
+                                >
+                                    {uploading ? 'Uploading' : 'Go'}
+                                </Button>
+                            </div>
+
+                            <FinalResult dataset={formdata} adaid={adaID} doi={doi} files={returnedFiles} clearResult={this.clearResult}/>
+                        </Col>
+                    </Row>
                 </div>
 
             </div>
