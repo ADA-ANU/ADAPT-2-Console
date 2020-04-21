@@ -17,8 +17,8 @@ export default class DataverseForm extends Component{
         createDataset: false,
         fileUploadSwitch: true,
         modalOpen: false,
-        selectedServer: '',
-        selectedDataverse: ''
+        selectedServer: null,
+        selectedDataverse: null
     }
 
     formRef = React.createRef();
@@ -173,7 +173,7 @@ export default class DataverseForm extends Component{
                     >
                         <Select
                             showSearch
-                            disabled={!this.state.createDataset}
+                            disabled={!this.state.createDataset || this.state.selectedServer === null}
                             placeholder="Select a dataverse"
                             optionFilterProp="children"
                             onChange={this.dataverseOnChange}

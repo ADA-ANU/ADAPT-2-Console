@@ -189,6 +189,11 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, i
                                             required: true,
                                             message: `Please input the API key for ${APIs[api.id-1].servername}!`,
                                         },
+                                        {
+                                            type: 'string',
+                                            pattern: '^[0-9A-Za-z\\-]+$',
+                                            message: 'This field must be a valid Dataverse API key.'
+                                        }
                                     ]}
                                 >
                                     <Input

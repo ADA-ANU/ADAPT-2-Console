@@ -13,6 +13,7 @@ class AuthStore {
     @observable serverList = []
     @observable Dataverses ={}
     @observable dataverseList = []
+    @observable adaFolderList  =[]
     //@observable isLoading = false;
     //@observable errors = undefined;
     //@observable ws = undefined;
@@ -109,11 +110,11 @@ class AuthStore {
                     throw new Error('Unable to download dataverse list, please refresh the page to try again.')
                 }
             }))
-            .then(json=>{
+            .then(action(json=>{
 
                     this.networkError = false
                     this.Dataverses = json.msg
-                })
+                }))
             .catch(err => {
                 this.networkError = true
                 this.networkErrorMessage = err
@@ -126,10 +127,30 @@ class AuthStore {
     @action logout(){
         return fetch(API_URL.QUERY_SITE + `logout`,{credentials: 'include'})
             .then(action(res=>{
-                if (res.status ===200){
+                if (res.status ===201){
                     window.location = '/#/unauthorised'
                 }
-            }))
+            })).catch(err => {
+                this.networkError = true
+                this.networkErrorMessage = err
+            })
+    }
+
+    @action getADAFolderList(){
+        return fetch(API_URL.QUERY_SITE + `adaFolderList`,{credentials: 'include'})
+            .then(action(res=>{
+                if (res.status === 201){
+                    return res.json()
+                }
+                else {
+                    throw new Error('Unable to get ADA folder list, please refresh the page to try again.')
+                }
+            })).then(action(json=>{
+                    this.adaFolderList = json
+                })).catch(err => {
+                this.networkError = true
+                this.networkErrorMessage = err
+            })
     }
 
     @action async init(){
@@ -137,8 +158,8 @@ class AuthStore {
         console.log("loading site")
         await this.loadSite()
         await this.authenticate()
+        await this.getADAFolderList()
         console.log("finished")
-        //await this.getAllDataverse()
         this.siteLoading = false
 
        //  {

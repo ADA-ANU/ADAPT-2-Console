@@ -14,6 +14,7 @@ import Login from "./components/Login";
 import history from "./stores/routingStore"
 import Overview from "./components/overview"
 import Adapt2 from "./components/adapt-2/adapt2";
+import DataverseFiles from "./components/adapt-2/dataverseFiles";
 const logo = require('./static/img/ADAlogo.jpg')
 import NotFound from "./404page";
 const { SubMenu } = Menu;
@@ -61,7 +62,7 @@ export default class Dashboard extends Component {
                                         style={{ lineHeight:'64px',height: '64px', borderBottom: '0px'}}
                                     >
                                         <Menu.Item key='/dashboard'><Link to='/dashboard'>ADAPT 2</Link></Menu.Item>
-                                        {/*<Menu.Item key='/dashboard/adapt2'><Link to='/dashboard/adapt2'>ADAPT 3</Link></Menu.Item>*/}
+                                        <Menu.Item key='/dashboard/dataverseFiles'><Link to='/dashboard/dataverseFiles'>Dataverse Files</Link></Menu.Item>
                                         {/*<Menu.Item key='/dashboard/forcode'><Link to='/dashboard/forcode'>FOR Code</Link></Menu.Item>*/}
                                         {/*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*/}
                                     </Menu>
@@ -87,7 +88,7 @@ export default class Dashboard extends Component {
                                             : '' : ''
                                     }
                                     <Route exact path='/dashboard' component={Adapt2} />
-                                    {/*<Route exact path='/dashboard/adapt2' component={Adapt2} />*/}
+                                    <Route exact path='/dashboard/dataverseFiles' component={DataverseFiles} />
 
                         </Content>
                         <Footer>
