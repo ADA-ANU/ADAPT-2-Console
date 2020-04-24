@@ -252,18 +252,28 @@ export default class DataverseFiles extends Component{
                             this.setState({doi: doi})
                             this.props.systemStore.getFileListByDOI(doi, temp[0].alias)
                         }
+                        else {
+                            console.log("AAAAAAAAAAAAAA")
+                            this.props.systemStore.resetFileList()
+                        }
                     }
                     else {
                         this.setState({doiMessage:"Server not found."})
+
                     }
                     this.setState({server: ser})
                 }
                 else {
-                    this.setState({server: server})
+                    this.setState({server: server, doiMessage: null})
                 }
+            }
+        else{
+                this.setState({server: null, doi: null})
+                this.props.systemStore.resetFileList()
             }
         }
         else if(value.length ===0){
+            this.props.systemStore.resetFileList()
             this.setState({
                 doiExisting:false,
                 doi: null,
@@ -333,7 +343,8 @@ export default class DataverseFiles extends Component{
                                     this.state.server?
                                         <div style={{marginLeft:'21%', marginBottom:'1vh'}}><Tag color="default" style={{width: '3vw',textAlign:'center'}}>Server: </Tag>
                                             <span>{this.state.server}</span>
-                                            <Tag style={{marginLeft:'1vw'}} color={this.state.doiMessage ==="Server not found."?"#f50":"#87d068"}>{this.state.doiMessage}</Tag>
+                                            {this.state.doiMessage?<Tag style={{marginLeft:'1vw'}} color={this.state.doiMessage ==="Server not found."?"#f50":"#87d068"}>{this.state.doiMessage}</Tag>
+                                            :null}
                                         </div>: null
                                 }
                                 {

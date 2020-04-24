@@ -83,6 +83,11 @@ export class SystemStore{
         //     .then(json=>console.log(json))
         //     .catch(err => err)
     }
+    @action resetFileList(){
+
+        this.fileList = []
+
+    }
 
 
 
