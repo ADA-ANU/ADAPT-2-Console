@@ -14,6 +14,10 @@ export class SystemStore{
     @observable fileList=[]
     @observable doiValid=false
     @observable isDoiLoading = false
+    @observable finalResultDataset = {}
+    @observable finalResultAdaid = null
+    @observable finalResultDOI = null
+    @observable finalResultFiles = []
 
 
     constructor() {
@@ -48,8 +52,20 @@ export class SystemStore{
             .then(json=>this.dataverseSubjects = json)
             .catch(err => err)
     }
-    @action handleFinalResultOpen(open){
-        this.showfinalResult = open
+    @action handleFinalResultClose(){
+        this.showfinalResult = false
+
+    }
+    @action handleFinalResultOpen(dataset, adaid, doi, files){
+        this.showfinalResult = true
+        this.finalResultDataset = dataset
+        this.finalResultAdaid = adaid
+        this.finalResultDOI = doi
+        this.finalResultFiles = files
+    }
+
+    @action resetFileList(){
+        this.fileList = []
     }
     @action getFileListByDOI(doi, server){
         const data = {

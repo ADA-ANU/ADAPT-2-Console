@@ -153,7 +153,7 @@ export default class Adapt2 extends Component{
                                           formReset: true,
                                           doi: doi
                                       });
-                                      systemStore.handleFinalResultOpen(true)
+                                      systemStore.handleFinalResultOpen(this.state.formdata, this.state.adaID, this.state.doi, data.files)
                                   }).catch(err=>{
                                   if (err.response) {
                                       this.setState({
@@ -174,7 +174,7 @@ export default class Adapt2 extends Component{
                                   fileList: [],
                                   formReset: true,
                               });
-                              systemStore.handleFinalResultOpen(true)
+                              systemStore.handleFinalResultOpen(this.state.formdata, this.state.adaID, this.state.doi, data.files)
                           }
 
 
@@ -341,8 +341,8 @@ export default class Adapt2 extends Component{
                                     {uploading ? 'Uploading' : 'Go'}
                                 </Button>
                             </div>
-
-                            <FinalResult dataset={formdata} adaid={adaID} doi={doi} files={returnedFiles} clearResult={this.clearResult}/>
+                            {/*dataset={formdata} adaid={adaID} doi={doi} files={returnedFiles}*/}
+                            <FinalResult  clearResult={this.clearResult}/>
                         </Col>
                     </Row>
                 </div>

@@ -15,12 +15,20 @@ const { Paragraph, Text } = Typography;
 export default class FinalResult extends Component{
 
     handleCloseFinalResult=()=>{
-        this.props.systemStore.handleFinalResultOpen(false)
-        this.props.clearResult()
+        this.props.systemStore.handleFinalResultClose()
+        if (this.props.clearResult){
+            this.props.clearResult()
+        }
+
 
     }
     render(){
-        const { systemStore, authStore, dataset, adaid, files, doi } = this.props
+        const { systemStore, authStore } = this.props
+        //dataset, adaid, files, doi
+        const dataset = systemStore.finalResultDataset
+        const adaid = systemStore.finalResultAdaid
+        const doi = systemStore.finalResultDOI
+        const files = systemStore.finalResultFiles
         const { server, dataverse, title, author, authorFields, email, description, subject, uploadSwitch, newDataset } = dataset
 
         const serverList = toJS(authStore.serverList)
@@ -40,7 +48,7 @@ export default class FinalResult extends Component{
             data.push({title:'Authors', result:author?authorFields?author +', '+authorFields.map(field=>field.name).join(', '):author:''})
             data.push({title:'Email', result:email?email:''})
             data.push({title:'Description', result:description?description:''})
-            data.push({title:'Subjects', result:subject?subject.map(sub=><Tag color="success">{sub[0]}</Tag>):''})
+            data.push({title:'Subjects', result:subject?subject.map(sub=><Tag key={sub[0]} color="success">{sub[0]}</Tag>):''})
         }
 
         return(
@@ -129,11 +137,11 @@ export default class FinalResult extends Component{
                                     </Text>:''
                                 }
                                 {
-                                    files && files.length>0?files.map(file=>{
+                                    files && files.length>0?files.map((file, index)=>{
                                         let beforePath = file.path.split('/')[1]
                                         let afterPath = `./${beforePath}/${file.originalname}`
                                         return(
-                                            <li><p>{file.originalname}</p>
+                                            <li key={index}><p>{file.originalname}</p>
                                                 <p>{`Path: ${afterPath}`}</p>
                                             </li>
                                         )
