@@ -118,7 +118,7 @@ export default class DataverseFiles extends Component{
         //let data = JSON.stringify(form)
         //console.log(data)
         this.setState({isLoading: true})
-        axios.post(API_URL.QUERY_SITE+'infotest', form)
+        axios.post(API_URL.Download_Dataset_Files, form)
             .then(res=>{
                 if (res.status ===201){
                     const data = res.data

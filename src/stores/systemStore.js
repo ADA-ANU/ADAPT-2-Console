@@ -32,7 +32,7 @@ export class SystemStore{
     }
 
     @action removeTempFile(fileName) {
-        return fetch(API_URL.QUERY_SITE + `deleteImg/${fileName}`)
+        return fetch(API_URL.Delete_Img + `${fileName}`)
             .then(action(res => res.json()))
             .catch(err => err)
         }
@@ -47,7 +47,7 @@ export class SystemStore{
         this.failedAPI = []
     }
     @action getDataverseSubjects(){
-        return fetch(API_URL.QUERY_SITE + `getSubjects`)
+        return fetch(API_URL.Get_Subjects)
             .then(action(res => res.json()))
             .then(json=>this.dataverseSubjects = json)
             .catch(err => err)
@@ -73,7 +73,7 @@ export class SystemStore{
             server: server
         }
         this.isDoiLoading = true
-        return axios.post(API_URL.QUERY_SITE+'getDatasetFileListByDOI', data)
+        return axios.post(API_URL.Get_Dataset_FileList_ByDOI, data)
             .then(action(res=>{
                 if (res.status ===201){
                     this.fileList = res.data
@@ -99,11 +99,11 @@ export class SystemStore{
         //     .then(json=>console.log(json))
         //     .catch(err => err)
     }
-    @action resetFileList(){
-
-        this.fileList = []
-
-    }
+    // @action resetFileList(){
+    //
+    //     this.fileList = []
+    //
+    // }
 
 
 

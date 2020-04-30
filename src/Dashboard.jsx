@@ -29,7 +29,13 @@ export default class Dashboard extends Component {
     componentDidMount() {
         //history.push('/login')
         //fetch('http://localhost:3000/api/authenticate', {credentials: 'include'}).then(res=>res.json()).then(json=>console.log(json))
+        //console.log("yes")
+        //this.redirectURL()
 
+    }
+    redirectURL = ()=>{
+        console.log("AAAAAAAAAAAAAAAAA")
+        this.props.history.push('/dashboard/adapt2-new')
     }
 
     render() {
@@ -51,7 +57,8 @@ export default class Dashboard extends Component {
                             <Row>
                                 {/*marginLeft: '68px', marginRight:'32px' style={{marginTop:'auto', marginBottom:'auto'}}*/}
                                 <Col xs={{ span: 4, offset: 1 }} sm={{ span: 4, offset: 2 }} md={{ span: 4, offset: 1 }} lg={{ span: 4, offset: 1 }} xl={{ span: 4, offset: 1 }} xxl={{ span: 4, offset: 1 }} >
-                                    <img alt='LOGO' className="logo" style={{ width:'80%', cursor:'pointer'}} src={ADAlogo} onClick={()=>{history.push('/overview')}} />
+                                    <img alt='LOGO' className="logo" style={{ width:'80%', }} src={ADAlogo}  />
+                                    {/*cursor:'pointer' onClick={()=>{history.push('/dashboard/adapt2-new')}}*/}
                                 </Col>
                                 <Col xs={{ span: 16, offset: 0 }} sm={{ span: 12, offset: 0 }} md={{ span: 13, offset: 0 }} lg={{ span: 13, offset: 0 }} xl={{ span: 13, offset: 0 }} xxl={{ span: 13, offset: 0 }}>
                                     <Menu
@@ -61,8 +68,8 @@ export default class Dashboard extends Component {
                                         selectedKeys={[routingStore? routingStore.history.location.pathname : '/']}
                                         style={{ lineHeight:'64px',height: '64px', borderBottom: '0px'}}
                                     >
-                                        <Menu.Item key='/dashboard'><Link to='/dashboard'>ADAPT 2</Link></Menu.Item>
-                                        <Menu.Item key='/dashboard/dataverseFiles'><Link to='/dashboard/dataverseFiles'>Dataverse Files</Link></Menu.Item>
+                                        <Menu.Item key='/dashboard'><Link to='/dashboard'>ADAPT-2 New</Link></Menu.Item>
+                                        <Menu.Item key='/dashboard/adapt2-existing'><Link to='/dashboard/adapt2-existing'>ADAPT-2 Existing</Link></Menu.Item>
                                         {/*<Menu.Item key='/dashboard/forcode'><Link to='/dashboard/forcode'>FOR Code</Link></Menu.Item>*/}
                                         {/*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*/}
                                     </Menu>
@@ -87,8 +94,9 @@ export default class Dashboard extends Component {
                                             <Alert style={{textAlign: 'center'}} message={ authStore.networkErrorMessage.toString() } type="error" />
                                             : '' : ''
                                     }
+                                    {/*<Route exact path='/dashboard' component={Adapt2} />*/}
                                     <Route exact path='/dashboard' component={Adapt2} />
-                                    <Route exact path='/dashboard/dataverseFiles' component={DataverseFiles} />
+                                    <Route exact path='/dashboard/adapt2-existing' component={DataverseFiles} />
 
                         </Content>
                         <Footer>

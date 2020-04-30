@@ -99,7 +99,7 @@ export default class Adapt2 extends Component{
         });
 
         // You can use any AJAX library you like
-        axios.post(`${API_URL.QUERY_SITE}adaID`, json, {
+        axios.post(API_URL.AdaID, json, {
                 headers: {
                     'Content-Type': 'application/json',
                 }
@@ -121,7 +121,7 @@ export default class Adapt2 extends Component{
                     formData.append('file', file);
                 });
                 axios({
-                    url:`${API_URL.QUERY_SITE}createADAdataset`,
+                    url:API_URL.Create_ADAdataset,
                     method: 'post',
                     data: formData,
                     config: { headers: {'Content-Type': 'multipart/form-data' }}
@@ -138,7 +138,7 @@ export default class Adapt2 extends Component{
                                   userid:toJS(this.props.authStore.currentUser).userID
                               }
                               const jsonData = JSON.stringify(datasetObj);
-                              axios.post(`${API_URL.QUERY_SITE}getDatasetInfo`, jsonData, {
+                              axios.post(API_URL.Get_DatasetInfo, jsonData, {
                                       headers: {
                                           'Content-Type': 'application/json',
                                       }

@@ -46,7 +46,7 @@ class AuthStore {
 
     @action authenticate(){
         console.log("Authenticating")
-        return fetch(API_URL.QUERY_SITE+'authenticate', {credentials: 'include'})
+        return fetch(API_URL.Authenticate, {credentials: 'include'})
             .then(action(res=>res.json()))
             .then(action(json=>{
                 if(json.success===true){
@@ -71,7 +71,7 @@ class AuthStore {
     }
 
     @action loadSite(){
-        return fetch(API_URL.QUERY_SITE+'site')
+        return fetch(API_URL.Site)
             .then(action(res=>{
                 //console.log(res.status)
                 if (res.status === 200){
@@ -87,7 +87,7 @@ class AuthStore {
             })
     }
     @action getServerList(userid) {
-        return fetch(API_URL.QUERY_SITE + `getServerList/${userid}`)
+        return fetch(API_URL.Get_ServerList + userid)
             .then(action(res => res.json()))
             .then(action(json=>{
                 this.networkError = false
@@ -101,7 +101,7 @@ class AuthStore {
 
     @action getAllDataverse(){
 
-        return fetch(API_URL.QUERY_SITE + `getDataverseLists`)
+        return fetch(API_URL.Get_DataverseLists)
             .then(action(res => {
                 if (res.status === 201){
                     return res.json()
@@ -125,7 +125,7 @@ class AuthStore {
 
     }
     @action logout(){
-        return fetch(API_URL.QUERY_SITE + `logout`,{credentials: 'include'})
+        return fetch(API_URL.Logout,{credentials: 'include'})
             .then(action(res=>{
                 if (res.status ===201){
                     window.location = '/#/unauthorised'
@@ -137,7 +137,7 @@ class AuthStore {
     }
 
     @action getADAFolderList(){
-        return fetch(API_URL.QUERY_SITE + `adaFolderList`,{credentials: 'include'})
+        return fetch(API_URL.Ada_FolderList,{credentials: 'include'})
             .then(action(res=>{
                 if (res.status === 201){
                     return res.json()
