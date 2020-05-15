@@ -29,7 +29,7 @@ export default class FinalResult extends Component{
         const adaid = systemStore.finalResultAdaid
         const doi = systemStore.finalResultDOI
         const files = systemStore.finalResultFiles
-        const { server, dataverse, title, author, authorFields, email, description, subject, uploadSwitch, newDataset } = dataset
+        const { server, dataverse, title, firstName, lastName, authorFields, email, description, subject, uploadSwitch, newDataset } = dataset
 
         const serverList = toJS(authStore.serverList)
         let data =[]
@@ -45,116 +45,123 @@ export default class FinalResult extends Component{
             data.push({title:'Server', result:server?server.toUpperCase():''})
             data.push({title:'Dataverse', result:dataverse?dataverse[0]:''})
             data.push({title:'Title', result:title?title:''})
-            data.push({title:'Authors', result:author?authorFields?author +', '+authorFields.map(field=>field.name).join(', '):author:''})
+            data.push({title:'Authors', result:(firstName && lastName)?authorFields?`${lastName}, ${firstName}` +'; '+authorFields.map(field=>`${field.lastName}, ${field.firstName}`).join('; '):`${lastName}, ${firstName}`:''})
             data.push({title:'Email', result:email?email:''})
             data.push({title:'Description', result:description?description:''})
-            data.push({title:'Subjects', result:subject?subject.map(sub=><Tag key={sub[0]} color="success">{sub[0]}</Tag>):''})
+            data.push({title:'Subjects', result:subject?subject.map(sub=><Tag key={sub} color="success">{sub}</Tag>):''})
         }
 
         return(
-            <Modal
-                visible={systemStore.showfinalResult}
-                maskClosable={false}
-                closable={false}
-                centered
-                footer={null}
-                width='30%'
-            >
-                <Result
-                    status="success"
-                    title="Submission Successful"
-                    subTitle="Please check your submission details below."
-                    extra={[
-                        <Button type="primary" key="console" onClick={this.handleCloseFinalResult}>
-                            OK
-                        </Button>
-                    ]}
-                >
-                    <div className="desc">
-                        <Paragraph>
-                            <Text
-                                strong
-                                style={{
-                                    fontSize: 16,
-                                }}
-                            >
-                                ADAID: {adaid? adaid:''}
+            // <Modal
+            //     visible={systemStore.showfinalResult}
+            //     maskClosable={false}
+            //     closable={false}
+            //     centered
+            //     footer={null}
+            //     width='30%'
+            // >
+            <div>
+            {
+                systemStore.showfinalResult?(
+                    <Result
+                        status="success"
+                        title="Submission Successful"
+                        subTitle="Please check your submission details below."
+                        // extra={[
+                        //     <Button type="primary" key="console" onClick={this.handleCloseFinalResult}>
+                        //         OK
+                        //     </Button>
+                        // ]}
+                    >
+                        <div className="desc">
+                            <Paragraph>
+                                <Text
+                                    strong
+                                    style={{
+                                        fontSize: 16,
+                                    }}
+                                >
+                                    ADAID: {adaid? adaid:''}
 
-                            </Text>
-                        </Paragraph>
-                        {
-                            newDataset?
-                                <>
-                                    <Paragraph>
-                                        Dataset Link: {
-                                        doi !== null && doi !==undefined?
-                                            <a href={url} target="_blank">Click Here</a>
-                                            :'Failed to get the link.'
+                                </Text>
+                            </Paragraph>
+                            {
+                                newDataset?
+                                    <>
+                                        <Paragraph>
+                                            Dataset Link: {
+                                            doi !== null && doi !==undefined?
+                                                <a href={url} target="_blank">Click Here</a>
+                                                :'Failed to get the link.'
 
-                                    }
-
-                                    </Paragraph>
-                                    <Paragraph>
-                                        Dataset DOI: {doi}
-                                    </Paragraph>
-                                    <Paragraph>
-                                        Dataset Status: Draft
-                                    </Paragraph>
-
-                                    <Collapse>
-                                        <Panel header="Dataset information" key="1">
-                                            <Descriptions
-                                                //title="Responsive Descriptions"
-                                                bordered
-                                                layout='vertical'
-                                                //column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}
-                                            >
-                                                {data.map(item=>
-                                                    <Descriptions.Item label={item.title}>{item.result}</Descriptions.Item>
-                                                )}
-
-                                            </Descriptions>
-                                        </Panel>
-                                    </Collapse>
-
-                                </>
-                                :null
-                        }
-
-                        <Paragraph>
-                            {/*<CloseCircleOutlined className="site-result-demo-error-icon" /> Your account is not yet*/}
-                            {/*eligible to apply <a>Apply Unlock &gt;</a>*/}
-                            <ol>
-                                {
-                                    files && files.length>0?<Text
-                                        strong
-                                        style={{
-                                            fontSize: 16,
-                                        }}
-                                    >
-                                        File List:
-
-                                    </Text>:''
-                                }
-                                {
-                                    files && files.length>0?files.map((file, index)=>{
-                                        let beforePath = file.path.split('/')[1]
-                                        let afterPath = `./${beforePath}/${file.originalname}`
-                                        return(
-                                            <li key={index}><p>{file.originalname}</p>
-                                                <p>{`Path: ${afterPath}`}</p>
-                                            </li>
-                                        )
                                         }
 
-                                    ):''
-                                }
-                            </ol>
-                        </Paragraph>
-                    </div>
-                </Result>
+                                        </Paragraph>
+                                        <Paragraph>
+                                            Dataset DOI: {doi}
+                                        </Paragraph>
+                                        <Paragraph>
+                                            Dataset Status: Draft
+                                        </Paragraph>
 
-            </Modal>
+                                        <Collapse>
+                                            <Panel header="Dataset information" key="1">
+                                                <Descriptions
+                                                    //title="Responsive Descriptions"
+                                                    bordered
+                                                    layout='vertical'
+                                                    //column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}
+                                                >
+                                                    {data.map(item=>
+                                                        <Descriptions.Item key={item.title} label={item.title}>{item.result}</Descriptions.Item>
+                                                    )}
+
+                                                </Descriptions>
+                                            </Panel>
+                                        </Collapse>
+
+                                    </>
+                                    :null
+                            }
+
+                            <Paragraph>
+                                {/*<CloseCircleOutlined className="site-result-demo-error-icon" /> Your account is not yet*/}
+                                {/*eligible to apply <a>Apply Unlock &gt;</a>*/}
+                                <ol>
+                                    {
+                                        files && files.length>0?<Text
+                                            strong
+                                            style={{
+                                                fontSize: 16,
+                                            }}
+                                        >
+                                            File List:
+
+                                        </Text>:''
+                                    }
+                                    {
+                                        files && files.length>0?files.map((file, index)=>{
+                                                let beforePath = file.path.split('/')[1]
+                                                let afterPath = `./${beforePath}/${file.originalname}`
+                                                return(
+                                                    <li key={index}><p>{file.originalname}</p>
+                                                        <p>{`Path: ${afterPath}`}</p>
+                                                    </li>
+                                                )
+                                            }
+
+                                        ):''
+                                    }
+                                </ol>
+                            </Paragraph>
+                        </div>
+                    </Result>
+                ):null
+            }
+            </div>
+
+
+            // </Modal>
 
         )
     }

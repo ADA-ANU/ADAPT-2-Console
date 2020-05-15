@@ -9,6 +9,7 @@ const API_URL = {
     Authenticate: ROOT + 'api/authenticate',
     Logout: ROOT + 'api/logout',
     Site: ROOT + 'api/site',
+    UPDATE_API: ROOT + 'api/updateAPI',
     Ada_FolderList: ROOT + 'api/adaFolderList',
     Get_ServerList: ROOT +'api/getServerList/',
     AdaID: ROOT + 'api/adaID',
@@ -18,7 +19,8 @@ const API_URL = {
     Download_Dataset_Files: ROOT+'api/downloadDatasetFiles',
     Get_Dataset_FileList_ByDOI:ROOT+'api/getDatasetFileListByDOI',
     Get_Subjects: ROOT +'api/getSubjects',
-    Delete_Img: ROOT +'api/deleteImg/'
+    Delete_Img: ROOT +'api/deleteImg/',
+    Check_DV_Permission: ROOT + 'api/dvPermissionSpecific'
 }
 
 // const PROD_API_URL = {

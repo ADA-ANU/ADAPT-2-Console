@@ -39,9 +39,9 @@ export default class APIInput extends Component{
     onCancel = ()=>{
         this.props.systemStore.handleAPIInputModal(false)
         this.props.systemStore.clearFailedAPI()
-        if(this.props.newDatasetSwitch){
-            this.props.newDatasetSwitch(false)
-        }
+        // if(this.props.newDatasetSwitch){
+        //     this.props.newDatasetSwitch(false)
+        // }
 
     }
     onFinish = values => {
@@ -54,7 +54,7 @@ export default class APIInput extends Component{
             userid: currentUser.userID
         }
         const json = JSON.stringify(obj);
-        axios.post(`${API_URL.QUERY_SITE}updateAPI`, json, {
+        axios.post(API_URL.UPDATE_API, json, {
                 headers: {
                     'Content-Type': 'application/json',
                 }
@@ -69,7 +69,9 @@ export default class APIInput extends Component{
                         this.props.systemStore.handleAPIInputModal(false)
                         this.openNotificationWithIcon('success','APIs', '')
                     })
-
+                if(this.props.getFileList){
+                    this.props.getFileList()
+                }
             }
             else {
                 this.props.systemStore.clearFailedAPI()
@@ -115,21 +117,43 @@ export default class APIInput extends Component{
                 neededAPIs = {systemStore.failedAPI}
                 APIs = {serverList}
                 isLoading={this.state.isLoading}
+                errorMsg={systemStore.apiInputErrorMsg}
             />
         )
     }
 }
-const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, isLoading }) => {
+const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, isLoading, errorMsg }) => {
     const [form] = Form.useForm();
     const NeededAPIs = toJS(neededAPIs)
-
+    console.log(NeededAPIs)
+    console.log(APIs)
+    const footer = errorMsg? ([<Button key="cancel" onClick={onCancel}>
+        Return
+    </Button>]):(
+        [<Button key="cancel" onClick={onCancel}>
+            Return
+        </Button>,
+        <Button key="submit" type="primary" loading={isLoading} onClick={() => {
+            //console.log(form.fields)
+            form.validateFields()
+                .then(values => {
+                    form.resetFields();
+                    onCreate(values);
+                })
+                .catch(info => {
+                    console.log('Validate Failed:', info);
+                });
+        }}>
+            Submit
+        </Button>])
+    console.log(errorMsg)
     return (
         <Modal
             visible={visible}
             maskClosable={false}
             closable={false}
             centered
-            title="We need your API keys for operations on Dataverses."
+            title="ERROR"
             // okText="Submit"
             // cancelText="Cancel"
             // onCancel={onCancel}
@@ -144,24 +168,24 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, i
             //             console.log('Validate Failed:', info);
             //         });
             // }}
-            footer={[
-                <Button key="cancel" onClick={onCancel}>
-                    Return
-                </Button>,
-                <Button key="submit" type="primary" loading={isLoading} onClick={() => {
-                    //console.log(form.fields)
-                    form.validateFields()
-                        .then(values => {
-                            form.resetFields();
-                            onCreate(values);
-                        })
-                        .catch(info => {
-                            console.log('Validate Failed:', info);
-                        });
-                }}>
-                    Submit
-                </Button>,
-            ]}
+            footer={footer
+                // <Button key="cancel" onClick={onCancel}>
+                //     Return
+                // </Button>,
+                // <Button key="submit" type="primary" loading={isLoading} onClick={() => {
+                //     //console.log(form.fields)
+                //     form.validateFields()
+                //         .then(values => {
+                //             form.resetFields();
+                //             onCreate(values);
+                //         })
+                //         .catch(info => {
+                //             console.log('Validate Failed:', info);
+                //         });
+                // }}>
+                //     Submit
+                // </Button>,
+            }
         >
 
             <Form
@@ -173,11 +197,19 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, i
                 }}
             >
                 {
+                    errorMsg?
+                    <div style={{paddingBottom:'2%'}}>
+                        <Alert message={errorMsg} type="error" showIcon />
+                    </div>: null
+                }
+                {
                     APIs.length>0&& NeededAPIs.length>0?
-                        NeededAPIs.map(api=>
-                            <Form.Item
+                        NeededAPIs.map(api=>{
+                            const tempAPI = APIs.filter(e=>e.id === api.id)[0]
+                            return (<Form.Item
                                 key={api.id-1}
-                                label={APIs[api.id-1].servername}
+                                //label={APIs[api.id-1].servername}
+                                label={tempAPI.servername}
                             >
                                 <div style={{paddingBottom:'2%'}}>
                                     <Alert message={api.msg} type="warning" showIcon />
@@ -187,7 +219,8 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, i
                                     rules={[
                                         {
                                             required: true,
-                                            message: `Please input the API key for ${APIs[api.id-1].servername}!`,
+                                            message: `Please input the API key for ${tempAPI.servername}!`,
+                                            //APIs[api.id-1].servername
                                         },
                                         {
                                             type: 'string',
@@ -197,11 +230,12 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, i
                                     ]}
                                 >
                                     <Input
-                                    placeholder={`API key for ${APIs[api.id-1].servername}`}
+                                    placeholder={`API key for ${tempAPI.servername}`}
+                                    //APIs[api.id-1].servername
                                     />
                                 </Form.Item>
 
-                            </Form.Item>
+                            </Form.Item>)}
 
                         ): null
                 }

@@ -5,7 +5,7 @@ import { Switch, Route, withRouter, Link } from 'react-router-dom';
 import './App.css';
 import 'antd/es/spin/style/css';
 import { Layout, Menu, Spin, Typography, Button, Tooltip, Alert, Row, Col, Badge, Dropdown } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { UserOutlined, SettingOutlined } from '@ant-design/icons';
 import ADAlogo from '../src/static/img/ADAlogo.jpg';
 import ANUlogo from '../src/static/img/ANUlogo.png';
 import Vertical_line from './static/img/vertical-line.js'
@@ -68,10 +68,12 @@ export default class Dashboard extends Component {
                                         selectedKeys={[routingStore? routingStore.history.location.pathname : '/']}
                                         style={{ lineHeight:'64px',height: '64px', borderBottom: '0px'}}
                                     >
-                                        <Menu.Item key='/dashboard'><Link to='/dashboard'>ADAPT-2 New</Link></Menu.Item>
-                                        <Menu.Item key='/dashboard/adapt2-existing'><Link to='/dashboard/adapt2-existing'>ADAPT-2 Existing</Link></Menu.Item>
-                                        {/*<Menu.Item key='/dashboard/forcode'><Link to='/dashboard/forcode'>FOR Code</Link></Menu.Item>*/}
-                                        {/*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*/}
+                                        <SubMenu icon={<SettingOutlined />} title="ADAPT-2">
+                                            <Menu.Item key='/dashboard'><Link to='/dashboard'>ADAPT-2 New</Link></Menu.Item>
+                                            <Menu.Item key='/dashboard/adapt2-existing'><Link to='/dashboard/adapt2-existing'>ADAPT-2 Existing</Link></Menu.Item>
+                                            {/*<Menu.Item key='/dashboard/forcode'><Link to='/dashboard/forcode'>FOR Code</Link></Menu.Item>*/}
+                                            {/*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*/}
+                                        </SubMenu>
                                     </Menu>
                                 </Col>
                                 <Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 0 }} md={{ span: 1, offset: 1 }} lg={{ span: 1, offset: 1 }} xl={{ span: 1, offset: 1 }} xxl={{ span: 1, offset: 1 }}>

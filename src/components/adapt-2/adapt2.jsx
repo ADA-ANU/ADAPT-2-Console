@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react';
 import { Switch, Route, withRouter, Link } from 'react-router-dom';
 import API_URL from '../../config'
 import 'antd/es/spin/style/css';
-import {Upload, Button, message, notification, Collapse, Popover, Col, Row,} from 'antd';
+import {Upload, Button, message, notification, Collapse, Popover, Col, Row, Anchor} from 'antd';
 import { UploadOutlined, InboxOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import axios from 'axios'
 import { toJS } from 'mobx'
@@ -43,7 +43,8 @@ export default class Adapt2 extends Component{
         })
     }
     handleUpload = (form) => {
-        const { newDataset, server, dataverse, title, author, authorFields, email, description, subject, uploadSwitch } = form
+        this.props.systemStore.handleFinalResultClose()
+        const { newDataset, server, dataverse, title, authorFields, email, description, subject, uploadSwitch, firstName, lastName } = form
         const { fileList } = this.state;
         console.log(authorFields)
 
@@ -72,19 +73,21 @@ export default class Adapt2 extends Component{
         }
         else {
             const dataverseID = dataverse[1]
-            let subjectIDs =[]
-            for(let sub of subject){
-                subjectIDs.push(sub[1])
-            }
+            // let subjectIDs =[]
+            // for(let sub of subject){
+            //     subjectIDs.push(sub[1])
+            // }
             obj = {
                 //doi: doi,
                 newDataset: newDataset,
                 title: title,
-                author: author,
+                //author: author,
+                author: `${lastName}, ${firstName}`,
                 authorFields: authorFields,
                 email: email,
                 description: description,
-                subject: subjectIDs,
+                subject: subject,
+                //subjectIDs
                 server: server,
                 dataverse: dataverseID,
                 uploadSwitch: uploadSwitch,
@@ -150,7 +153,7 @@ export default class Adapt2 extends Component{
                                           uploading: false,
                                           finalFiles: fileList,
                                           fileList: [],
-                                          formReset: true,
+                                          //formReset: true,
                                           doi: doi
                                       });
                                       systemStore.handleFinalResultOpen(this.state.formdata, this.state.adaID, this.state.doi, data.files)
@@ -160,7 +163,7 @@ export default class Adapt2 extends Component{
                                           uploading: false,
                                           finalFiles: fileList,
                                           fileList: [],
-                                          formReset: true,
+                                          //formReset: true,
 
                                       });
                                       systemStore.handleFinalResultOpen(true)
@@ -172,7 +175,7 @@ export default class Adapt2 extends Component{
                                   uploading: false,
                                   finalFiles: fileList,
                                   fileList: [],
-                                  formReset: true,
+                                  //formReset: true,
                               });
                               systemStore.handleFinalResultOpen(this.state.formdata, this.state.adaID, this.state.doi, data.files)
                           }
@@ -184,7 +187,7 @@ export default class Adapt2 extends Component{
                               uploading: false,
                               finalFiles: fileList,
                               fileList: [],
-                              formReset: true
+                              //formReset: true
                           });
                           this.openNotificationWithIcon('error','files', data.msg.message)
                       }
@@ -194,7 +197,7 @@ export default class Adapt2 extends Component{
                         uploading: false,
                         finalFiles: fileList,
                         fileList: [],
-                        formReset: true
+                        //formReset: true
                     });
                     this.openNotificationWithIcon('error','files', err)
                 })
@@ -208,7 +211,7 @@ export default class Adapt2 extends Component{
                     uploading: false,
                     finalFiles: fileList,
                     fileList: [],
-                    formReset: true
+                    //formReset: true
                 });
                 if (err.response.status ===401){
                     const servers = toJS(this.props.authStore.serverList)
@@ -232,7 +235,7 @@ export default class Adapt2 extends Component{
                     uploading: false,
                     finalFiles: fileList,
                     fileList: [],
-                    formReset: true
+                    //formReset: true
                 })
                 this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
             }
@@ -261,7 +264,7 @@ export default class Adapt2 extends Component{
 
     };
     extraInfo = (content) => (
-        <Popover placement="topLeft" content={content} trigger="click" arrowPointAtCenter>
+        <Popover placement="topLeft" content={content} arrowPointAtCenter>
         <InfoCircleOutlined
             onClick={event => {
                 // If you don't want click extra trigger collapse, you can prevent this:
@@ -300,17 +303,45 @@ export default class Adapt2 extends Component{
             },
             fileList,
         };
+        const content = <>
+                            <div style={{paddingBottom:'1vh'}}>1. Do nothing but clicking Get ADAID button: A new ADAID will be generated and a folder named after it will be created on the local directory.</div>
+                            <div style={{paddingBottom:'1vh'}}>2. Upload files and then click Get ADAID button: A new ADAID will be generated and a local folder named after it will be created with uploaded files in it.</div>
+                            <div style={{paddingBottom:'1vh'}}>3. Switch “Create new dataset” to yes and fill the blanks underneath and click Get ADAID button: A new ADAID will be generated and a folder named after it as well as a new dataset will be created on local directory and the Dataverse you choose respectively. The new dataset will come with that ADAID in the Other ID field.</div>
+                            <div style={{paddingBottom:'1vh'}}>4. Upload files and Switch “Create new dataset” to yes: You will get the same result as No. 3 and uploaded files will be stored in local directory as well as in the new dataset.</div>
+                        </>
         return (
             <div style={{background: 'white', paddingTop:'2%'}}>
                 <div style={{ margin: 'auto'}}>
                     <Row>
-                        <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
+                        <Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 1 }} md={{ span: 1, offset: 1 }} lg={{ span: 2, offset: 2 }} xl={{ span: 2, offset: 3 }} xxl={{ span: 2, offset: 4 }}>
+                            <Anchor
+                                offsetTop={350}
+                            >
+                                <Popover placement="bottomRight" title={`Instruction`} content={content} overlayStyle={{ width: '50vw'}}>
+                                    <Button>Instruction</Button>
+                                </Popover>
+                            </Anchor>
+                        </Col>
+                        <Col xs={{ span: 20, offset: 1 }} sm={{ span: 20, offset: 0 }} md={{ span: 18, offset: 1 }} lg={{ span: 16, offset: 0 }} xl={{ span: 14, offset: 0 }} xxl={{ span: 12, offset: 0 }}>
+                            <div style={{marginTop: '3%', paddingBottom: '3%', textAlign:'center'}}>
+                                <Button
+                                    form="createDataset"
+                                    key="submit"
+                                    htmlType="submit"
+                                    type="primary"
+                                    //onClick={this.handleUpload}
+                                    disabled={!systemStore.dataversePermissionValid}
+                                    loading={uploading}
+                                >
+                                    {uploading ? 'Uploading' : 'Get ADAID'}
+                                </Button>
+                            </div>
                             <Collapse
                             defaultActiveKey={['1', '2']}
                             // onChange={callback}
                             // expandIconPosition={expandIconPosition}
                         >
-                            <Panel header="Files" key="1" extra={this.extraInfo("Select files to upload to ADA directory")}>
+                            <Panel header="Files" key="1" extra={this.extraInfo("Click or drag file(s) to this area to upload to the newly created ADA folder")}>
                                 <div >
                                     <Dragger {...props}>
                                         <p className="ant-upload-drag-icon">
@@ -323,7 +354,7 @@ export default class Adapt2 extends Component{
                                     </Dragger>
                                 </div>
                             </Panel>
-                            <Panel header="Dataset" key="2" extra={this.extraInfo("Create a dataset on dataverse")}>
+                            <Panel header="Dataset" key="2" extra={this.extraInfo("Create a dataset along with the ADAID and upload the files to that dataset")}>
                                 <DataverseForm handleFormData={this.handleUpload} files={fileList} formReset={formReset}/>
                             </Panel>
 
@@ -335,14 +366,14 @@ export default class Adapt2 extends Component{
                                     htmlType="submit"
                                     type="primary"
                                     //onClick={this.handleUpload}
-                                    // disabled={fileList.length === 0}
+                                    disabled={!systemStore.dataversePermissionValid}
                                     loading={uploading}
                                 >
-                                    {uploading ? 'Uploading' : 'Go'}
+                                    {uploading ? 'Uploading' : 'Get ADAID'}
                                 </Button>
                             </div>
                             {/*dataset={formdata} adaid={adaID} doi={doi} files={returnedFiles}*/}
-                            <FinalResult  clearResult={this.clearResult}/>
+                            <FinalResult clearResult={this.clearResult}/>
                         </Col>
                     </Row>
                 </div>

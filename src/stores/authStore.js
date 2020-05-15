@@ -54,6 +54,7 @@ class AuthStore {
                     this.currentUser = json.user
                     return this.getServerList(json.user.userID)
                         .then(action(res=>{
+                            this.siteLoading = false
                             return this.getAllDataverse()
                                 .then(action(res=>{
                                     return true
@@ -157,10 +158,11 @@ class AuthStore {
         this.siteLoading = true
         console.log("loading site")
         await this.loadSite()
-        await this.authenticate()
         await this.getADAFolderList()
+        await this.authenticate()
+
         console.log("finished")
-        this.siteLoading = false
+
 
        //  {
        //

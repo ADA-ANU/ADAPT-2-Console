@@ -5,7 +5,7 @@ import API_URL from '../../config'
 import 'antd/es/spin/style/css';
 import APIInput from "./apiInput";
 import { toJS } from 'mobx'
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import DynamicField from "./dynamicFields";
 import FinalResult from "./finalResult";
 const { TextArea } = Input;
@@ -35,10 +35,11 @@ export default class DataverseForm extends Component{
         })
         if (checked === false){
             this.formRef.current.resetFields()
+            this.props.systemStore.handlePermission(true)
         }
-        else {
-            this.checkAPI()
-        }
+        // else {
+        //     this.checkAPI()
+        // }
     }
 
     checkAPI = ()=>{
@@ -57,7 +58,7 @@ export default class DataverseForm extends Component{
     onFinish = values => {
         console.log('Received values of form: ', values);
         this.props.handleFormData(values)
-        this.createDatasetOnChange(false)
+        //this.createDatasetOnChange(false)
     };
     serverOnChange =(value) => {
         console.log(`selected ${value}`);
@@ -72,6 +73,24 @@ export default class DataverseForm extends Component{
 
     dataverseOnChange =(value) => {
         console.log(`selected ${value}`);
+        //const userid = toJS(this.props.authStore.currentUser).userID
+        const serverValue = this.formRef.current.getFieldValue("server")
+        const servers = toJS(this.props.authStore.serverList)
+        const dvID = value[1]
+        const dvName = value[0]
+        this.props.systemStore.checkDVPermission(serverValue, dvID, dvName, 'ADD_DS', true)
+            // .then(res=>{
+            //     if (res === false){
+            //         for (let server of servers){
+            //             if (server.alias === serverValue){
+            //                 this.props.systemStore.handleFailedAPI(server.id, 2, `Sorry, you don't have permission to create a dataset in ${dvName} dataverse,
+            //                  please make sure your API key is correct`)
+            //                 this.props.systemStore.handleAPIInputModal(true)
+            //                 return
+            //             }
+            //         }
+            //     }
+            // })
     }
 
     dataverseOnBlur = ()=> {
@@ -106,12 +125,13 @@ export default class DataverseForm extends Component{
                     id="createDataset"
                     ref={this.formRef}
                     onFinish={this.onFinish}
-                    labelCol={{ span: 4 }}
-                    wrapperCol={{ span: 18, offset:1 }}
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 16, offset:1 }}
                     layout="horizontal"
                     initialValues={{ newDataset: false, uploadSwitch: false, server: undefined,
                         dataverse: undefined, doi: undefined, title: undefined, author: undefined,
-                        email: undefined, description: undefined, subject: undefined
+                        email: undefined, description: undefined, subject: undefined, firstName: undefined,
+                        lastName: undefined
                     }}
                     size={"middle"}
                 >
@@ -177,6 +197,7 @@ export default class DataverseForm extends Component{
                             placeholder="Select a dataverse"
                             optionFilterProp="children"
                             onChange={this.dataverseOnChange}
+                            loading={Object.keys(dataverses).length < 1}
                             // onFocus={this.dataverseOnFocus}
                             // onBlur={this.dataverseOnBlur}
                             // onSearch={this.dataverseOnSearch}
@@ -185,17 +206,14 @@ export default class DataverseForm extends Component{
                             }
                         >
                             {
-                                dataverses && this.state.selectedServer?
+                                Object.keys(dataverses).length > 0 && this.state.selectedServer?
                                     dataverses[this.state.selectedServer].dataverses.map(dataverse=>{
                                         return(
                                             <Select.Option key={dataverse.id} value={[dataverse.title, dataverse.id]}>{dataverse.title}</Select.Option>
                                         )
-                                    }):<Select.Option value={0}>Loading</Select.Option>
-
+                                    }):null
+//<Select.Option value={0}>Loading <LoadingOutlined style={{ fontSize: 24 }} spin /></Select.Option>
                             }
-                            {/*<Select.Option value="jack">Jack</Select.Option>*/}
-                            {/*<Select.Option value="lucy">Lucy</Select.Option>*/}
-                            {/*<Select.Option value="tom">Tom</Select.Option>*/}
                         </Select>
                     </Form.Item>
                     {/*<Form.Item*/}
@@ -219,27 +237,57 @@ export default class DataverseForm extends Component{
                         rules={[
                             {
                                 required: this.state.createDataset,
-                                message: "Please input title.",
+                                message: "Please enter title.",
                             },
                         ]}
                     >
                         <Input
-                            placeholder="input dataset title"
+                            placeholder="Enter title ..."
+                            disabled={!this.state.createDataset}
+                        />
+                    </Form.Item>
+                    {/*<Form.Item*/}
+                    {/*    label="Dataset Author"*/}
+                    {/*    name="author"*/}
+                    {/*    rules={[*/}
+                    {/*        {*/}
+                    {/*            required: this.state.createDataset,*/}
+                    {/*            message: "Please enter author name.",*/}
+                    {/*        },*/}
+                    {/*    ]}*/}
+                    {/*>*/}
+                    {/*    <Input*/}
+                    {/*        placeholder="Enter familyName, givenName ..."*/}
+                    {/*        disabled={!this.state.createDataset}*/}
+                    {/*    />*/}
+                    {/*</Form.Item>*/}
+                    <Form.Item
+                        label="Author's First Name"
+                        name="firstName"
+                        rules={[
+                            {
+                                required: this.state.createDataset,
+                                message: "Please enter author's first name.",
+                            },
+                        ]}
+                    >
+                        <Input
+                            placeholder="Enter first name ..."
                             disabled={!this.state.createDataset}
                         />
                     </Form.Item>
                     <Form.Item
-                        label="Dataset Author"
-                        name="author"
+                        label="Author's Last Name"
+                        name="lastName"
                         rules={[
                             {
                                 required: this.state.createDataset,
-                                message: "Please input author name.",
+                                message: "Please enter author's last name.",
                             },
                         ]}
                     >
                         <Input
-                            placeholder="input name of dataset author"
+                            placeholder="Enter last name ..."
                             disabled={!this.state.createDataset}
                         />
                     </Form.Item>
@@ -250,13 +298,13 @@ export default class DataverseForm extends Component{
                         rules={[
                             {
                                 required: this.state.createDataset,
-                                message: "Please input email.",
+                                message: "Please enter email.",
                                 type: 'email'
                             },
                         ]}
                     >
                         <Input
-                            placeholder="input contact email"
+                            placeholder="Enter email ..."
                             disabled={!this.state.createDataset}
                         />
                     </Form.Item>
@@ -266,12 +314,12 @@ export default class DataverseForm extends Component{
                         rules={[
                             {
                                 required: this.state.createDataset,
-                                message: "Please input description.",
+                                message: "Please enter description.",
                             },
                         ]}
                     >
                         <TextArea
-                            placeholder="input description"
+                            placeholder="Enter description ..."
                             autoSize={{ minRows: 4, maxRows: 15 }}
                             disabled={!this.state.createDataset}
                         />
@@ -282,7 +330,7 @@ export default class DataverseForm extends Component{
                         rules={[
                             {
                                 required: this.state.createDataset,
-                                message: "Please input subject.",
+                                message: "Please select subject.",
                             },
                         ]}
                     >
@@ -292,7 +340,7 @@ export default class DataverseForm extends Component{
                         <Select
                             mode="multiple"
                             style={{ width: '100%' }}
-                            placeholder="select one or more subjects"
+                            placeholder="Select one or more subjects"
                             disabled={!this.state.createDataset}
                             //defaultValue={['china']}
                             //onChange={this.handleSubjectChange}
@@ -301,7 +349,8 @@ export default class DataverseForm extends Component{
                             {
                                 systemStore.dataverseSubjects && systemStore.dataverseSubjects.length>0?
                                     systemStore.dataverseSubjects.map(subject=>
-                                            <Select.Option value={[subject.subjectname,subject.id]} key={subject.id} label={subject.subjectname}>
+                                            <Select.Option value={subject.subjectname} key={subject.id} label={subject.subjectname}>
+                                                {/*{[subject.subjectname,subject.id]}*/}
                                                 {subject.subjectname}
                                             </Select.Option>
                                     ):null
@@ -311,7 +360,7 @@ export default class DataverseForm extends Component{
                         </Select>
                     </Form.Item>
                     <Form.Item
-                        label="Update files to dataverse "
+                        label="Upload files to dataverse "
                         name="uploadSwitch"
                         valuePropName="checked"
                         rules={[

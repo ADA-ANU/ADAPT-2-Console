@@ -1,5 +1,5 @@
 import React, {Component, useState} from 'react';
-import {Form, Input, Select, Switch, Button, Table, Spin, Row, Col, Divider, Tag, notification} from 'antd';
+import {Form, Input, Select, Switch, Button, Table, Spin, Row, Col, Divider, Tag, notification, Anchor} from 'antd';
 import { inject, observer } from 'mobx-react';
 import API_URL from '../../config'
 import 'antd/es/spin/style/css';
@@ -10,6 +10,7 @@ import { MinusCircleOutlined, PlusOutlined, LoadingOutlined } from '@ant-design/
 import DynamicField from "./dynamicFields";
 import FinalResult from "./finalResult";
 const { TextArea } = Input;
+const { Link } = Anchor;
 const doiLoadingIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
 const columns = [
     {
@@ -108,7 +109,8 @@ export default class DataverseFiles extends Component{
         this.submit(values)
     };
 
-    submit=(form)=>{
+    submit=async (form)=>{
+        this.props.systemStore.handleFinalResultClose()
         const { doi, server, dataverse, adaIDSelect, newADAID } = form
         if (dataverse ===undefined){
             form.server = this.state.doiMessage
@@ -116,55 +118,53 @@ export default class DataverseFiles extends Component{
         form.userid = toJS(this.props.authStore.currentUser).userID
         console.log(form)
         //let data = JSON.stringify(form)
-        //console.log(data)
-        this.setState({isLoading: true})
-        axios.post(API_URL.Download_Dataset_Files, form)
-            .then(res=>{
-                if (res.status ===201){
-                    const data = res.data
-                    this.props.systemStore.handleFinalResultOpen({},data.adaid, doi, data.files)
-                    this.resetState()
-                    this.fileFormRef.current.resetFields()
-                }
-            })
-            .catch(err=>{
-                if (err.response) {
-                    this.setState({
-                        isLoading: false
-                    });
-                    if (err.response.status ===403){
-                        const servers = toJS(this.props.authStore.serverList)
-                        for (let serv of servers){
-                            if (serv.alias === form.server){
-                                this.props.systemStore.handleFailedAPI(serv.id, 2, err.response.data)
-                                this.props.systemStore.handleAPIInputModal(true)
+        // console.log(await this.getFileList())
+        // if (await this.getFileList()) {
+            this.setState({isLoading: true})
+            axios.post(API_URL.Download_Dataset_Files, form)
+                .then(res => {
+                    if (res.status === 201) {
+                        const data = res.data
+                        this.props.systemStore.handleFinalResultOpen({}, data.adaid, doi, data.files)
+                        this.resetState()
+                        this.fileFormRef.current.resetFields()
+                    }
+                })
+                .catch(err => {
+                    if (err.response) {
+                        this.setState({
+                            isLoading: false
+                        });
+                        if (err.response.status === 403) {
+                            const servers = toJS(this.props.authStore.serverList)
+                            for (let serv of servers) {
+                                if (serv.alias === form.server) {
+                                    this.props.systemStore.handleFailedAPI(serv.id, 2, err.response.data)
+                                    this.props.systemStore.handleAPIInputModal(true)
+                                }
                             }
+
+                        } else if (err.response.status === 405) {
+                            const servers = toJS(this.props.authStore.serverList)
+                            for (let serv of servers) {
+                                if (serv.alias === form.server) {
+                                    this.props.systemStore.handleFailedAPI(serv.id, 1, err.response.data)
+                                    this.props.systemStore.handleAPIInputModal(true)
+                                }
+                            }
+                        } else {
+                            //console.log(err)
+                            this.openNotificationWithIcon('error', 'files', `${err.response.data}, please try again.`)
                         }
 
+                    } else {
+                        this.setState({
+                            isLoading: false
+                        });
+                        this.openNotificationWithIcon('error', 'files', `${err}, please refresh the page and retry.`)
                     }
-                    else if (err.response.status ===405){
-                        const servers = toJS(this.props.authStore.serverList)
-                        for (let serv of servers){
-                            if (serv.alias === form.server){
-                                this.props.systemStore.handleFailedAPI(serv.id, 1, err.response.data)
-                                this.props.systemStore.handleAPIInputModal(true)
-                            }
-                        }
-                    }
-                    else {
-                        //console.log(err)
-                        this.openNotificationWithIcon('error','files', `${err.response.data}, please try again.`)
-                    }
-
-                }
-
-                else {
-                    this.setState({
-                        isLoading: false
-                    });
-                    this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
-                }
-            })
+                })
+        //}
     }
     openNotificationWithIcon = (type,fileName,error) => {
         if (type === 'success'){
@@ -247,8 +247,16 @@ export default class DataverseFiles extends Component{
         }
     }
 
-    dataverseOnChange =(value) => {
-        console.log(`selected ${value}`);
+    getFileList =async () => {
+        const { doi, doiMessage } = this.state
+        const userid = toJS(this.props.authStore.currentUser).userID
+        try{
+            let check = await this.props.systemStore.getFileListByDOI(doi, doiMessage, userid)
+            return check
+        }catch(error){
+            console.log(error)
+            return false
+        }
     }
     doiOnChange = e =>{
         const value = e.target.value
@@ -272,9 +280,10 @@ export default class DataverseFiles extends Component{
                     if (temp.length ===1){
                         this.setState({doiMessage:temp[0].alias})
                         if (value.indexOf('doi:')>0){
+                            const userid = toJS(this.props.authStore.currentUser).userID
                             let doi = value.split('doi:')[1]
                             this.setState({doi: doi})
-                            this.props.systemStore.getFileListByDOI(doi, temp[0].alias)
+                            this.props.systemStore.getFileListByDOI(doi, temp[0].alias, userid)
                         }
                         else {
                             console.log("AAAAAAAAAAAAAA")
@@ -317,14 +326,15 @@ export default class DataverseFiles extends Component{
         const adaFolderList = toJS(authStore.adaFolderList)
 
         return (
-            <div style={{background: 'white', paddingTop:'2%'}}>
+            <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}}>
                 <div style={{ margin: 'auto'}}>
+                    {/*<a href="#API" className="anchor">#</a>*/}
                     <Form
                         id="dataverseFiles"
                         ref={this.fileFormRef}
                         onFinish={this.onFinish}
-                        labelCol={{ span: 4 }}
-                        wrapperCol={{ span: 18, offset:1 }}
+                        labelCol={{ span: 6 }}
+                        wrapperCol={{ span: 16, offset:1 }}
                         layout="horizontal"
                         initialValues={{ server: undefined, dataverse: undefined, doi: undefined, subject: undefined}}
                         size={"middle"}
@@ -348,13 +358,13 @@ export default class DataverseFiles extends Component{
                                         rules={[
                                             {
                                                 required: this.state.doiExisting ===false && this.state.serverExisting ===false ||this.state.doiExisting,
-                                                message: "Please input DOI.",
+                                                message: "Please enter DOI.",
                                             },
                                             {
                                                 //\/.*
                                                 type: 'string',
                                                 pattern: '(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi:.*\\/.*$(?![\\w])',
-                                                message: 'This field must be a valid doi url.'
+                                                message: 'Please enter a valid doi url.'
                                             }
                                         ]}
                                     >
@@ -378,7 +388,7 @@ export default class DataverseFiles extends Component{
                                             <div style={{marginLeft:'21%', marginBottom:'5vh'}}>
                                                 <Tag color="default" style={{width: '3vw',textAlign:'center'}}>DOI: </Tag>
                                                 <span>{this.state.doi}</span><
-                                                Tag style={{marginLeft:'1vw'}} color={systemStore.doiValid ?"#87d068":"#f50"}>{systemStore.doiValid?"Valid":"DOI not Found"}</Tag>
+                                                Tag style={{marginLeft:'1vw'}} color={systemStore.doiValid ?"#87d068":"#f50"}>{systemStore.doiValid?"Valid":systemStore.doiMessage}</Tag>
                                                 <Spin spinning={systemStore.isDoiLoading} delay={20} indicator={doiLoadingIcon} />
                                             </div>: null
                                     }
@@ -554,9 +564,23 @@ export default class DataverseFiles extends Component{
                         </Row>
 
                     </Form>
+                    {
+                        systemStore.showfinalResult?(
+                            <div>
+                                <a href="#API" className="anchor">#</a>
+                                <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
+                                    <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
+                                        <FinalResult clearResult={this.clearResult} />
+
+                                    </Col>
+                                </Row>
+                            </div>
+                        ):null
+                    }
+
                 </div>
-                <APIInput />
-                <FinalResult  clearResult={this.clearResult}/>
+                <APIInput getFileList={this.getFileList}/>
+
             </div>
 
         )
