@@ -20,6 +20,7 @@ export class SystemStore{
     @observable dataversePermissionValid = true
     @observable dataverseSubjects = []
     @observable showfinalResult = false
+    @observable showfinalResultDVFiles = false
     @observable fileList=[]
     @observable doiValid=false
     @observable doiMessage=null
@@ -79,8 +80,18 @@ export class SystemStore{
         this.showfinalResult = false
 
     }
-    @action handleFinalResultOpen(dataset, adaid, doi, files){
-        this.showfinalResult = true
+    @action handleFinalResultDVFilesClose(){
+        this.showfinalResultDVFiles = false
+
+    }
+    @action handleFinalResultOpen(dataset, adaid, doi, files, type){
+        if (type === PERMISSION_CATEGORY.dvFiles){
+            this.showfinalResultDVFiles = true
+        }
+        else {
+            this.showfinalResult = true
+        }
+
         this.finalResultDataset = dataset
         this.finalResultAdaid = adaid
         this.finalResultDOI = doi

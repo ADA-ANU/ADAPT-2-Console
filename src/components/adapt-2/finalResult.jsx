@@ -61,8 +61,6 @@ export default class FinalResult extends Component{
             //     width='30%'
             // >
             <div>
-            {
-                systemStore.showfinalResult?(
                     <Result
                         status="success"
                         title="Submission Successful"
@@ -156,8 +154,7 @@ export default class FinalResult extends Component{
                             </Paragraph>
                         </div>
                     </Result>
-                ):null
-            }
+
             </div>
 
 

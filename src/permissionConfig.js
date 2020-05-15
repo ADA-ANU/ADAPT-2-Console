@@ -21,7 +21,8 @@ const PERMISSION_CATEGORY = {
     PUBLISH_DS: 'PublishDataset',
     DELETE_DV: 'DeleteDataverse',
     DELETE_DS: 'DeleteDatasetDraft',
-
+    dvFiles: 'dvFiles',
+    dv: 'dv'
 }
 
 

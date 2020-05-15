@@ -51,39 +51,13 @@ export default class DataverseFiles extends Component{
         isLoading: false,
         fileList:[]
     }
+    componentDidMount() {
+        this.props.systemStore.handleFinalResultClose()
+        this.props.systemStore.handleFinalResultDVFilesClose()
+    }
 
     fileFormRef = React.createRef();
 
-    // fileUploadSwitchOnChange = (checked)=>{
-    //     this.setState({
-    //         fileUploadSwitch: checked
-    //     })
-    // }
-    // createDatasetOnChange = (checked)=>{
-    //     console.log("create button value change to "+ checked)
-    //     this.setState({
-    //         createDataset: checked
-    //     })
-    //     if (checked === false){
-    //         this.formRef.current.resetFields()
-    //     }
-    //     else {
-    //         this.checkAPI()
-    //     }
-    //  }
-    //
-    // checkAPI = ()=>{
-    //     const servers = toJS(this.props.authStore.serverList)
-    //     if (servers.length>0) {
-    //         servers.map(server=>{
-    //             if(!server.API){
-    //                 this.props.systemStore.handleFailedAPI(server.id, 1, 'No API found.')
-    //                 this.props.systemStore.handleAPIInputModal(true)
-    //             }
-    //         })
-    //     }
-    //
-    // }
     resetState = ()=>{
         this.setState({
             createDataset: false,
@@ -103,6 +77,7 @@ export default class DataverseFiles extends Component{
         this.props.systemStore.resetFileList()
     }
 
+
     onFinish = values => {
         console.log('Received values of form: ', values);
         //this.createDatasetOnChange(false)
@@ -110,7 +85,7 @@ export default class DataverseFiles extends Component{
     };
 
     submit=async (form)=>{
-        this.props.systemStore.handleFinalResultClose()
+        this.props.systemStore.handleFinalResultDVFilesClose()
         const { doi, server, dataverse, adaIDSelect, newADAID } = form
         if (dataverse ===undefined){
             form.server = this.state.doiMessage
@@ -125,7 +100,7 @@ export default class DataverseFiles extends Component{
                 .then(res => {
                     if (res.status === 201) {
                         const data = res.data
-                        this.props.systemStore.handleFinalResultOpen({}, data.adaid, doi, data.files)
+                        this.props.systemStore.handleFinalResultOpen({}, data.adaid, doi, data.files, 'dvFiles')
                         this.resetState()
                         this.fileFormRef.current.resetFields()
                     }
@@ -565,13 +540,11 @@ export default class DataverseFiles extends Component{
 
                     </Form>
                     {
-                        systemStore.showfinalResult?(
+                        systemStore.showfinalResultDVFiles?(
                             <div>
-                                <a href="#API" className="anchor">#</a>
                                 <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                                     <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
                                         <FinalResult clearResult={this.clearResult} />
-
                                     </Col>
                                 </Row>
                             </div>

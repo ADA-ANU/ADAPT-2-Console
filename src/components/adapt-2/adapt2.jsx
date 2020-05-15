@@ -28,7 +28,10 @@ export default class Adapt2 extends Component{
         doi :null,
         returnedFiles:[]
     };
-
+    componentDidMount() {
+        this.props.systemStore.handleFinalResultClose()
+        this.props.systemStore.handleFinalResultDVFilesClose()
+    }
     // handleFormData = (form)=>{
     //     this.setState({
     //         formdata: form
@@ -373,7 +376,10 @@ export default class Adapt2 extends Component{
                                 </Button>
                             </div>
                             {/*dataset={formdata} adaid={adaID} doi={doi} files={returnedFiles}*/}
-                            <FinalResult clearResult={this.clearResult}/>
+                            {
+                                systemStore.showfinalResult?<FinalResult clearResult={this.clearResult}/>: null
+                            }
+
                         </Col>
                     </Row>
                 </div>
