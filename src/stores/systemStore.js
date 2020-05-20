@@ -29,6 +29,9 @@ export class SystemStore{
     @observable finalResultAdaid = null
     @observable finalResultDOI = null
     @observable finalResultFiles = []
+    @observable isADAFolderInfoLoading = false
+    @observable adaFolderInfo = null
+    @observable adaFolderInfoErrorMsg = null
 
 
     constructor() {
@@ -112,6 +115,12 @@ export class SystemStore{
             }
         }
     }
+    @action popupInputModalByServerID(id){
+
+        this.handleFailedAPI(id, 2, `Bad api key, please enter the correct one.`)
+        this.handleAPIInputModal(true)
+    }
+
     @action getFileListByDOI(doi, server, userid){
         console.log(server)
         const data = {
@@ -163,6 +172,48 @@ export class SystemStore{
         //     .then(action(res => res.json()))
         //     .then(json=>console.log(json))
         //     .catch(err => err)
+    }
+
+    @action getDatasetInfoByADAID(adaid, userid){
+        const data = {
+            adaid: adaid,
+            userid: userid
+        }
+        this.isADAFolderInfoLoading = true
+        return axios.post(API_URL.getADAFolderInfo, data)
+            .then(action(res=>{
+                if (res.status ===201){
+                    this.adaFolderInfoErrorMsg = null
+                    console.log(res.data)
+                    this.adaFolderInfo = res.data
+                }
+            })).catch(action(err=>{
+                this.adaFolderInfo = null
+                if (err.response) {
+
+                    if (err.response.status ===404){
+                        this.adaFolderInfoErrorMsg = 'DOI not found'
+
+                    }
+                    else if (err.response.status ===401){
+                        this.adaFolderInfoErrorMsg = 'No permission to view'
+                        this.handleAPIInputErrorMsg(`Sorry, you don't have permission to view the content.`)
+                        this.handleAPIInputModal(true)
+
+                    }
+                    else if (err.response.status ===402){
+                        let serverid = err.response.data
+                        this.popupInputModalByServerID(serverid)
+
+                    }
+                    else {
+                        authStore.networkError = true
+                        authStore.networkErrorMessage = err.response.data
+
+                    }
+                }
+
+            })).finally(()=>this.isADAFolderInfoLoading = false)
     }
     @action handlePermission(value){
         this.dataversePermissionValid = value

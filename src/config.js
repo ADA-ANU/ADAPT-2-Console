@@ -20,7 +20,8 @@ const API_URL = {
     Get_Dataset_FileList_ByDOI:ROOT+'api/getDatasetFileListByDOI',
     Get_Subjects: ROOT +'api/getSubjects',
     Delete_Img: ROOT +'api/deleteImg/',
-    Check_DV_Permission: ROOT + 'api/dvPermissionSpecific'
+    Check_DV_Permission: ROOT + 'api/dvPermissionSpecific',
+    getADAFolderInfo: ROOT + 'api/getADAFolderInfo'
 }
 
 // const PROD_API_URL = {

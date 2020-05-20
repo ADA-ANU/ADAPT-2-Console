@@ -1,5 +1,5 @@
 import React, {Component, useState} from 'react';
-import {Form, Input, Select, Switch, Button, Table, Spin, Row, Col, Divider, Tag, notification, Anchor} from 'antd';
+import {Form, Input, Select, Switch, Button, Table, Spin, Row, Col, Divider, Tag, notification, Anchor, List, Skeleton} from 'antd';
 import { inject, observer } from 'mobx-react';
 import API_URL from '../../config'
 import 'antd/es/spin/style/css';
@@ -12,11 +12,11 @@ import FinalResult from "./finalResult";
 const { TextArea } = Input;
 const { Link } = Anchor;
 const doiLoadingIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
+
 const columns = [
     {
         title: 'ID',
         dataIndex: 'id',
-        //render: text => <a>{text}</a>,
     },
     {
         title: 'File Name',
@@ -26,10 +26,24 @@ const columns = [
         title: 'Size',
         dataIndex: 'filesize',
     },
-    ,
+
     {
         title: 'MD5',
         dataIndex: 'md5',
+    }
+];
+const data = [
+    {
+        title: 'Ant Design Title 1',
+    },
+    {
+        title: 'Ant Design Title 2',
+    },
+    {
+        title: 'Ant Design Title 3',
+    },
+    {
+        title: 'Ant Design Title 4',
     },
 ];
 
@@ -49,7 +63,8 @@ export default class DataverseFiles extends Component{
         server: null,
         doiMessage: null,
         isLoading: false,
-        fileList:[]
+        fileList:[],
+        selectedRowKeys:[]
     }
     componentDidMount() {
         this.props.systemStore.handleFinalResultClose()
@@ -211,6 +226,8 @@ export default class DataverseFiles extends Component{
             this.setState({
                 selectedADAFolder: value,
             })
+            let userid = toJS(this.props.authStore.currentUser).userID
+            this.props.systemStore.getDatasetInfoByADAID(value, userid)
         }
     }
     handleNewADA = checked =>{
@@ -290,16 +307,27 @@ export default class DataverseFiles extends Component{
             this.fileFormRef.current.resetFields()
         }
     }
+    // onSelectChange = selectedRowKeys => {
+    //     console.log('selectedRowKeys changed: ', selectedRowKeys);
+    //     this.setState({ selectedRowKeys });
+    // };
 
     render() {
         const { authStore, systemStore, files, formReset } = this.props
-        const { doi, doiMessage, isLoading } = this.state
+        const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder } = this.state
         const serverList = toJS(authStore.serverList)
         const datasource = toJS(systemStore.fileList)
         const user = toJS(authStore.currentUser)
         const dataverses = toJS(authStore.Dataverses)
         const adaFolderList = toJS(authStore.adaFolderList)
-
+        console.log(selectedRowKeys)
+        const rowSelection = {
+            // selectedRowKeys: datasource.map(ele=>ele.id),
+            onChange: (selectedRowKeys, selectedRows) => {
+                console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+                this.setState({ selectedRowKeys });
+            },
+        };
         return (
             <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}}>
                 <div style={{ margin: 'auto'}}>
@@ -456,6 +484,7 @@ export default class DataverseFiles extends Component{
                                     <Row style={{ marginBottom:'2vh' }}>
                                         <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
                                             <Table
+                                                rowSelection={rowSelection}
                                                 columns={columns}
                                                 dataSource={datasource}
                                                 rowKey="id"
@@ -502,6 +531,46 @@ export default class DataverseFiles extends Component{
                                             }
                                         </Select>
                                     </Form.Item>
+                                {
+                                    selectedADAFolder && systemStore.adaFolderInfo?
+                                        <Row style={{marginBottom:'3vh'}}>
+                                            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
+                                                <Skeleton active={true} loading={systemStore.isADAFolderInfoLoading}>
+                                                    <div style={{ paddingBottom:'2vh'}}>
+                                                        <List
+                                                            itemLayout="horizontal"
+                                                            dataSource={Object.keys(systemStore.adaFolderInfo).filter(ele=>ele !=='authorFields')}
+                                                            renderItem={key => (
+                                                                <List.Item>
+                                                                    <List.Item.Meta
+                                                                        avatar={<Tag
+                                                                            style={{marginLeft: '1vw', fontSize: '15px'}}
+                                                                            color={"#87d068"}>{key.toUpperCase()}</Tag>}
+                                                                        //title={<a href="https://ant.design">{item.title}</a>}
+                                                                        description={systemStore.adaFolderInfo[key]}
+                                                                    />
+                                                                </List.Item>
+                                                                )
+
+                                                            }
+                                                        />
+                                                    </div>
+                                                </Skeleton>
+                                            </Col>
+                                        </Row>
+                                        : null
+
+                                }
+                                {
+                                    systemStore.adaFolderInfoErrorMsg?
+                                        <Row style={{marginBottom:'3vh'}}>
+                                            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
+                                                <div style={{ paddingBottom:'2vh'}}>
+                                                    <Tag style={{marginLeft:'1vw', fontSize:'15px'}} color="warning">{systemStore.adaFolderInfoErrorMsg}</Tag>
+                                                </div>
+                                            </Col>
+                                        </Row>: null
+                                }
                                     <Form.Item
                                         label="Or"
                                         //name="uploadSwitch"
