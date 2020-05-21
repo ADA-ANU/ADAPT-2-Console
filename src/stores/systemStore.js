@@ -213,7 +213,10 @@ export class SystemStore{
                     }
                 }
 
-            })).finally(()=>this.isADAFolderInfoLoading = false)
+            })).finally(()=>{
+                setTimeout(() => {
+                    this.isADAFolderInfoLoading = false
+                }, 1000)})
     }
     @action handlePermission(value){
         this.dataversePermissionValid = value

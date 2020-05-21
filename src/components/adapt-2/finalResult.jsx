@@ -29,7 +29,7 @@ export default class FinalResult extends Component{
         const adaid = systemStore.finalResultAdaid
         const doi = systemStore.finalResultDOI
         const files = systemStore.finalResultFiles
-        const { server, dataverse, title, firstName, lastName, authorFields, email, description, subject, uploadSwitch, newDataset } = dataset
+        const { server, dataverse, title, firstName, lastName, authorFields, email, description, subject, uploadSwitch, newDataset, datasetURL } = dataset
 
         const serverList = toJS(authStore.serverList)
         let data =[]
@@ -83,6 +83,20 @@ export default class FinalResult extends Component{
 
                                 </Text>
                             </Paragraph>
+                            {
+                                datasetURL?
+                                    <Paragraph>
+                                        <Text
+                                            strong
+                                            style={{
+                                                fontSize: 16,
+                                            }}
+                                        >
+                                            Dataset Link: <a href={datasetURL} target="_blank">Click Here</a>
+
+                                        </Text>
+                                    </Paragraph>: null
+                            }
                             {
                                 newDataset?
                                     <>

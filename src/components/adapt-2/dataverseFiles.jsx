@@ -115,7 +115,7 @@ export default class DataverseFiles extends Component{
                 .then(res => {
                     if (res.status === 201) {
                         const data = res.data
-                        this.props.systemStore.handleFinalResultOpen({}, data.adaid, doi, data.files, 'dvFiles')
+                        this.props.systemStore.handleFinalResultOpen({datasetURL: data.datasetURL}, data.adaid, doi, data.files, 'dvFiles')
                         this.resetState()
                         this.fileFormRef.current.resetFields()
                     }
