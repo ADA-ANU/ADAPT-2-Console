@@ -83,6 +83,10 @@ export class SystemStore{
         this.showfinalResult = false
 
     }
+
+    @action clearAdaFolderInfoErrorMsg(){
+        this.adaFolderInfoErrorMsg = null
+    }
     @action handleFinalResultDVFilesClose(){
         this.showfinalResultDVFiles = false
 
@@ -121,6 +125,15 @@ export class SystemStore{
         this.handleAPIInputModal(true)
     }
 
+    @action addFileToFileList(file){
+        this.fileList = [...this.fileList, file]
+    }
+    @action deleteFileFromFileList(fileID){
+        console.log("deleting")
+
+        const tempList = toJS(this.fileList)
+        this.fileList = tempList.filter(file=> file.id !== fileID)
+    }
     @action getFileListByDOI(doi, server, userid){
         console.log(server)
         const data = {
@@ -132,18 +145,19 @@ export class SystemStore{
         return axios.post(API_URL.Get_Dataset_FileList_ByDOI, data)
             .then(action(res=>{
                 if (res.status ===201){
-                    this.fileList = res.data
+                    this.fileList = [...this.fileList, ...res.data]
+                    //this.fileList = res.data
                     this.doiValid = true
                     return true
                 }
                 else {
-                    this.fileList = []
+                    //this.fileList = []
                     this.doiValid = false
                     return false
                 }
             })).catch(action(err=>{
                 if (err.response) {
-                    this.fileList = []
+                    //this.fileList = []
                     this.doiValid = false
                     if (err.response.status ===404){
                         this.doiMessage = 'DOI not found'

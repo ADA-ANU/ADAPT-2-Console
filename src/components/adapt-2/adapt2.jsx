@@ -104,7 +104,7 @@ export default class Adapt2 extends Component{
             uploading: true,
         });
 
-        // You can use any AJAX library you like
+
         axios.post(API_URL.AdaID, json, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -352,7 +352,7 @@ export default class Adapt2 extends Component{
                                         </p>
                                         <p className="ant-upload-text">Click or drag file to this area to upload</p>
                                         <p className="ant-upload-hint">
-                                            Both single and multiple file uploading are supported.
+                                            Both single and multiple file upload are supported.
                                         </p>
                                     </Dragger>
                                 </div>

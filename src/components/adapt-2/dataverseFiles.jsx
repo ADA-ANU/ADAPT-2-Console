@@ -1,16 +1,36 @@
 import React, {Component, useState} from 'react';
-import {Form, Input, Select, Switch, Button, Table, Spin, Row, Col, Divider, Tag, notification, Anchor, List, Skeleton} from 'antd';
+import {
+    Form,
+    Input,
+    Select,
+    Switch,
+    Button,
+    Table,
+    Spin,
+    Row,
+    Col,
+    Divider,
+    Tag,
+    notification,
+    Anchor,
+    List,
+    Skeleton,
+    Upload,
+    Transfer
+} from 'antd';
 import { inject, observer } from 'mobx-react';
 import API_URL from '../../config'
 import 'antd/es/spin/style/css';
 import APIInput from "./apiInput";
 import { toJS } from 'mobx'
 import axios from 'axios'
-import { MinusCircleOutlined, PlusOutlined, LoadingOutlined } from '@ant-design/icons';
+import { MinusCircleOutlined, InboxOutlined, LoadingOutlined } from '@ant-design/icons';
 import DynamicField from "./dynamicFields";
 import FinalResult from "./finalResult";
 const { TextArea } = Input;
 const { Link } = Anchor;
+const { Dragger } = Upload;
+const { Option } = Select;
 const doiLoadingIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
 
 const columns = [
@@ -32,20 +52,6 @@ const columns = [
         dataIndex: 'md5',
     }
 ];
-const data = [
-    {
-        title: 'Ant Design Title 1',
-    },
-    {
-        title: 'Ant Design Title 2',
-    },
-    {
-        title: 'Ant Design Title 3',
-    },
-    {
-        title: 'Ant Design Title 4',
-    },
-];
 
 @inject('routingStore', 'systemStore', 'authStore')
 @observer
@@ -64,7 +70,8 @@ export default class DataverseFiles extends Component{
         doiMessage: null,
         isLoading: false,
         fileList:[],
-        selectedRowKeys:[]
+        selectedRowKeys:[],
+        targetKeys:[]
     }
     componentDidMount() {
         this.props.systemStore.handleFinalResultClose()
@@ -101,59 +108,78 @@ export default class DataverseFiles extends Component{
 
     submit=async (form)=>{
         this.props.systemStore.handleFinalResultDVFilesClose()
-        const { doi, server, dataverse, adaIDSelect, newADAID } = form
-        if (dataverse ===undefined){
-            form.server = this.state.doiMessage
-        }
-        form.userid = toJS(this.props.authStore.currentUser).userID
         console.log(form)
-        //let data = JSON.stringify(form)
-        // console.log(await this.getFileList())
-        // if (await this.getFileList()) {
-            this.setState({isLoading: true})
-            axios.post(API_URL.Download_Dataset_Files, form)
-                .then(res => {
-                    if (res.status === 201) {
-                        const data = res.data
-                        this.props.systemStore.handleFinalResultOpen({datasetURL: data.datasetURL}, data.adaid, doi, data.files, 'dvFiles')
-                        this.resetState()
-                        this.fileFormRef.current.resetFields()
-                    }
-                })
-                .catch(err => {
-                    if (err.response) {
-                        this.setState({
-                            isLoading: false
-                        });
-                        if (err.response.status === 403) {
-                            const servers = toJS(this.props.authStore.serverList)
-                            for (let serv of servers) {
-                                if (serv.alias === form.server) {
-                                    this.props.systemStore.handleFailedAPI(serv.id, 2, err.response.data)
-                                    this.props.systemStore.handleAPIInputModal(true)
-                                }
-                            }
+        const formData = new FormData();
+        formData.set('adaid', form.adaIDSelect)
+        formData.set('userid', toJS(this.props.authStore.currentUser).userID)
+        formData.set('newDataset', form.newADAID)
 
-                        } else if (err.response.status === 405) {
-                            const servers = toJS(this.props.authStore.serverList)
-                            for (let serv of servers) {
-                                if (serv.alias === form.server) {
-                                    this.props.systemStore.handleFailedAPI(serv.id, 1, err.response.data)
-                                    this.props.systemStore.handleAPIInputModal(true)
-                                }
-                            }
-                        } else {
-                            //console.log(err)
-                            this.openNotificationWithIcon('error', 'files', `${err.response.data}, please try again.`)
-                        }
-
-                    } else {
-                        this.setState({
-                            isLoading: false
-                        });
-                        this.openNotificationWithIcon('error', 'files', `${err}, please refresh the page and retry.`)
-                    }
-                })
+        this.state.fileList.forEach(file => {
+            formData.append('file', file);
+        });
+        axios({
+            url:API_URL.uploadFilesFromExsitingPage,
+            method: 'post',
+            data: formData,
+            config: { headers: {'Content-Type': 'multipart/form-data' }}
+        }).then(res=>res.data)
+            .then(data=>console.log(data))
+            .catch(err=>{
+                console.log(err)
+            })
+        // const { doi, server, dataverse, adaIDSelect, newADAID } = form
+        // if (dataverse ===undefined){
+        //     form.server = this.state.doiMessage
+        // }
+        // form.userid = toJS(this.props.authStore.currentUser).userID
+        // console.log(form)
+        // //let data = JSON.stringify(form)
+        // // console.log(await this.getFileList())
+        // // if (await this.getFileList()) {
+        //     this.setState({isLoading: true})
+        //     axios.post(API_URL.Download_Dataset_Files, form)
+        //         .then(res => {
+        //             if (res.status === 201) {
+        //                 const data = res.data
+        //                 this.props.systemStore.handleFinalResultOpen({datasetURL: data.datasetURL}, data.adaid, doi, data.files, 'dvFiles')
+        //                 this.resetState()
+        //                 this.fileFormRef.current.resetFields()
+        //             }
+        //         })
+        //         .catch(err => {
+        //             if (err.response) {
+        //                 this.setState({
+        //                     isLoading: false
+        //                 });
+        //                 if (err.response.status === 403) {
+        //                     const servers = toJS(this.props.authStore.serverList)
+        //                     for (let serv of servers) {
+        //                         if (serv.alias === form.server) {
+        //                             this.props.systemStore.handleFailedAPI(serv.id, 2, err.response.data)
+        //                             this.props.systemStore.handleAPIInputModal(true)
+        //                         }
+        //                     }
+        //
+        //                 } else if (err.response.status === 405) {
+        //                     const servers = toJS(this.props.authStore.serverList)
+        //                     for (let serv of servers) {
+        //                         if (serv.alias === form.server) {
+        //                             this.props.systemStore.handleFailedAPI(serv.id, 1, err.response.data)
+        //                             this.props.systemStore.handleAPIInputModal(true)
+        //                         }
+        //                     }
+        //                 } else {
+        //                     //console.log(err)
+        //                     this.openNotificationWithIcon('error', 'files', `${err.response.data}, please try again.`)
+        //                 }
+        //
+        //             } else {
+        //                 this.setState({
+        //                     isLoading: false
+        //                 });
+        //                 this.openNotificationWithIcon('error', 'files', `${err}, please refresh the page and retry.`)
+        //             }
+        //         })
         //}
     }
     openNotificationWithIcon = (type,fileName,error) => {
@@ -216,6 +242,8 @@ export default class DataverseFiles extends Component{
             this.setState({
                 selectedADAFolder: null,
             })
+            console.log("clearAdaFolderInfo")
+            this.props.systemStore.clearAdaFolderInfoErrorMsg()
             //this.fileFormRef.current.resetFields()
         }
         else {
@@ -311,16 +339,22 @@ export default class DataverseFiles extends Component{
     //     console.log('selectedRowKeys changed: ', selectedRowKeys);
     //     this.setState({ selectedRowKeys });
     // };
+    handleTransferChange = targetKeys => {
+
+        this.setState({ targetKeys });
+    };
 
     render() {
         const { authStore, systemStore, files, formReset } = this.props
-        const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder } = this.state
+        const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, targetKeys } = this.state
         const serverList = toJS(authStore.serverList)
         const datasource = toJS(systemStore.fileList)
         const user = toJS(authStore.currentUser)
         const dataverses = toJS(authStore.Dataverses)
         const adaFolderList = toJS(authStore.adaFolderList)
-        console.log(selectedRowKeys)
+        console.log(fileList)
+        console.log(targetKeys)
+        //console.log(datasource)
         const rowSelection = {
             // selectedRowKeys: datasource.map(ele=>ele.id),
             onChange: (selectedRowKeys, selectedRows) => {
@@ -328,6 +362,35 @@ export default class DataverseFiles extends Component{
                 this.setState({ selectedRowKeys });
             },
         };
+        const props = {
+            onRemove: file => {
+                this.setState(state => {
+                    const index = state.fileList.indexOf(file);
+                    const newFileList = state.fileList.slice();
+                    newFileList.splice(index, 1);
+                    return {
+                        fileList: newFileList,
+                    };
+                });
+                this.props.systemStore.deleteFileFromFileList(file.uid)
+                let keys = targetKeys.filter(ele=>ele !== file.name)
+                this.setState({targetKeys: keys})
+            },
+            multiple: true,
+            listType: 'picture',
+            beforeUpload: file => {
+                this.setState(state => ({
+                    fileList: [...state.fileList, file],
+                }));
+                const tempFile = {id: file.uid, filename:file.name, type:'local'}
+                this.props.systemStore.addFileToFileList(tempFile)
+                return false;
+            },
+            fileList,
+        };
+        console.log(datasource.length)
+        const dynamicWidth = 50 * datasource.length
+        console.log(dynamicWidth)
         return (
             <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}}>
                 <div style={{ margin: 'auto'}}>
@@ -483,14 +546,54 @@ export default class DataverseFiles extends Component{
                                     </div>
                                     <Row style={{ marginBottom:'2vh' }}>
                                         <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
-                                            <Table
-                                                rowSelection={rowSelection}
-                                                columns={columns}
+
+                                            <Transfer
                                                 dataSource={datasource}
-                                                rowKey="id"
+                                                showSearch
+                                                listStyle={{
+                                                    width: 350,
+                                                    height: 400,
+                                                }}
+                                                operations={['to right', 'to left']}
+                                                targetKeys={this.state.targetKeys}
+                                                onChange={this.handleTransferChange}
+                                                render={item => `${item.filename}`}
+                                                rowKey={record => record.filename}
+                                                //footer={this.renderFooter}
                                             />
+                                            {/*<Table*/}
+                                            {/*    rowSelection={rowSelection}*/}
+                                            {/*    columns={columns}*/}
+                                            {/*    dataSource={datasource}*/}
+                                            {/*    rowKey="id"*/}
+                                            {/*/>*/}
                                         </Col>
                                     </Row>
+                            </Col>
+                        </Row>
+                        <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
+                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
+
+                                <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'0vh'}}>
+                                    <span>Upload Files from your computer: </span>
+                                    <Divider />
+
+                                </div>
+                                <Row style={{ marginBottom:'2vh' }}>
+                                    <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
+                                        <div>
+                                            <Dragger {...props}>
+                                                <p className="ant-upload-drag-icon">
+                                                    <InboxOutlined />
+                                                </p>
+                                                <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                                                <p className="ant-upload-hint">
+                                                    Both single and multiple file upload are supported.
+                                                </p>
+                                            </Dragger>
+                                        </div>
+                                    </Col>
+                                </Row>
                             </Col>
                         </Row>
                         <Row style={{marginTop:'2vh', marginBottom:'5vh'}}>
