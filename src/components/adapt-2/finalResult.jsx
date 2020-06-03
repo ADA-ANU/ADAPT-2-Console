@@ -28,7 +28,9 @@ export default class FinalResult extends Component{
         const dataset = systemStore.finalResultDataset
         const adaid = systemStore.finalResultAdaid
         const doi = systemStore.finalResultDOI
-        const files = systemStore.finalResultFiles
+        //const files = systemStore.finalResultFiles
+        const localFiles = systemStore.finalResultLocalFiles
+        const remoteFiles = systemStore.finalResultRemoteFiles
         const { server, dataverse, title, firstName, lastName, authorFields, email, description, subject, uploadSwitch, newDataset, datasetURL } = dataset
 
         const serverList = toJS(authStore.serverList)
@@ -141,23 +143,48 @@ export default class FinalResult extends Component{
                                 {/*eligible to apply <a>Apply Unlock &gt;</a>*/}
                                 <ol>
                                     {
-                                        files && files.length>0?<Text
+                                        localFiles && localFiles.length>0?<Text
                                             strong
                                             style={{
                                                 fontSize: 16,
                                             }}
                                         >
-                                            File List:
+                                            Files Stored Locally:
 
                                         </Text>:''
                                     }
                                     {
-                                        files && files.length>0?files.map((file, index)=>{
+                                        localFiles && localFiles.length>0?localFiles.map((file, index)=>{
                                                 let beforePath = file.path.split('/')[1]
                                                 let afterPath = `./${beforePath}/${file.originalname}`
                                                 return(
                                                     <li key={index}><p>{file.originalname}</p>
                                                         <p>{`Path: ${afterPath}`}</p>
+                                                    </li>
+                                                )
+                                            }
+
+                                        ):''
+                                    }
+                                </ol>
+                                <br />
+                                <ol>
+                                    {
+                                        remoteFiles && remoteFiles.length>0?<Text
+                                            strong
+                                            style={{
+                                                fontSize: 16,
+                                            }}
+                                        >
+                                            Files Added to Dataset:
+
+                                        </Text>:''
+                                    }
+                                    {
+                                        remoteFiles && remoteFiles.length>0?remoteFiles.map((file, index)=>{
+
+                                                return(
+                                                    <li key={index}><p>{file}</p>
                                                     </li>
                                                 )
                                             }

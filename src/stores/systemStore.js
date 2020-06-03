@@ -28,7 +28,8 @@ export class SystemStore{
     @observable finalResultDataset = {}
     @observable finalResultAdaid = null
     @observable finalResultDOI = null
-    @observable finalResultFiles = []
+    @observable finalResultLocalFiles = []
+    @observable finalResultRemoteFiles = []
     @observable isADAFolderInfoLoading = false
     @observable adaFolderInfo = null
     @observable adaFolderInfoErrorMsg = null
@@ -91,7 +92,7 @@ export class SystemStore{
         this.showfinalResultDVFiles = false
 
     }
-    @action handleFinalResultOpen(dataset, adaid, doi, files, type){
+    @action handleFinalResultOpen(dataset, adaid, doi, localFiles, remoteFiles, type){
         if (type === PERMISSION_CATEGORY.dvFiles){
             this.showfinalResultDVFiles = true
         }
@@ -102,7 +103,8 @@ export class SystemStore{
         this.finalResultDataset = dataset
         this.finalResultAdaid = adaid
         this.finalResultDOI = doi
-        this.finalResultFiles = files
+        this.finalResultLocalFiles = localFiles
+        this.finalResultRemoteFiles = remoteFiles
     }
 
     @action resetFileList(){
@@ -216,6 +218,8 @@ export class SystemStore{
 
                     }
                     else if (err.response.status ===402){
+                        console.log(err.response)
+                        this.adaFolderInfoErrorMsg = 'No permission to view'
                         let serverid = err.response.data
                         this.popupInputModalByServerID(serverid)
 

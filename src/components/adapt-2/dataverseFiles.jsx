@@ -71,7 +71,8 @@ export default class DataverseFiles extends Component{
         isLoading: false,
         fileList:[],
         selectedRowKeys:[],
-        targetKeys:[]
+        localTargetKeys:[],
+        remoteTargetKeys:[]
     }
     componentDidMount() {
         this.props.systemStore.handleFinalResultClose()
@@ -107,15 +108,54 @@ export default class DataverseFiles extends Component{
     };
 
     submit=async (form)=>{
+        this.setState({isLoading: true})
         this.props.systemStore.handleFinalResultDVFilesClose()
         console.log(form)
+        const { doi, adaIDSelect, newADAID } = form
+        const { localTargetKeys, remoteTargetKeys, doiMessage} = this.state
+        console.log(localTargetKeys)
+        console.log(remoteTargetKeys)
+        let adaid = adaIDSelect
+        console.log(adaid)
+        if (newADAID){
+            let obj = {
+                doi: null,
+                newDataset: false,
+                title: null,
+                author: null,
+                email: null,
+                description: null,
+                subject: null,
+                server: null,
+                dataverse: null,
+                uploadSwitch: false,
+                userid: toJS(this.props.authStore.currentUser).userID,
+
+            }
+            const json = JSON.stringify(obj);
+            let d = await axios.post(API_URL.AdaID, json, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            )
+
+            adaid = d.data.msg.adaid
+        }
+
         const formData = new FormData();
-        formData.set('adaid', form.adaIDSelect)
+        formData.set('adaid', adaid)
         formData.set('userid', toJS(this.props.authStore.currentUser).userID)
-        formData.set('newDataset', form.newADAID)
+        formData.set('newADAID', newADAID)
+        formData.set('server', doiMessage)
+        formData.set('doi', doi)
+        formData.set('localFileList', JSON.stringify(localTargetKeys))
+        formData.set('remoteFileList', JSON.stringify(remoteTargetKeys))
 
         this.state.fileList.forEach(file => {
-            formData.append('file', file);
+            if( localTargetKeys.includes(file.name) || remoteTargetKeys.includes(file.name) ){
+                formData.append('file', file);
+            }
         });
         axios({
             url:API_URL.uploadFilesFromExsitingPage,
@@ -123,9 +163,48 @@ export default class DataverseFiles extends Component{
             data: formData,
             config: { headers: {'Content-Type': 'multipart/form-data' }}
         }).then(res=>res.data)
-            .then(data=>console.log(data))
+            .then(data=>{
+                this.props.systemStore.handleFinalResultOpen({datasetURL: data.datasetURL}, data.adaid, doi, data.localFiles, data.remoteFiles, 'dvFiles')
+                //this.resetState()
+                this.setState({
+                    isLoading: false
+                });
+            })
             .catch(err=>{
                 console.log(err)
+                if (err.response) {
+                    this.setState({
+                        isLoading: false
+                    });
+                    if (err.response.status === 403) {
+                        const servers = toJS(this.props.authStore.serverList)
+                        for (let serv of servers) {
+                            if (serv.alias === form.server) {
+                                this.props.systemStore.handleFailedAPI(serv.id, 2, err.response.data)
+                                this.props.systemStore.handleAPIInputModal(true)
+                            }
+                        }
+
+                    } else if (err.response.status === 405) {
+                        const servers = toJS(this.props.authStore.serverList)
+                        for (let serv of servers) {
+                            if (serv.alias === form.server) {
+                                this.props.systemStore.handleFailedAPI(serv.id, 1, err.response.data)
+                                this.props.systemStore.handleAPIInputModal(true)
+                            }
+                        }
+                    } else {
+                        //console.log(err)
+                        this.openNotificationWithIcon('error', 'files', `${err.response.data}, please try again.`)
+                    }
+
+                } else {
+                    this.setState({
+                        isLoading: false
+                    });
+                    this.openNotificationWithIcon('error', 'files', `${err}, please refresh the page and retry.`)
+                }
+
             })
         // const { doi, server, dataverse, adaIDSelect, newADAID } = form
         // if (dataverse ===undefined){
@@ -339,21 +418,26 @@ export default class DataverseFiles extends Component{
     //     console.log('selectedRowKeys changed: ', selectedRowKeys);
     //     this.setState({ selectedRowKeys });
     // };
-    handleTransferChange = targetKeys => {
+    handleLocalTransferChange = targetKeys => {
 
-        this.setState({ targetKeys });
+        this.setState({ localTargetKeys: targetKeys });
+    };
+    handleRemoteTransferChange = targetKeys => {
+
+        this.setState({ remoteTargetKeys: targetKeys });
     };
 
     render() {
         const { authStore, systemStore, files, formReset } = this.props
-        const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, targetKeys } = this.state
+        const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, localTargetKeys, remoteTargetKeys } = this.state
         const serverList = toJS(authStore.serverList)
         const datasource = toJS(systemStore.fileList)
         const user = toJS(authStore.currentUser)
         const dataverses = toJS(authStore.Dataverses)
         const adaFolderList = toJS(authStore.adaFolderList)
         console.log(fileList)
-        console.log(targetKeys)
+        console.log(localTargetKeys)
+        console.log(remoteTargetKeys)
         //console.log(datasource)
         const rowSelection = {
             // selectedRowKeys: datasource.map(ele=>ele.id),
@@ -372,25 +456,32 @@ export default class DataverseFiles extends Component{
                         fileList: newFileList,
                     };
                 });
-                this.props.systemStore.deleteFileFromFileList(file.uid)
-                let keys = targetKeys.filter(ele=>ele !== file.name)
-                this.setState({targetKeys: keys})
+                systemStore.deleteFileFromFileList(file.uid)
+                let localKeys = localTargetKeys.filter(ele=>ele !== file.name)
+                let remoteKeys = remoteTargetKeys.filter(ele=>ele !== file.name)
+                this.setState({localTargetKeys: localKeys, remoteTargetKeys: remoteKeys})
             },
             multiple: true,
             listType: 'picture',
             beforeUpload: file => {
-                this.setState(state => ({
-                    fileList: [...state.fileList, file],
-                }));
-                const tempFile = {id: file.uid, filename:file.name, type:'local'}
-                this.props.systemStore.addFileToFileList(tempFile)
+                let localfileListIncludes = fileList.includes(file.name)
+                let remoteFileListIncludes = datasource.filter(ele=>ele.filename === file.name).length >0?true:false
+                if (localfileListIncludes || remoteFileListIncludes){
+                    this.openNotificationWithIcon('error', 'files', `Duplicate file detected.`)
+                }
+                else {
+                    this.setState(state => ({
+                        fileList: [...state.fileList, file],
+                    }));
+                    const tempFile = {id: file.uid, filename:file.name, type:'local'}
+                    this.props.systemStore.addFileToFileList(tempFile)
+
+                }
                 return false;
             },
             fileList,
         };
-        console.log(datasource.length)
-        const dynamicWidth = 50 * datasource.length
-        console.log(dynamicWidth)
+
         return (
             <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}}>
                 <div style={{ margin: 'auto'}}>
@@ -555,10 +646,36 @@ export default class DataverseFiles extends Component{
                                                     height: 400,
                                                 }}
                                                 operations={['to right', 'to left']}
-                                                targetKeys={this.state.targetKeys}
-                                                onChange={this.handleTransferChange}
+                                                targetKeys={this.state.localTargetKeys}
+                                                onChange={this.handleLocalTransferChange}
                                                 render={item => `${item.filename}`}
                                                 rowKey={record => record.filename}
+                                                //footer={this.renderFooter}
+                                            />
+                                            {/*<Table*/}
+                                            {/*    rowSelection={rowSelection}*/}
+                                            {/*    columns={columns}*/}
+                                            {/*    dataSource={datasource}*/}
+                                            {/*    rowKey="id"*/}
+                                            {/*/>*/}
+                                        </Col>
+                                    </Row>
+                                    <Row style={{ marginBottom:'2vh' }}>
+                                        <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
+
+                                            <Transfer
+                                                dataSource={datasource}
+                                                showSearch
+                                                listStyle={{
+                                                    width: 350,
+                                                    height: 400,
+                                                }}
+                                                operations={['to right', 'to left']}
+                                                targetKeys={this.state.remoteTargetKeys}
+                                                onChange={this.handleRemoteTransferChange}
+                                                render={item => `${item.filename}`}
+                                                rowKey={record => record.filename}
+                                                disabled={this.state.newADAID || systemStore.adaFolderInfoErrorMsg?true:false}
                                                 //footer={this.renderFooter}
                                             />
                                             {/*<Table*/}
