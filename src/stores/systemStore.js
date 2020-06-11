@@ -121,6 +121,7 @@ export class SystemStore{
 
     @action resetFileList(){
         this.fileList = []
+        this.adaFolderInfoErrorMsg = null
         this.resetKeys()
     }
 
