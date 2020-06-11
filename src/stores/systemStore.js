@@ -33,6 +33,8 @@ export class SystemStore{
     @observable isADAFolderInfoLoading = false
     @observable adaFolderInfo = null
     @observable adaFolderInfoErrorMsg = null
+    @observable localTargetKeys = []
+    @observable remoteTargetKeys = []
 
 
     constructor() {
@@ -41,6 +43,16 @@ export class SystemStore{
     //
     @action async init(){
         await this.getDataverseSubjects()
+    }
+    @action setLocalKeys(key){
+        this.localTargetKeys = key
+    }
+    @action setRemoteKeys(key){
+        this.remoteTargetKeys = key
+    }
+    @action resetKeys(){
+        this.localTargetKeys = []
+        this.remoteTargetKeys = []
     }
 
     @action setCheck(server, dvID, permissionType){
@@ -109,6 +121,7 @@ export class SystemStore{
 
     @action resetFileList(){
         this.fileList = []
+        this.resetKeys()
     }
 
     @action popupInputModal(serverAlias){
@@ -163,22 +176,26 @@ export class SystemStore{
                     this.doiValid = false
                     if (err.response.status ===404){
                         this.doiMessage = 'DOI not found'
-
+                        //this.resetKeys()
+                        this.resetFileList()
                     }
                     else if (err.response.status ===401){
                         this.doiMessage = 'No permission to view'
                         this.handleAPIInputErrorMsg(`${PERMISSION_CATEGORY.VIEW_UNPUBLISHED_DV.errorMsg} in doi:${doi} dataset.`)
                         this.handleAPIInputModal(true)
-
+                        //this.resetKeys()
+                        this.resetFileList()
                     }
                     else if (err.response.status ===402){
                         this.popupInputModal(server)
-
+                        //this.resetKeys()
+                        this.resetFileList()
                     }
                     else {
                         authStore.networkError = true
                         authStore.networkErrorMessage = err.response.data
-
+                        //this.resetKeys()
+                        this.resetFileList()
                     }
                 }
 
@@ -208,6 +225,7 @@ export class SystemStore{
                 if (err.response) {
 
                     if (err.response.status ===404){
+                        console.log("404")
                         this.adaFolderInfoErrorMsg = 'DOI not found'
 
                     }
@@ -224,9 +242,14 @@ export class SystemStore{
                         this.popupInputModalByServerID(serverid)
 
                     }
+                    else if (err.response.status ===405){
+                        this.adaFolderInfoErrorMsg = 'Server info not found'
+
+                    }
                     else {
-                        authStore.networkError = true
-                        authStore.networkErrorMessage = err.response.data
+                        this.adaFolderInfoErrorMsg = `Error, ${err.response.data}`
+                        // authStore.networkError = true
+                        // authStore.networkErrorMessage = err.response.data
 
                     }
                 }

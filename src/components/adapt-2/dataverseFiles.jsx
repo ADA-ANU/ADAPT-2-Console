@@ -27,8 +27,9 @@ import axios from 'axios'
 import { MinusCircleOutlined, InboxOutlined, LoadingOutlined } from '@ant-design/icons';
 import DynamicField from "./dynamicFields";
 import FinalResult from "./finalResult";
+import { HashLink as Link } from 'react-router-hash-link';
 const { TextArea } = Input;
-const { Link } = Anchor;
+// const { Link } = Anchor;
 const { Dragger } = Upload;
 const { Option } = Select;
 const doiLoadingIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
@@ -77,8 +78,9 @@ export default class DataverseFiles extends Component{
     componentDidMount() {
         this.props.systemStore.handleFinalResultClose()
         this.props.systemStore.handleFinalResultDVFilesClose()
+        this.props.systemStore.resetFileList()
     }
-
+    finalResult_Existing=React.createRef()
     fileFormRef = React.createRef();
 
     resetState = ()=>{
@@ -102,6 +104,7 @@ export default class DataverseFiles extends Component{
 
 
     onFinish = values => {
+
         console.log('Received values of form: ', values);
         //this.createDatasetOnChange(false)
         this.submit(values)
@@ -112,9 +115,12 @@ export default class DataverseFiles extends Component{
         this.props.systemStore.handleFinalResultDVFilesClose()
         console.log(form)
         const { doi, adaIDSelect, newADAID } = form
-        const { localTargetKeys, remoteTargetKeys, doiMessage} = this.state
-        console.log(localTargetKeys)
-        console.log(remoteTargetKeys)
+        const { doiMessage} = this.state
+        console.log(this.props.systemStore.localTargetKeys)
+        let localTargetKeys = this.props.systemStore.localTargetKeys
+        console.log(this.props.systemStore.remoteTargetKeys)
+        let remoteTargetKeys = this.props.systemStore.remoteTargetKeys
+
         let adaid = adaIDSelect
         console.log(adaid)
         if (newADAID){
@@ -169,6 +175,7 @@ export default class DataverseFiles extends Component{
                 this.setState({
                     isLoading: false
                 });
+                this.finalResult_Existing.scrollIntoView({behavior:'smooth'})
             })
             .catch(err=>{
                 console.log(err)
@@ -330,6 +337,7 @@ export default class DataverseFiles extends Component{
             //     dataverse: undefined,
             //     doi: undefined
             // })
+            this.props.systemStore.clearAdaFolderInfoErrorMsg()
             this.setState({
                 selectedADAFolder: value,
             })
@@ -438,6 +446,7 @@ export default class DataverseFiles extends Component{
         console.log(fileList)
         console.log(localTargetKeys)
         console.log(remoteTargetKeys)
+        console.log(systemStore.adaFolderInfoErrorMsg)
         //console.log(datasource)
         const rowSelection = {
             // selectedRowKeys: datasource.map(ele=>ele.id),
@@ -483,7 +492,7 @@ export default class DataverseFiles extends Component{
         };
 
         return (
-            <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}}>
+            <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}} >
                 <div style={{ margin: 'auto'}}>
                     {/*<a href="#API" className="anchor">#</a>*/}
                     <Form
@@ -503,7 +512,7 @@ export default class DataverseFiles extends Component{
                         </Row>
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             {/*border:'1px solid #BFBFBF'*/}
-                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
+                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
                                 <div style={{textAlign: 'center', paddingTop:'2vh'}}>
                                     <span>Dataset: </span>
                                     <Divider />
@@ -549,6 +558,31 @@ export default class DataverseFiles extends Component{
                                                 <Spin spinning={systemStore.isDoiLoading} delay={20} indicator={doiLoadingIcon} />
                                             </div>: null
                                     }
+                            </Col>
+                        </Row>
+                        <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
+                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
+
+                                <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'0vh'}}>
+                                    <span>Upload Files: </span>
+                                    <Divider />
+
+                                </div>
+                                <Row style={{ marginBottom:'2vh' }}>
+                                    <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
+                                        <div>
+                                            <Dragger {...props}>
+                                                <p className="ant-upload-drag-icon">
+                                                    <InboxOutlined />
+                                                </p>
+                                                <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                                                <p className="ant-upload-hint">
+                                                    Both single and multiple file upload are supported.
+                                                </p>
+                                            </Dragger>
+                                        </div>
+                                    </Col>
+                                </Row>
                             </Col>
                         </Row>
                                     {/*<Form.Item*/}
@@ -628,7 +662,7 @@ export default class DataverseFiles extends Component{
                                     {/*    </Select>*/}
                                     {/*</Form.Item>*/}
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
-                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
+                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
                                     <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>
                                         <span>File List: </span>
@@ -637,21 +671,26 @@ export default class DataverseFiles extends Component{
                                     </div>
                                     <Row style={{ marginBottom:'2vh' }}>
                                         <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
+                                            <div style={{textAlign:'center'}}>
+                                                <Transfer
+                                                    dataSource={datasource}
+                                                    showSearch
+                                                    listStyle={{
+                                                        width: 350,
+                                                        height: 400,
+                                                        textAlign:'left'
+                                                    }}
+                                                    operations={['Add to ADA Directory', 'Revert']}
+                                                    targetKeys={systemStore.localTargetKeys}
+                                                    //this.state.localTargetKeys
+                                                    onChange={(ele)=>systemStore.setLocalKeys(ele)}
+                                                    //this.handleLocalTransferChange
+                                                    render={item => `${item.filename}`}
+                                                    rowKey={record => record.filename}
+                                                    //footer={this.renderFooter}
+                                                />
+                                            </div>
 
-                                            <Transfer
-                                                dataSource={datasource}
-                                                showSearch
-                                                listStyle={{
-                                                    width: 350,
-                                                    height: 400,
-                                                }}
-                                                operations={['to right', 'to left']}
-                                                targetKeys={this.state.localTargetKeys}
-                                                onChange={this.handleLocalTransferChange}
-                                                render={item => `${item.filename}`}
-                                                rowKey={record => record.filename}
-                                                //footer={this.renderFooter}
-                                            />
                                             {/*<Table*/}
                                             {/*    rowSelection={rowSelection}*/}
                                             {/*    columns={columns}*/}
@@ -660,24 +699,29 @@ export default class DataverseFiles extends Component{
                                             {/*/>*/}
                                         </Col>
                                     </Row>
-                                    <Row style={{ marginBottom:'2vh' }}>
+                                    <Row style={{ marginBottom:'5vh', marginTop:'5vh' }}>
                                         <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
+                                            <div style={{textAlign:'center'}}>
+                                                <Transfer
+                                                    dataSource={datasource}
+                                                    showSearch
+                                                    listStyle={{
+                                                        width: 350,
+                                                        height: 400,
+                                                        textAlign:'left'
+                                                    }}
+                                                    operations={['Add to Dataset', 'Revert']}
+                                                    targetKeys={systemStore.remoteTargetKeys}
+                                                    //this.state.remoteTargetKeys
+                                                    onChange={(ele)=>systemStore.setRemoteKeys(ele)}
+                                                    //this.handleRemoteTransferChange
+                                                    render={item => `${item.filename}`}
+                                                    rowKey={record => record.filename}
+                                                    disabled={this.state.newADAID || systemStore.adaFolderInfoErrorMsg?true:false}
+                                                    //footer={this.renderFooter}
+                                                />
+                                            </div>
 
-                                            <Transfer
-                                                dataSource={datasource}
-                                                showSearch
-                                                listStyle={{
-                                                    width: 350,
-                                                    height: 400,
-                                                }}
-                                                operations={['to right', 'to left']}
-                                                targetKeys={this.state.remoteTargetKeys}
-                                                onChange={this.handleRemoteTransferChange}
-                                                render={item => `${item.filename}`}
-                                                rowKey={record => record.filename}
-                                                disabled={this.state.newADAID || systemStore.adaFolderInfoErrorMsg?true:false}
-                                                //footer={this.renderFooter}
-                                            />
                                             {/*<Table*/}
                                             {/*    rowSelection={rowSelection}*/}
                                             {/*    columns={columns}*/}
@@ -688,33 +732,9 @@ export default class DataverseFiles extends Component{
                                     </Row>
                             </Col>
                         </Row>
-                        <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
-                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
 
-                                <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'0vh'}}>
-                                    <span>Upload Files from your computer: </span>
-                                    <Divider />
-
-                                </div>
-                                <Row style={{ marginBottom:'2vh' }}>
-                                    <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
-                                        <div>
-                                            <Dragger {...props}>
-                                                <p className="ant-upload-drag-icon">
-                                                    <InboxOutlined />
-                                                </p>
-                                                <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                                                <p className="ant-upload-hint">
-                                                    Both single and multiple file upload are supported.
-                                                </p>
-                                            </Dragger>
-                                        </div>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
                         <Row style={{marginTop:'2vh', marginBottom:'5vh'}}>
-                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
+                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
                             <div style={{textAlign: 'center', paddingTop:'2vh', paddingBottom:'3vh'}}>
                                 <span>ADAID: </span>
@@ -817,7 +837,7 @@ export default class DataverseFiles extends Component{
                             </Col>
                         </Row>
 
-                        <Row style={{marginBottom:'5vh'}}>
+                        <Row style={{marginBottom:'5vh'}} >
                             <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
                                 <div style={{textAlign: 'center', paddingBottom:'3vh'}}>
                                     <Button type="primary" htmlType="submit" disabled={!systemStore.doiValid} loading={isLoading}>
@@ -828,18 +848,19 @@ export default class DataverseFiles extends Component{
                         </Row>
 
                     </Form>
-                    {
-                        systemStore.showfinalResultDVFiles?(
-                            <div>
+                    <div ref={ref => {this.finalResult_Existing = ref}}>
+                        {
+                            systemStore.showfinalResultDVFiles?(
+
                                 <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                                     <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
                                         <FinalResult clearResult={this.clearResult} />
                                     </Col>
                                 </Row>
-                            </div>
-                        ):null
-                    }
 
+                            ):null
+                        }
+                    </div>
                 </div>
                 <APIInput getFileList={this.getFileList}/>
 

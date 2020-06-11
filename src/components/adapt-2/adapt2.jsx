@@ -37,6 +37,7 @@ export default class Adapt2 extends Component{
     //         formdata: form
     //     })
     // }
+    finalResult_New=React.createRef()
     clearResult=()=>{
         this.setState({
             finalFiles: [],
@@ -160,6 +161,7 @@ export default class Adapt2 extends Component{
                                           doi: doi
                                       });
                                       systemStore.handleFinalResultOpen(this.state.formdata, this.state.adaID, this.state.doi, data.files)
+                                      this.finalResult_New.scrollIntoView({behavior:'smooth'})
                                   }).catch(err=>{
                                   if (err.response) {
                                       this.setState({
@@ -181,6 +183,7 @@ export default class Adapt2 extends Component{
                                   //formReset: true,
                               });
                               systemStore.handleFinalResultOpen(this.state.formdata, this.state.adaID, this.state.doi, data.files)
+                              this.finalResult_New.scrollIntoView({behavior:'smooth'})
                           }
 
 
@@ -376,10 +379,11 @@ export default class Adapt2 extends Component{
                                 </Button>
                             </div>
                             {/*dataset={formdata} adaid={adaID} doi={doi} files={returnedFiles}*/}
-                            {
-                                systemStore.showfinalResult?<FinalResult clearResult={this.clearResult}/>: null
-                            }
-
+                            <div ref={ref => {this.finalResult_New = ref}}>
+                                {
+                                    systemStore.showfinalResult?<FinalResult clearResult={this.clearResult}/>: null
+                                }
+                            </div>
                         </Col>
                     </Row>
                 </div>
