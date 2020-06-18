@@ -465,7 +465,7 @@ export default class DataverseFiles extends Component{
                         fileList: newFileList,
                     };
                 });
-                systemStore.deleteFileFromFileList(file.uid)
+                systemStore.deleteFileFromFileList(file.uid, file.name)
                 let localKeys = localTargetKeys.filter(ele=>ele !== file.name)
                 let remoteKeys = remoteTargetKeys.filter(ele=>ele !== file.name)
                 this.setState({localTargetKeys: localKeys, remoteTargetKeys: remoteKeys})

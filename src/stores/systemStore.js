@@ -144,11 +144,13 @@ export class SystemStore{
     @action addFileToFileList(file){
         this.fileList = [...this.fileList, file]
     }
-    @action deleteFileFromFileList(fileID){
+    @action deleteFileFromFileList(fileID, filename){
         console.log("deleting")
-
+        console.log(fileID)
         const tempList = toJS(this.fileList)
         this.fileList = tempList.filter(file=> file.id !== fileID)
+        this.localTargetKeys = this.localTargetKeys.filter(file=> file !== filename)
+        this.remoteTargetKeys = this.remoteTargetKeys.filter(file=> file !== filename)
     }
     @action getFileListByDOI(doi, server, userid){
         console.log(server)

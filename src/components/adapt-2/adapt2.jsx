@@ -123,6 +123,8 @@ export default class Adapt2 extends Component{
                 formData.set('server', json.msg.dataverse)
                 formData.set('uploadSwitch', uploadSwitch)
                 formData.set('newDataset', newDataset)
+                formData.set('dataset', JSON.stringify(obj))
+                formData.set('doi', json.msg.doi)
 
                 fileList.forEach(file => {
                     formData.append('file', file);
