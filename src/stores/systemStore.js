@@ -22,6 +22,7 @@ export class SystemStore{
     @observable showfinalResult = false
     @observable showfinalResultDVFiles = false
     @observable fileList=[]
+    @observable lastFileList=[]
     @observable doiValid=false
     @observable doiMessage=null
     @observable isDoiLoading = false
@@ -51,8 +52,10 @@ export class SystemStore{
         this.remoteTargetKeys = key
     }
     @action resetKeys(){
-        this.localTargetKeys = []
-        this.remoteTargetKeys = []
+        let filteredLocalKeys = this.localTargetKeys.filter(ele=>!this.lastFileList.includes(ele))
+        let filteredRemoteKeys = this.remoteTargetKeys.filter(ele=>!this.lastFileList.includes(ele))
+        this.localTargetKeys = filteredLocalKeys
+        this.remoteTargetKeys = filteredRemoteKeys
     }
 
     @action setCheck(server, dvID, permissionType){
@@ -120,7 +123,11 @@ export class SystemStore{
     }
 
     @action resetFileList(){
-        this.fileList = []
+        console.log(toJS(this.lastFileList))
+        let filteredList = this.fileList.filter(ele=>!this.lastFileList.includes(ele.filename)
+        )
+        console.log(filteredList)
+        this.fileList = filteredList
         this.adaFolderInfoErrorMsg = null
         this.resetKeys()
     }
@@ -160,13 +167,35 @@ export class SystemStore{
             userid: userid
         }
         this.isDoiLoading = true
+        console.log("send request")
         return axios.post(API_URL.Get_Dataset_FileList_ByDOI, data)
             .then(action(res=>{
+                console.log("got result")
                 if (res.status ===201){
-                    this.fileList = [...this.fileList, ...res.data]
-                    //this.fileList = res.data
-                    this.doiValid = true
-                    return true
+                    if (this.lastFileList.length >0){
+                        let filteredList = this.fileList.filter(ele=>!this.lastFileList.includes(ele.filename))
+                        this.fileList = [...filteredList, ...res.data]
+                        //this.fileList = res.data
+                        this.doiValid = true
+                        let lastFiles = []
+                        for (let file of res.data){
+                            lastFiles.push(file.filename)
+                        }
+                        this.lastFileList = lastFiles
+                        return true
+                    }
+                    else {
+                        let lastFiles = []
+                        for (let file of res.data){
+                            lastFiles.push(file.filename)
+                        }
+                        this.lastFileList = lastFiles
+                        this.fileList = [...this.fileList, ...res.data]
+                        //this.fileList = res.data
+                        this.doiValid = true
+                        return true
+                    }
+
                 }
                 else {
                     //this.fileList = []

@@ -446,7 +446,8 @@ export default class DataverseFiles extends Component{
         console.log(fileList)
         console.log(localTargetKeys)
         console.log(remoteTargetKeys)
-        console.log(systemStore.adaFolderInfoErrorMsg)
+        console.log(datasource)
+        console.log(toJS(systemStore.lastFileList))
         //console.log(datasource)
         const rowSelection = {
             // selectedRowKeys: datasource.map(ele=>ele.id),
