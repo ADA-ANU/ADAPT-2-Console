@@ -81,7 +81,7 @@ export default class FinalResult extends Component{
                                         fontSize: 16,
                                     }}
                                 >
-                                    ADAID: {adaid? adaid:''}
+                                    <Text style={{fontWeight: "bold"}}>ADAID:</Text> {adaid? adaid:''}
 
                                 </Text>
                             </Paragraph>
@@ -149,7 +149,7 @@ export default class FinalResult extends Component{
                                                 fontSize: 16,
                                             }}
                                         >
-                                            Files Stored on D10:
+                                            <Text style={{fontWeight: "bold"}}>Files Stored on D10:</Text>
 
                                         </Text>:''
                                     }

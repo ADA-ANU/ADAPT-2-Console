@@ -312,10 +312,10 @@ export default class Adapt2 extends Component{
             fileList,
         };
         const content = <>
-                            <div style={{paddingBottom:'1vh'}}>1. Do nothing but clicking Get ADAID button: A new ADAID will be generated and a folder named after it will be created on the local directory.</div>
-                            <div style={{paddingBottom:'1vh'}}>2. Upload files and then click Get ADAID button: A new ADAID will be generated and a local folder named after it will be created with uploaded files in it.</div>
-                            <div style={{paddingBottom:'1vh'}}>3. Switch “Create new dataset” to yes and fill the blanks underneath and click Get ADAID button: A new ADAID will be generated and a folder named after it as well as a new dataset will be created on local directory and the Dataverse you choose respectively. The new dataset will come with that ADAID in the Other ID field.</div>
-                            <div style={{paddingBottom:'1vh'}}>4. Upload files and Switch “Create new dataset” to yes: You will get the same result as No. 3 and uploaded files will be stored in local directory as well as in the new dataset.</div>
+                            <div style={{paddingBottom:'1vh'}}>1. Create a new ADAID: Click Get ADAID button</div>
+                            <div style={{paddingBottom:'1vh'}}>2. Create a new ADAID with files: Click or drag files to the uploading component and then click GetADAID button.</div>
+                            <div style={{paddingBottom:'1vh'}}>3. Create a new DV dataset: Switch "Create new datase" to right and fill in the blanks below and then click GetADAID button.</div>
+                            <div style={{paddingBottom:'1vh'}}>4. Create a new DV dataset with files: Switch "Create new datase" to right, fill in the blanks below, upload files through uploading component, switch "Upload files to dataverse" to right and then click GetADAID button.</div>
                         </>
         return (
             <div style={{background: 'white', paddingTop:'2%'}}>
