@@ -149,7 +149,7 @@ export default class FinalResult extends Component{
                                                 fontSize: 16,
                                             }}
                                         >
-                                            Files Stored Locally:
+                                            Files Stored on D10:
 
                                         </Text>:''
                                     }
