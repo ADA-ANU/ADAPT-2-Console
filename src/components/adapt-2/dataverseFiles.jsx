@@ -278,9 +278,9 @@ export default class DataverseFiles extends Component{
         }
         else {
             notification[type]({
-                message: 'Operation Failed',
+                message: 'Submission Failed',
                 description:
-                    `Operation failed, ${error}`,
+                    `${error}`,
                 duration: 0,
             });
         }
