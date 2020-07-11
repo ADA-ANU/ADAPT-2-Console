@@ -22,7 +22,8 @@ const API_URL = {
     Delete_Img: ROOT +'api/deleteImg/',
     Check_DV_Permission: ROOT + 'api/dvPermissionSpecific',
     getADAFolderInfo: ROOT + 'api/getADAFolderInfo',
-    uploadFilesFromExsitingPage: ROOT + 'api/uploadFilesFromExsitingPage'
+    uploadFilesFromExsitingPage: ROOT + 'api/uploadFilesFromExsitingPage',
+    getSubDVs: ROOT + 'api/getSubDVs/'
 }
 
 // const PROD_API_URL = {

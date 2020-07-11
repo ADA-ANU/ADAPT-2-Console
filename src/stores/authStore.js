@@ -14,6 +14,8 @@ class AuthStore {
     @observable Dataverses ={}
     @observable dataverseList = []
     @observable adaFolderList  =[]
+    @observable initProdDVList = []
+    @observable productionDVList = []
     //@observable isLoading = false;
     //@observable errors = undefined;
     //@observable ws = undefined;
@@ -113,9 +115,35 @@ class AuthStore {
             }))
             .then(action(json=>{
 
-                    this.networkError = false
-                    this.Dataverses = json.msg
-                }))
+                this.networkError = false
+                this.Dataverses = json.msg
+                this.initProdDVList = json.prod
+                this.productionDVList = json.prod
+            }))
+            .catch(err => {
+                this.networkError = true
+                this.networkErrorMessage = err
+            })
+    }
+    @action resetProdSubDVs(){
+        this.productionDVList = this.initProdDVList
+    }
+    @action getSubDataverses(dvID){
+        return fetch(API_URL.getSubDVs + dvID)
+            .then(action( res=>{
+                if (res.status === 201){
+                    return res.json()
+                }
+                // else {
+                //     throw new Error('Unable to download dataverse list, please refresh the page to try again.')
+                // }
+            }))
+            .then(action(json=>{
+                console.log(json)
+                let data = this.productionDVList.concat(json)
+                this.productionDVList = data
+                return true
+            }))
             .catch(err => {
                 this.networkError = true
                 this.networkErrorMessage = err

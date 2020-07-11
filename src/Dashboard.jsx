@@ -15,6 +15,7 @@ import history from "./stores/routingStore"
 import Overview from "./components/overview"
 import Adapt2 from "./components/adapt-2/adapt2";
 import DataverseFiles from "./components/adapt-2/dataverseFiles";
+import CopyTool from "./components/adapt-2/copyTool";
 const logo = require('./static/img/ADAlogo.jpg')
 import NotFound from "./404page";
 const { SubMenu } = Menu;
@@ -74,6 +75,7 @@ export default class Dashboard extends Component {
                                             {/*<Menu.Item key='/dashboard/forcode'><Link to='/dashboard/forcode'>FOR Code</Link></Menu.Item>*/}
                                             {/*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*/}
                                         </SubMenu>
+                                        <Menu.Item key="/dashboard/copy-tool"><Link to='/dashboard/copy-tool'>Copy Tool</Link></Menu.Item>
                                     </Menu>
                                 </Col>
                                 <Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 0 }} md={{ span: 1, offset: 1 }} lg={{ span: 1, offset: 1 }} xl={{ span: 1, offset: 1 }} xxl={{ span: 1, offset: 1 }}>
@@ -99,6 +101,7 @@ export default class Dashboard extends Component {
                                     {/*<Route exact path='/dashboard' component={Adapt2} />*/}
                                     <Route exact path='/dashboard' component={Adapt2} />
                                     <Route exact path='/dashboard/adapt2-existing' component={DataverseFiles} />
+                                    <Route exact path='/dashboard/copy-tool' component={CopyTool} />
 
                         </Content>
                         <Footer>

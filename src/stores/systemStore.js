@@ -174,11 +174,11 @@ export class SystemStore{
                 if (res.status ===201){
                     if (this.lastFileList.length >0){
                         let filteredList = this.fileList.filter(ele=>!this.lastFileList.includes(ele.filename))
-                        this.fileList = [...filteredList, ...res.data]
+                        this.fileList = [...filteredList, ...res.data.fileList]
                         //this.fileList = res.data
                         this.doiValid = true
                         let lastFiles = []
-                        for (let file of res.data){
+                        for (let file of res.data.fileList){
                             lastFiles.push(file.filename)
                         }
                         this.lastFileList = lastFiles
@@ -186,11 +186,11 @@ export class SystemStore{
                     }
                     else {
                         let lastFiles = []
-                        for (let file of res.data){
+                        for (let file of res.data.fileList){
                             lastFiles.push(file.filename)
                         }
                         this.lastFileList = lastFiles
-                        this.fileList = [...this.fileList, ...res.data]
+                        this.fileList = [...this.fileList, ...res.data.fileList]
                         //this.fileList = res.data
                         this.doiValid = true
                         return true

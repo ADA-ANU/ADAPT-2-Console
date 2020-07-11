@@ -16,7 +16,8 @@ import {
     List,
     Skeleton,
     Upload,
-    Transfer
+    Transfer,
+    TreeSelect
 } from 'antd';
 import { inject, observer } from 'mobx-react';
 import API_URL from '../../config'
@@ -56,7 +57,7 @@ const columns = [
 
 @inject('routingStore', 'systemStore', 'authStore')
 @observer
-export default class DataverseFiles extends Component{
+export default class CopyTool extends Component{
     state={
         createDataset: false,
         doiExisting: false,
@@ -79,6 +80,7 @@ export default class DataverseFiles extends Component{
         this.props.systemStore.handleFinalResultClose()
         this.props.systemStore.handleFinalResultDVFilesClose()
         this.props.systemStore.resetFileList()
+        this.props.authStore.resetProdSubDVs()
     }
     finalResult_Existing=React.createRef()
     fileFormRef = React.createRef();
@@ -407,7 +409,7 @@ export default class DataverseFiles extends Component{
                     this.setState({server: server, doiMessage: null})
                 }
             }
-        else{
+            else{
                 this.setState({server: null, doi: null})
                 this.props.systemStore.resetFileList()
             }
@@ -434,19 +436,30 @@ export default class DataverseFiles extends Component{
 
         this.setState({ remoteTargetKeys: targetKeys });
     };
+    onLoadData = treeNode =>{
+        const { id } = treeNode.props;
+        return new Promise((resolve, reject)=>{
+             this.props.authStore.getSubDataverses(id)
+                .then(res=>resolve())
+                .catch(err=>{
+                    console.log(err)
+                })
+        })
+
+    }
 
     render() {
         const { authStore, systemStore, files, formReset } = this.props
         const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, localTargetKeys, remoteTargetKeys } = this.state
         const serverList = toJS(authStore.serverList)
-        const datasource = toJS(systemStore.fileList)
+        const datasource = systemStore.fileList
         const user = toJS(authStore.currentUser)
-        const dataverses = toJS(authStore.Dataverses)
-        const adaFolderList = toJS(authStore.adaFolderList)
+        const treeData = authStore.productionDVList
+        const adaFolderList = authStore.adaFolderList
         console.log(fileList)
-        console.log(localTargetKeys)
-        console.log(remoteTargetKeys)
-        console.log(datasource)
+        console.log(toJS(authStore.productionDVList))
+        console.log(treeData)
+        console.log(toJS(datasource))
         console.log(toJS(systemStore.lastFileList))
         //console.log(datasource)
         const rowSelection = {
@@ -518,50 +531,120 @@ export default class DataverseFiles extends Component{
                                     <span>Dataset: </span>
                                     <Divider />
                                 </div>
-                                    <Form.Item
-                                        label="Dataset URL"
-                                        name="doi"
-                                        hasFeedback
-                                        rules={[
-                                            {
-                                                required: this.state.doiExisting ===false && this.state.serverExisting ===false ||this.state.doiExisting,
-                                                message: "Please enter DOI.",
-                                            },
-                                            {
-                                                //\/.*
-                                                type: 'string',
-                                                pattern: '(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi:.*\\/.*$(?![\\w])',
-                                                message: 'Please enter a valid doi url.'
-                                            }
-                                        ]}
-                                    >
-                                        <Input
-                                            placeholder="E.g. https://dataverse-dev.ada.edu.au/dataset.xhtml?persistentId=doi:10.5072/FK2/XS0BPD"
-                                            disabled={this.state.serverExisting}
-                                            onChange={this.doiOnChange}
-                                        />
+                                <Form.Item
+                                    label="Dataset URL"
+                                    name="doi"
+                                    hasFeedback
+                                    rules={[
+                                        {
+                                            required: this.state.doiExisting ===false && this.state.serverExisting ===false ||this.state.doiExisting,
+                                            message: "Please enter DOI.",
+                                        },
+                                        {
+                                            //\/.*
+                                            type: 'string',
+                                            pattern: '(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi:.*\\/.*$(?![\\w])',
+                                            message: 'Please enter a valid doi url.'
+                                        }
+                                    ]}
+                                >
+                                    <Input
+                                        placeholder="E.g. https://dataverse-dev.ada.edu.au/dataset.xhtml?persistentId=doi:10.5072/FK2/XS0BPD"
+                                        disabled={this.state.serverExisting}
+                                        onChange={this.doiOnChange}
+                                    />
 
-                                    </Form.Item>
-                                    {
-                                        this.state.server?
-                                            <div style={{marginLeft:'21%', marginBottom:'1vh'}}><Tag color="default" style={{width: '3vw',textAlign:'center'}}>Server: </Tag>
-                                                <span>{this.state.server}</span>
-                                                {this.state.doiMessage?<Tag style={{marginLeft:'1vw'}} color={this.state.doiMessage ==="Server not found."?"#f50":"#87d068"}>{this.state.doiMessage}</Tag>
+                                </Form.Item>
+                                {
+                                    this.state.server?
+                                        <div style={{marginLeft:'21%', marginBottom:'1vh'}}><Tag color="default" style={{width: '3vw',textAlign:'center'}}>Server: </Tag>
+                                            <span>{this.state.server}</span>
+                                            {this.state.doiMessage?<Tag style={{marginLeft:'1vw'}} color={this.state.doiMessage ==="Server not found."?"#f50":"#87d068"}>{this.state.doiMessage}</Tag>
                                                 :null}
-                                            </div>: null
-                                    }
-                                    {
-                                        this.state.doi?
-                                            <div style={{marginLeft:'21%', marginBottom:'5vh'}}>
-                                                <Tag color="default" style={{width: '3vw',textAlign:'center'}}>DOI: </Tag>
-                                                <span>{this.state.doi}</span><
-                                                Tag style={{marginLeft:'1vw'}} color={systemStore.doiValid ?"#87d068":"#f50"}>{systemStore.doiValid?"Valid":systemStore.doiMessage}</Tag>
-                                                <Spin spinning={systemStore.isDoiLoading} delay={20} indicator={doiLoadingIcon} />
-                                            </div>: null
-                                    }
+                                        </div>: null
+                                }
+                                {
+                                    this.state.doi?
+                                        <div style={{marginLeft:'21%', marginBottom:'5vh'}}>
+                                            <Tag color="default" style={{width: '3vw',textAlign:'center'}}>DOI: </Tag>
+                                            <span>{this.state.doi}</span><
+                                            Tag style={{marginLeft:'1vw'}} color={systemStore.doiValid ?"#87d068":"#f50"}>{systemStore.doiValid?"Valid":systemStore.doiMessage}</Tag>
+                                            <Spin spinning={systemStore.isDoiLoading} delay={20} indicator={doiLoadingIcon} />
+                                        </div>: null
+                                }
                             </Col>
                         </Row>
-                        
+                        <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
+                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
+
+                                <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>
+                                    <span>File List: </span>
+                                    <Divider />
+
+                                </div>
+                                <Row style={{ marginBottom:'2vh' }}>
+                                    <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
+                                        <div style={{textAlign:'center'}}>
+                                            <Transfer
+                                                dataSource={datasource}
+                                                showSearch
+                                                listStyle={{
+                                                    width: 350,
+                                                    height: 400,
+                                                    textAlign:'left'
+                                                }}
+                                                operations={['Add to ADA Directory', 'Revert']}
+                                                targetKeys={systemStore.localTargetKeys}
+                                                //this.state.localTargetKeys
+                                                onChange={(ele)=>systemStore.setLocalKeys(ele)}
+                                                //this.handleLocalTransferChange
+                                                render={item => `${item.filename}`}
+                                                rowKey={record => record.filename}
+                                                //footer={this.renderFooter}
+                                            />
+                                        </div>
+
+                                        {/*<Table*/}
+                                        {/*    rowSelection={rowSelection}*/}
+                                        {/*    columns={columns}*/}
+                                        {/*    dataSource={datasource}*/}
+                                        {/*    rowKey="id"*/}
+                                        {/*/>*/}
+                                    </Col>
+                                </Row>
+                                <Row style={{ marginBottom:'5vh', marginTop:'5vh' }}>
+                                    <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
+                                        <div style={{textAlign:'center'}}>
+                                            <Transfer
+                                                dataSource={datasource}
+                                                showSearch
+                                                listStyle={{
+                                                    width: 350,
+                                                    height: 400,
+                                                    textAlign:'left'
+                                                }}
+                                                operations={['Add to Dataset', 'Revert']}
+                                                targetKeys={systemStore.remoteTargetKeys}
+                                                //this.state.remoteTargetKeys
+                                                onChange={(ele)=>systemStore.setRemoteKeys(ele)}
+                                                //this.handleRemoteTransferChange
+                                                render={item => `${item.filename}`}
+                                                rowKey={record => record.filename}
+                                                disabled={this.state.newADAID || systemStore.adaFolderInfoErrorMsg?true:false}
+                                                //footer={this.renderFooter}
+                                            />
+                                        </div>
+
+                                        {/*<Table*/}
+                                        {/*    rowSelection={rowSelection}*/}
+                                        {/*    columns={columns}*/}
+                                        {/*    dataSource={datasource}*/}
+                                        {/*    rowKey="id"*/}
+                                        {/*/>*/}
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row>
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
@@ -587,255 +670,58 @@ export default class DataverseFiles extends Component{
                                 </Row>
                             </Col>
                         </Row>
-                                    {/*<Form.Item*/}
-                                    {/*    label="Or"*/}
-                                    {/*    //name="uploadSwitch"*/}
-                                    {/*>*/}
-                                    {/*</Form.Item>*/}
-                                    {/*<Form.Item*/}
-                                    {/*    label="Server"*/}
-                                    {/*    name="server"*/}
-                                    {/*    rules={[*/}
-                                    {/*        {*/}
-                                    {/*            required: this.state.doiExisting ===false && this.state.serverExisting ===false ||this.state.selectedServer !==null,*/}
-                                    {/*            message: "Please select a dataverse server.",*/}
-                                    {/*        },*/}
-                                    {/*    ]}*/}
-                                    {/*>*/}
-                                    {/*    <Select*/}
-                                    {/*        placeholder="Select a server"*/}
-                                    {/*        allowClear*/}
-                                    {/*        disabled={this.state.doiExisting}*/}
-                                    {/*        onChange={this.serverOnChange}*/}
-                                    {/*    >*/}
-                                    {/*        {*/}
-                                    {/*            serverList && serverList.length>0?*/}
-                                    {/*                serverList.map(server=>{*/}
-                                    {/*                    return(*/}
-                                    {/*                        <Select.Option key={server.id} value={server.alias}>{server.servername} ({server.url})</Select.Option>*/}
-                                    {/*                    )*/}
-                                    {/*                }):<Select.Option value={0}>Loading</Select.Option>*/}
-
-                                    {/*        }*/}
-                                    {/*        /!*<Select.Option value="self">Self Deposit (deposit.ada.edu.au)</Select.Option>*!/*/}
-                                    {/*        /!*<Select.Option value="production">Production Deposit (dataverse.ada.edu.au)</Select.Option>*!/*/}
-                                    {/*        /!*<Select.Option value="test">Test Deposit (dataverse-test.ada.edu.au)</Select.Option>*!/*/}
-                                    {/*    </Select>*/}
-                                    {/*</Form.Item>*/}
-                                    {/*<Form.Item*/}
-                                    {/*    label="Dataverse"*/}
-                                    {/*    name="dataverse"*/}
-                                    {/*    rules={[*/}
-                                    {/*        {*/}
-                                    {/*            required: this.state.selectedServer !==null,*/}
-                                    {/*            message: "Please select a dataverse.",*/}
-                                    {/*        },*/}
-                                    {/*    ]}*/}
-
-                                    {/*    // validateStatus={()=>{*/}
-                                    {/*    //     if( this.state.selectedServer ===null){*/}
-                                    {/*    //         return 'success'*/}
-                                    {/*    //     }*/}
-                                    {/*    // }}*/}
-                                    {/*>*/}
-                                    {/*    <Select*/}
-                                    {/*        showSearch*/}
-                                    {/*        allowClear*/}
-                                    {/*        disabled={this.state.selectedServer ===null}*/}
-                                    {/*        placeholder="Select a dataverse"*/}
-                                    {/*        optionFilterProp="children"*/}
-                                    {/*        onChange={this.dataverseOnChange}*/}
-                                    {/*        // onFocus={this.dataverseOnFocus}*/}
-                                    {/*        // onBlur={this.dataverseOnBlur}*/}
-                                    {/*        // onSearch={this.dataverseOnSearch}*/}
-                                    {/*        filterOption={(input, option) =>*/}
-                                    {/*            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0*/}
-                                    {/*        }*/}
-                                    {/*    >*/}
-                                    {/*        {*/}
-                                    {/*            dataverses && this.state.selectedServer?*/}
-                                    {/*                dataverses[this.state.selectedServer].dataverses.map(dataverse=>{*/}
-                                    {/*                    return(*/}
-                                    {/*                        <Select.Option key={dataverse.id} value={[dataverse.title, dataverse.id]}>{dataverse.title}</Select.Option>*/}
-                                    {/*                    )*/}
-                                    {/*                }):<Select.Option value={0}>Loading</Select.Option>*/}
-
-                                    {/*        }*/}
-                                    {/*    </Select>*/}
-                                    {/*</Form.Item>*/}
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
+                                <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>
+                                    <span>Production Dataverse: </span>
+                                    <Divider />
 
-                                    <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>
-                                        <span>File List: </span>
-                                        <Divider />
+                                </div>
+                                <Form.Item
+                                    label="Dataverse"
+                                    name="dataverse"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: "Please select a dataverse.",
+                                        },
+                                    ]}
 
-                                    </div>
-                                    <Row style={{ marginBottom:'2vh' }}>
-                                        <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
-                                            <div style={{textAlign:'center'}}>
-                                                <Transfer
-                                                    dataSource={datasource}
-                                                    showSearch
-                                                    listStyle={{
-                                                        width: 350,
-                                                        height: 400,
-                                                        textAlign:'left'
-                                                    }}
-                                                    operations={['Add to ADA Directory', 'Revert']}
-                                                    targetKeys={systemStore.localTargetKeys}
-                                                    //this.state.localTargetKeys
-                                                    onChange={(ele)=>systemStore.setLocalKeys(ele)}
-                                                    //this.handleLocalTransferChange
-                                                    render={item => `${item.filename}`}
-                                                    rowKey={record => record.filename}
-                                                    //footer={this.renderFooter}
-                                                />
-                                            </div>
-
-                                            {/*<Table*/}
-                                            {/*    rowSelection={rowSelection}*/}
-                                            {/*    columns={columns}*/}
-                                            {/*    dataSource={datasource}*/}
-                                            {/*    rowKey="id"*/}
-                                            {/*/>*/}
-                                        </Col>
-                                    </Row>
-                                    <Row style={{ marginBottom:'5vh', marginTop:'5vh' }}>
-                                        <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
-                                            <div style={{textAlign:'center'}}>
-                                                <Transfer
-                                                    dataSource={datasource}
-                                                    showSearch
-                                                    listStyle={{
-                                                        width: 350,
-                                                        height: 400,
-                                                        textAlign:'left'
-                                                    }}
-                                                    operations={['Add to Dataset', 'Revert']}
-                                                    targetKeys={systemStore.remoteTargetKeys}
-                                                    //this.state.remoteTargetKeys
-                                                    onChange={(ele)=>systemStore.setRemoteKeys(ele)}
-                                                    //this.handleRemoteTransferChange
-                                                    render={item => `${item.filename}`}
-                                                    rowKey={record => record.filename}
-                                                    disabled={this.state.newADAID || systemStore.adaFolderInfoErrorMsg?true:false}
-                                                    //footer={this.renderFooter}
-                                                />
-                                            </div>
-
-                                            {/*<Table*/}
-                                            {/*    rowSelection={rowSelection}*/}
-                                            {/*    columns={columns}*/}
-                                            {/*    dataSource={datasource}*/}
-                                            {/*    rowKey="id"*/}
-                                            {/*/>*/}
-                                        </Col>
-                                    </Row>
-                            </Col>
-                        </Row>
-
-                        <Row style={{marginTop:'2vh', marginBottom:'5vh'}}>
-                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
-
-                            <div style={{textAlign: 'center', paddingTop:'2vh', paddingBottom:'3vh'}}>
-                                <span>ADAID: </span>
-                                <Divider />
-                            </div>
-                                    <Form.Item
-                                        label="Select"
-                                        name="adaIDSelect"
-                                        rules={[
-                                            {
-                                                required: !this.state.selectedADAFolder && this.state.newADAID ===false,
-                                                message: "Please select a ADA folder.",
-                                            },
-                                        ]}
+                                    // validateStatus={()=>{
+                                    //     if( this.state.selectedServer ===null){
+                                    //         return 'success'
+                                    //     }
+                                    // }}
+                                >
+                                    <TreeSelect
+                                        treeDataSimpleMode
+                                        showSearch
+                                        allowClear
+                                        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                                        //disabled={this.state.selectedServer ===null}
+                                        placeholder="Select a dataverse"
+                                        optionFilterProp="children"
+                                        onChange={this.dataverseOnChange}
+                                        loadData={this.onLoadData}
+                                        // onFocus={this.dataverseOnFocus}
+                                        // onBlur={this.dataverseOnBlur}
+                                        // onSearch={this.dataverseOnSearch}
+                                        // filterOption={(input, option) =>
+                                        //     option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                        // }
+                                        treeData={treeData}
                                     >
-                                        <Select
-                                            // mode="multiple"
-                                            style={{ width: '100%' }}
-                                            placeholder="select a ADA folder"
-                                            allowClear
-                                            disabled={this.state.newADAID}
-                                            //defaultValue={['china']}
-                                            onChange={this.handleADAFolderChange}
-                                            optionLabelProp="label"
-                                        >
-                                            {
-                                                adaFolderList && adaFolderList.length>0?
-                                                    adaFolderList.map((folder,index)=>
-                                                        <Select.Option value={folder} key={index} label={folder}>
-                                                            {folder}
-                                                        </Select.Option>
-                                                    ):null
+                                        {/*{*/}
+                                        {/*    dataverses.dataverses && dataverses.dataverses.length>0?*/}
+                                        {/*        dataverses.dataverses.map(dataverse=>{*/}
+                                        {/*            return(*/}
+                                        {/*                <Select.Option key={dataverse.id} value={[dataverse.title, dataverse.id]}>{dataverse.title}</Select.Option>*/}
+                                        {/*            )*/}
+                                        {/*        }):<Select.Option value={0}>Loading</Select.Option>*/}
 
-                                            }
-                                        </Select>
-                                    </Form.Item>
-                                {
-                                    selectedADAFolder && systemStore.adaFolderInfo?
-                                        <Row style={{marginBottom:'3vh'}}>
-                                            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
-                                                <Skeleton active={true} loading={systemStore.isADAFolderInfoLoading}>
-                                                    <div style={{ paddingBottom:'2vh'}}>
-                                                        <List
-                                                            itemLayout="horizontal"
-                                                            dataSource={Object.keys(systemStore.adaFolderInfo).filter(ele=>ele !=='authorFields')}
-                                                            renderItem={key => (
-                                                                <List.Item>
-                                                                    <List.Item.Meta
-                                                                        avatar={<Tag
-                                                                            style={{marginLeft: '1vw', fontSize: '15px'}}
-                                                                            color={"#87d068"}>{key.toUpperCase()}</Tag>}
-                                                                        //title={<a href="https://ant.design">{item.title}</a>}
-                                                                        description={systemStore.adaFolderInfo[key]}
-                                                                    />
-                                                                </List.Item>
-                                                                )
-
-                                                            }
-                                                        />
-                                                    </div>
-                                                </Skeleton>
-                                            </Col>
-                                        </Row>
-                                        : null
-
-                                }
-                                {
-                                    systemStore.adaFolderInfoErrorMsg?
-                                        <Row style={{marginBottom:'3vh'}}>
-                                            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
-                                                <div style={{ paddingBottom:'2vh'}}>
-                                                    <Tag style={{marginLeft:'1vw', fontSize:'15px'}} color="warning">{systemStore.adaFolderInfoErrorMsg}</Tag>
-                                                </div>
-                                            </Col>
-                                        </Row>: null
-                                }
-                                    <Form.Item
-                                        label="Or"
-                                        //name="uploadSwitch"
-                                    >
-                                    </Form.Item>
-                                    <Form.Item
-                                        label="Create New"
-                                        name="newADAID"
-                                        valuePropName="checked"
-                                        rules={[
-                                            {
-                                                required: !this.state.selectedADAFolder && this.state.newADAID ===false
-                                            },
-                                        ]}
-                                    >
-                                        <Switch
-                                            // defaultChecked={true}
-                                            //checked={this.state.fileUploadSwitch}
-                                            disabled={ this.state.selectedADAFolder?true: false}
-                                            checkedChildren="Yes"
-                                            unCheckedChildren="No"
-                                            onChange={this.handleNewADA}/>
-                                    </Form.Item>
+                                        {/*}*/}
+                                    </TreeSelect>
+                                </Form.Item>
                             </Col>
                         </Row>
 
