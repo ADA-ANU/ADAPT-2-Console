@@ -74,17 +74,21 @@ export default class FinalResult extends Component{
                         // ]}
                     >
                         <div className="desc">
-                            <Paragraph>
-                                <Text
-                                    strong
-                                    style={{
-                                        fontSize: 16,
-                                    }}
-                                >
-                                    <Text style={{fontWeight: "bold"}}>ADAID:</Text> {adaid? adaid:''}
+                            {
+                                adaid?
+                                <Paragraph>
+                                    <Text
+                                        strong
+                                        style={{
+                                            fontSize: 16,
+                                        }}
+                                    >
+                                        <Text style={{fontWeight: "bold"}}>ADAID:</Text> {adaid? adaid:''}
 
-                                </Text>
-                            </Paragraph>
+                                    </Text>
+                                </Paragraph> : null
+                            }
+
                             {
                                 datasetURL?
                                     <Paragraph>

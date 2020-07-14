@@ -23,7 +23,8 @@ const API_URL = {
     Check_DV_Permission: ROOT + 'api/dvPermissionSpecific',
     getADAFolderInfo: ROOT + 'api/getADAFolderInfo',
     uploadFilesFromExsitingPage: ROOT + 'api/uploadFilesFromExsitingPage',
-    getSubDVs: ROOT + 'api/getSubDVs/'
+    getSubDVs: ROOT + 'api/getSubDVs/',
+    createProdDS: ROOT + 'api/createProdDS'
 }
 
 // const PROD_API_URL = {

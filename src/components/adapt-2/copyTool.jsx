@@ -85,24 +85,7 @@ export default class CopyTool extends Component{
     finalResult_Existing=React.createRef()
     fileFormRef = React.createRef();
 
-    resetState = ()=>{
-        this.setState({
-            createDataset: false,
-            doiExisting: false,
-            serverExisting: false,
-            modalOpen: false,
-            selectedServer: null,
-            selectedDataverse: null,
-            selectedADAFolder: null,
-            newADAID: false,
-            doi: null,
-            server: null,
-            doiMessage: null,
-            isLoading: false,
-            fileList:[]
-        })
-        this.props.systemStore.resetFileList()
-    }
+
 
 
     onFinish = values => {
@@ -112,67 +95,28 @@ export default class CopyTool extends Component{
         this.submit(values)
     };
 
-    submit=async (form)=>{
+    submit=(form)=>{
         this.setState({isLoading: true})
         this.props.systemStore.handleFinalResultDVFilesClose()
         console.log(form)
-        const { doi, adaIDSelect, newADAID } = form
-        const { doiMessage} = this.state
-        console.log(this.props.systemStore.localTargetKeys)
-        let localTargetKeys = this.props.systemStore.localTargetKeys
-        console.log(this.props.systemStore.remoteTargetKeys)
-        let remoteTargetKeys = this.props.systemStore.remoteTargetKeys
+        const { dataverse } = form
+        const { doi, doiMessage } = this.state
+        console.log(this.state)
 
-        let adaid = adaIDSelect
-        console.log(adaid)
-        if (newADAID){
-            let obj = {
-                doi: null,
-                newDataset: false,
-                title: null,
-                author: null,
-                email: null,
-                description: null,
-                subject: null,
-                server: null,
-                dataverse: null,
-                uploadSwitch: false,
-                userid: toJS(this.props.authStore.currentUser).userID,
+        const obj = {
+            destinationDVID: dataverse,
+            userid: toJS(this.props.authStore.currentUser).userID,
+            destinationServer: 'production',
+            originServer: doiMessage,
+            originDOI: doi
 
-            }
-            const json = JSON.stringify(obj);
-            let d = await axios.post(API_URL.AdaID, json, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }
-            )
-
-            adaid = d.data.msg.adaid
         }
+        const json = JSON.stringify(obj);
 
-        const formData = new FormData();
-        formData.set('adaid', adaid)
-        formData.set('userid', toJS(this.props.authStore.currentUser).userID)
-        formData.set('newADAID', newADAID)
-        formData.set('server', doiMessage)
-        formData.set('doi', doi)
-        formData.set('localFileList', JSON.stringify(localTargetKeys))
-        formData.set('remoteFileList', JSON.stringify(remoteTargetKeys))
-
-        this.state.fileList.forEach(file => {
-            if( localTargetKeys.includes(file.name) || remoteTargetKeys.includes(file.name) ){
-                formData.append('file', file);
-            }
-        });
-        axios({
-            url:API_URL.uploadFilesFromExsitingPage,
-            method: 'post',
-            data: formData,
-            config: { headers: {'Content-Type': 'multipart/form-data' }}
-        }).then(res=>res.data)
+        axios.post(API_URL.createProdDS, json, {headers: {'Content-Type': 'application/json'}})
+            .then(res=>res.data)
             .then(data=>{
-                this.props.systemStore.handleFinalResultOpen({datasetURL: data.datasetURL}, data.adaid, doi, data.localFiles, data.remoteFiles, 'dvFiles')
+                this.props.systemStore.handleFinalResultOpen({datasetURL: data.datasetURL}, null, null, [], [], 'dvFiles')
                 //this.resetState()
                 this.setState({
                     isLoading: false
@@ -215,60 +159,6 @@ export default class CopyTool extends Component{
                 }
 
             })
-        // const { doi, server, dataverse, adaIDSelect, newADAID } = form
-        // if (dataverse ===undefined){
-        //     form.server = this.state.doiMessage
-        // }
-        // form.userid = toJS(this.props.authStore.currentUser).userID
-        // console.log(form)
-        // //let data = JSON.stringify(form)
-        // // console.log(await this.getFileList())
-        // // if (await this.getFileList()) {
-        //     this.setState({isLoading: true})
-        //     axios.post(API_URL.Download_Dataset_Files, form)
-        //         .then(res => {
-        //             if (res.status === 201) {
-        //                 const data = res.data
-        //                 this.props.systemStore.handleFinalResultOpen({datasetURL: data.datasetURL}, data.adaid, doi, data.files, 'dvFiles')
-        //                 this.resetState()
-        //                 this.fileFormRef.current.resetFields()
-        //             }
-        //         })
-        //         .catch(err => {
-        //             if (err.response) {
-        //                 this.setState({
-        //                     isLoading: false
-        //                 });
-        //                 if (err.response.status === 403) {
-        //                     const servers = toJS(this.props.authStore.serverList)
-        //                     for (let serv of servers) {
-        //                         if (serv.alias === form.server) {
-        //                             this.props.systemStore.handleFailedAPI(serv.id, 2, err.response.data)
-        //                             this.props.systemStore.handleAPIInputModal(true)
-        //                         }
-        //                     }
-        //
-        //                 } else if (err.response.status === 405) {
-        //                     const servers = toJS(this.props.authStore.serverList)
-        //                     for (let serv of servers) {
-        //                         if (serv.alias === form.server) {
-        //                             this.props.systemStore.handleFailedAPI(serv.id, 1, err.response.data)
-        //                             this.props.systemStore.handleAPIInputModal(true)
-        //                         }
-        //                     }
-        //                 } else {
-        //                     //console.log(err)
-        //                     this.openNotificationWithIcon('error', 'files', `${err.response.data}, please try again.`)
-        //                 }
-        //
-        //             } else {
-        //                 this.setState({
-        //                     isLoading: false
-        //                 });
-        //                 this.openNotificationWithIcon('error', 'files', `${err}, please refresh the page and retry.`)
-        //             }
-        //         })
-        //}
     }
     openNotificationWithIcon = (type,fileName,error) => {
         if (type === 'success'){
@@ -288,73 +178,6 @@ export default class CopyTool extends Component{
         }
 
     };
-    serverOnChange =(value) => {
-        console.log(`selected ${value}`);
-        if (value === undefined){
-            this.setState({
-                selectedServer: null,
-                serverExisting: false
-            })
-            this.fileFormRef.current.resetFields()
-            // this.fileFormRef.current.setFieldsValue({
-            //     server: undefined,
-            // })
-            // this.fileFormRef.current.setFields([
-            //     {
-            //         name: 'dataverse',
-            //         errors: null,
-            //     },
-            //     {
-            //         name: 'server',
-            //         errors: null,
-            //     }
-            //     ]);
-
-        }
-        else {
-            this.fileFormRef.current.setFieldsValue({
-                dataverse: undefined,
-                doi: undefined
-            })
-            this.setState({
-                selectedServer: value,
-                serverExisting: true
-            })
-        }
-
-
-    }
-    handleADAFolderChange = value =>{
-        console.log(`ada folder selected ${value}`);
-        if (value === undefined){
-            this.setState({
-                selectedADAFolder: null,
-            })
-            console.log("clearAdaFolderInfo")
-            this.props.systemStore.clearAdaFolderInfoErrorMsg()
-            //this.fileFormRef.current.resetFields()
-        }
-        else {
-            // this.fileFormRef.current.setFieldsValue({
-            //     dataverse: undefined,
-            //     doi: undefined
-            // })
-            this.props.systemStore.clearAdaFolderInfoErrorMsg()
-            this.setState({
-                selectedADAFolder: value,
-            })
-            let userid = toJS(this.props.authStore.currentUser).userID
-            this.props.systemStore.getDatasetInfoByADAID(value, userid)
-        }
-    }
-    handleNewADA = checked =>{
-        this.setState({newADAID: checked})
-        if(checked){
-            this.fileFormRef.current.setFieldsValue({
-                adaIDSelect: undefined,
-            })
-        }
-    }
 
     getFileList =async () => {
         const { doi, doiMessage } = this.state
@@ -372,10 +195,10 @@ export default class CopyTool extends Component{
         if( value.length >0){
 
             this.setState({doiExisting:true})
-            this.fileFormRef.current.setFieldsValue({
-                dataverse: undefined,
-                server: undefined
-            })
+            // this.fileFormRef.current.setFieldsValue({
+            //     dataverse: undefined,
+            //     server: undefined
+            // })
 
 
             if (value.indexOf('https://')===0){
@@ -424,18 +247,7 @@ export default class CopyTool extends Component{
             this.fileFormRef.current.resetFields()
         }
     }
-    // onSelectChange = selectedRowKeys => {
-    //     console.log('selectedRowKeys changed: ', selectedRowKeys);
-    //     this.setState({ selectedRowKeys });
-    // };
-    handleLocalTransferChange = targetKeys => {
 
-        this.setState({ localTargetKeys: targetKeys });
-    };
-    handleRemoteTransferChange = targetKeys => {
-
-        this.setState({ remoteTargetKeys: targetKeys });
-    };
     onLoadData = treeNode =>{
         const { id } = treeNode.props;
         return new Promise((resolve, reject)=>{
@@ -445,6 +257,14 @@ export default class CopyTool extends Component{
                     console.log(err)
                 })
         })
+
+    }
+    dataverseOnChange =(value) => {
+        console.log(`selected ${value}`);
+
+        const dvID = value
+        const dvName = 'aaaa'
+        this.props.systemStore.checkDVPermission('production', dvID, dvName, 'ADD_DS', true)
 
     }
 
@@ -457,11 +277,11 @@ export default class CopyTool extends Component{
         const treeData = authStore.productionDVList
         const adaFolderList = authStore.adaFolderList
         console.log(fileList)
-        console.log(toJS(authStore.productionDVList))
-        console.log(treeData)
-        console.log(toJS(datasource))
-        console.log(toJS(systemStore.lastFileList))
-        //console.log(datasource)
+        //console.log(toJS(authStore.productionDVList))
+        //console.log(treeData)
+        //console.log(toJS(datasource))
+        //console.log(toJS(systemStore.lastFileList))
+        console.log(systemStore.remoteTargetKeys)
         const rowSelection = {
             // selectedRowKeys: datasource.map(ele=>ele.id),
             onChange: (selectedRowKeys, selectedRows) => {
@@ -528,7 +348,7 @@ export default class CopyTool extends Component{
                             {/*border:'1px solid #BFBFBF'*/}
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
                                 <div style={{textAlign: 'center', paddingTop:'2vh'}}>
-                                    <span>Dataset: </span>
+                                    <span>Origin Dataset: </span>
                                     <Divider />
                                 </div>
                                 <Form.Item
@@ -574,106 +394,121 @@ export default class CopyTool extends Component{
                                 }
                             </Col>
                         </Row>
+                        {/*<Row style={{marginTop:'2vh', marginBottom:'2vh'}}>*/}
+                        {/*    <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>*/}
+
+                        {/*        <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'0vh'}}>*/}
+                        {/*            <span>Dataset Details: </span>*/}
+                        {/*            <Divider />*/}
+
+                        {/*        </div>*/}
+                        {/*        <Row style={{ marginBottom:'2vh' }}>*/}
+                        {/*            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>*/}
+                        {/*                <div>*/}
+                        {/*                    <Dragger {...props}>*/}
+                        {/*                        <p className="ant-upload-drag-icon">*/}
+                        {/*                            <InboxOutlined />*/}
+                        {/*                        </p>*/}
+                        {/*                        <p className="ant-upload-text">Click or drag file to this area to upload</p>*/}
+                        {/*                        <p className="ant-upload-hint">*/}
+                        {/*                            Both single and multiple file upload are supported.*/}
+                        {/*                        </p>*/}
+                        {/*                    </Dragger>*/}
+                        {/*                </div>*/}
+                        {/*            </Col>*/}
+                        {/*        </Row>*/}
+                        {/*    </Col>*/}
+                        {/*</Row>*/}
+
+
+                        {/*<Row style={{marginTop:'2vh', marginBottom:'2vh'}}>*/}
+                        {/*    <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>*/}
+
+                        {/*        <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>*/}
+                        {/*            <span>File List: </span>*/}
+                        {/*            <Divider />*/}
+
+                        {/*        </div>*/}
+                        {/*        <Row style={{ marginBottom:'2vh' }}>*/}
+                        {/*            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>*/}
+                        {/*                <div style={{textAlign:'center'}}>*/}
+                        {/*                    <Transfer*/}
+                        {/*                        dataSource={datasource}*/}
+                        {/*                        showSearch*/}
+                        {/*                        listStyle={{*/}
+                        {/*                            width: 350,*/}
+                        {/*                            height: 400,*/}
+                        {/*                            textAlign:'left'*/}
+                        {/*                        }}*/}
+                        {/*                        operations={['Add to ADA Directory', 'Revert']}*/}
+                        {/*                        targetKeys={systemStore.localTargetKeys}*/}
+                        {/*                        //this.state.localTargetKeys*/}
+                        {/*                        onChange={(ele)=>systemStore.setLocalKeys(ele)}*/}
+                        {/*                        //this.handleLocalTransferChange*/}
+                        {/*                        render={item => `${item.filename}`}*/}
+                        {/*                        rowKey={record => record.filename}*/}
+                        {/*                        //footer={this.renderFooter}*/}
+                        {/*                    />*/}
+                        {/*                </div>*/}
+
+                        {/*            </Col>*/}
+                        {/*        </Row>*/}
+                        {/*        <Row style={{ marginBottom:'5vh', marginTop:'5vh' }}>*/}
+                        {/*            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>*/}
+                        {/*                <div style={{textAlign:'center'}}>*/}
+                        {/*                    <Transfer*/}
+                        {/*                        dataSource={datasource}*/}
+                        {/*                        showSearch*/}
+                        {/*                        listStyle={{*/}
+                        {/*                            width: 350,*/}
+                        {/*                            height: 400,*/}
+                        {/*                            textAlign:'left'*/}
+                        {/*                        }}*/}
+                        {/*                        operations={['Add to Dataset', 'Revert']}*/}
+                        {/*                        targetKeys={systemStore.remoteTargetKeys}*/}
+                        {/*                        //this.state.remoteTargetKeys*/}
+                        {/*                        onChange={(ele)=>systemStore.setRemoteKeys(ele)}*/}
+                        {/*                        //this.handleRemoteTransferChange*/}
+                        {/*                        render={item => `${item.filename}`}*/}
+                        {/*                        rowKey={record => record.filename}*/}
+                        {/*                        disabled={this.state.newADAID || systemStore.adaFolderInfoErrorMsg?true:false}*/}
+                        {/*                        //footer={this.renderFooter}*/}
+                        {/*                    />*/}
+                        {/*                </div>*/}
+
+                        {/*            </Col>*/}
+                        {/*        </Row>*/}
+                        {/*    </Col>*/}
+                        {/*</Row>*/}
+                        {/*<Row style={{marginTop:'2vh', marginBottom:'2vh'}}>*/}
+                        {/*    <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>*/}
+
+                        {/*        <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'0vh'}}>*/}
+                        {/*            <span>Upload Files: </span>*/}
+                        {/*            <Divider />*/}
+
+                        {/*        </div>*/}
+                        {/*        <Row style={{ marginBottom:'2vh' }}>*/}
+                        {/*            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>*/}
+                        {/*                <div>*/}
+                        {/*                    <Dragger {...props}>*/}
+                        {/*                        <p className="ant-upload-drag-icon">*/}
+                        {/*                            <InboxOutlined />*/}
+                        {/*                        </p>*/}
+                        {/*                        <p className="ant-upload-text">Click or drag file to this area to upload</p>*/}
+                        {/*                        <p className="ant-upload-hint">*/}
+                        {/*                            Both single and multiple file upload are supported.*/}
+                        {/*                        </p>*/}
+                        {/*                    </Dragger>*/}
+                        {/*                </div>*/}
+                        {/*            </Col>*/}
+                        {/*        </Row>*/}
+                        {/*    </Col>*/}
+                        {/*</Row>*/}
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
-
                                 <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>
-                                    <span>File List: </span>
-                                    <Divider />
-
-                                </div>
-                                <Row style={{ marginBottom:'2vh' }}>
-                                    <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
-                                        <div style={{textAlign:'center'}}>
-                                            <Transfer
-                                                dataSource={datasource}
-                                                showSearch
-                                                listStyle={{
-                                                    width: 350,
-                                                    height: 400,
-                                                    textAlign:'left'
-                                                }}
-                                                operations={['Add to ADA Directory', 'Revert']}
-                                                targetKeys={systemStore.localTargetKeys}
-                                                //this.state.localTargetKeys
-                                                onChange={(ele)=>systemStore.setLocalKeys(ele)}
-                                                //this.handleLocalTransferChange
-                                                render={item => `${item.filename}`}
-                                                rowKey={record => record.filename}
-                                                //footer={this.renderFooter}
-                                            />
-                                        </div>
-
-                                        {/*<Table*/}
-                                        {/*    rowSelection={rowSelection}*/}
-                                        {/*    columns={columns}*/}
-                                        {/*    dataSource={datasource}*/}
-                                        {/*    rowKey="id"*/}
-                                        {/*/>*/}
-                                    </Col>
-                                </Row>
-                                <Row style={{ marginBottom:'5vh', marginTop:'5vh' }}>
-                                    <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
-                                        <div style={{textAlign:'center'}}>
-                                            <Transfer
-                                                dataSource={datasource}
-                                                showSearch
-                                                listStyle={{
-                                                    width: 350,
-                                                    height: 400,
-                                                    textAlign:'left'
-                                                }}
-                                                operations={['Add to Dataset', 'Revert']}
-                                                targetKeys={systemStore.remoteTargetKeys}
-                                                //this.state.remoteTargetKeys
-                                                onChange={(ele)=>systemStore.setRemoteKeys(ele)}
-                                                //this.handleRemoteTransferChange
-                                                render={item => `${item.filename}`}
-                                                rowKey={record => record.filename}
-                                                disabled={this.state.newADAID || systemStore.adaFolderInfoErrorMsg?true:false}
-                                                //footer={this.renderFooter}
-                                            />
-                                        </div>
-
-                                        {/*<Table*/}
-                                        {/*    rowSelection={rowSelection}*/}
-                                        {/*    columns={columns}*/}
-                                        {/*    dataSource={datasource}*/}
-                                        {/*    rowKey="id"*/}
-                                        {/*/>*/}
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                        <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
-                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
-
-                                <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'0vh'}}>
-                                    <span>Upload Files: </span>
-                                    <Divider />
-
-                                </div>
-                                <Row style={{ marginBottom:'2vh' }}>
-                                    <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
-                                        <div>
-                                            <Dragger {...props}>
-                                                <p className="ant-upload-drag-icon">
-                                                    <InboxOutlined />
-                                                </p>
-                                                <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                                                <p className="ant-upload-hint">
-                                                    Both single and multiple file upload are supported.
-                                                </p>
-                                            </Dragger>
-                                        </div>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                        <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
-                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
-                                <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>
-                                    <span>Production Dataverse: </span>
+                                    <span>Destination Dataverse (Production): </span>
                                     <Divider />
 
                                 </div>
@@ -683,26 +518,23 @@ export default class CopyTool extends Component{
                                     rules={[
                                         {
                                             required: true,
-                                            message: "Please select a dataverse.",
+                                            message: "Please select a destination dataverse.",
                                         },
                                     ]}
 
-                                    // validateStatus={()=>{
-                                    //     if( this.state.selectedServer ===null){
-                                    //         return 'success'
-                                    //     }
-                                    // }}
                                 >
                                     <TreeSelect
                                         treeDataSimpleMode
                                         showSearch
-                                        allowClear
+                                        //allowClear
+                                        autoClearSearchValue='false'
                                         dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                                         //disabled={this.state.selectedServer ===null}
                                         placeholder="Select a dataverse"
                                         optionFilterProp="children"
                                         onChange={this.dataverseOnChange}
                                         loadData={this.onLoadData}
+                                        filterTreeNode={(value, node)=>node.title.toLowerCase().indexOf(value.toLowerCase())>=0}
                                         // onFocus={this.dataverseOnFocus}
                                         // onBlur={this.dataverseOnBlur}
                                         // onSearch={this.dataverseOnSearch}
@@ -711,15 +543,6 @@ export default class CopyTool extends Component{
                                         // }
                                         treeData={treeData}
                                     >
-                                        {/*{*/}
-                                        {/*    dataverses.dataverses && dataverses.dataverses.length>0?*/}
-                                        {/*        dataverses.dataverses.map(dataverse=>{*/}
-                                        {/*            return(*/}
-                                        {/*                <Select.Option key={dataverse.id} value={[dataverse.title, dataverse.id]}>{dataverse.title}</Select.Option>*/}
-                                        {/*            )*/}
-                                        {/*        }):<Select.Option value={0}>Loading</Select.Option>*/}
-
-                                        {/*}*/}
                                     </TreeSelect>
                                 </Form.Item>
                             </Col>
