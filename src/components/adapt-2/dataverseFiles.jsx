@@ -16,7 +16,7 @@ import {
     List,
     Skeleton,
     Upload,
-    Transfer
+    Transfer, Popover
 } from 'antd';
 import { inject, observer } from 'mobx-react';
 import API_URL from '../../config'
@@ -27,9 +27,9 @@ import axios from 'axios'
 import { MinusCircleOutlined, InboxOutlined, LoadingOutlined } from '@ant-design/icons';
 import DynamicField from "./dynamicFields";
 import FinalResult from "./finalResult";
-import { HashLink as Link } from 'react-router-hash-link';
+//import { HashLink as Link } from 'react-router-hash-link';
 const { TextArea } = Input;
-// const { Link } = Anchor;
+const { Link } = Anchor;
 const { Dragger } = Upload;
 const { Option } = Select;
 const doiLoadingIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
@@ -434,6 +434,10 @@ export default class DataverseFiles extends Component{
 
         this.setState({ remoteTargetKeys: targetKeys });
     };
+    handleAnchorClick = (e, link) => {
+        e.preventDefault();
+        console.log(link);
+    };
 
     render() {
         const { authStore, systemStore, files, formReset } = this.props
@@ -506,15 +510,31 @@ export default class DataverseFiles extends Component{
                         initialValues={{ server: undefined, dataverse: undefined, doi: undefined, subject: undefined}}
                         size={"middle"}
                     >
-                        <Row>
-                            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
+                        {/*<Row>*/}
+                        {/*    <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>*/}
 
-                            </Col>
-                        </Row>
+                        {/*    </Col>*/}
+                        {/*</Row>*/}
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             {/*border:'1px solid #BFBFBF'*/}
-                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
-                                <div style={{textAlign: 'center', paddingTop:'2vh'}}>
+                            <Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 1 }} md={{ span: 1, offset: 1 }} lg={{ span: 2, offset: 2 }} xl={{ span: 2, offset: 3 }} xxl={{ span: 2, offset: 2 }}>
+                                <Anchor
+                                    onClick={this.handleAnchorClick}
+                                    offsetTop={150}
+                                >
+                                    <Link href="#datasetURL" title="Dataset URL (optional)"/>
+                                    <Link href="#uploadFiles" title="Upload Files (optional)"/>
+                                    <Link href="#FileList" title="File List"/>
+                                    <Link href="#ADAID" title="ADA ID"/>
+                                    {
+                                        systemStore.showfinalResultDVFiles?
+                                            <Link href="#finalResult" title="Final Result"/>: null
+                                    }
+                                    {/*<Link href="#components-anchor-demo-basic" title="Basic demo" />*/}
+                                </Anchor>
+                            </Col>
+                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 0 }} sm={{ span: 20, offset: 0 }} md={{ span: 18, offset: 1 }} lg={{ span: 16, offset: 0 }} xl={{ span: 14, offset: 0 }} xxl={{ span: 14, offset: 1 }}>
+                                <div id="datasetURL" style={{textAlign: 'center', paddingTop:'2vh'}}>
                                     <span>Dataset: </span>
                                     <Divider />
                                 </div>
@@ -524,7 +544,8 @@ export default class DataverseFiles extends Component{
                                         hasFeedback
                                         rules={[
                                             {
-                                                required: this.state.doiExisting ===false && this.state.serverExisting ===false ||this.state.doiExisting,
+                                                required: systemStore.localTargetKeys.length >0 || systemStore.remoteTargetKeys.length >0?systemStore.doiValid?false:false:true,
+                                                //required: localTargetKeys.length && remoteTargetKeys.length ===0?this.state.doiExisting ===false && this.state.serverExisting ===false ||this.state.doiExisting? true: false: false,
                                                 message: "Please enter DOI.",
                                             },
                                             {
@@ -561,11 +582,11 @@ export default class DataverseFiles extends Component{
                                     }
                             </Col>
                         </Row>
-                        
+
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
-                                <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'0vh'}}>
+                                <div id="uploadFiles" style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'0vh'}}>
                                     <span>Upload Files: </span>
                                     <Divider />
 
@@ -666,7 +687,7 @@ export default class DataverseFiles extends Component{
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
-                                    <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>
+                                    <div id="FileList" style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>
                                         <span>File List: </span>
                                         <Divider />
 
@@ -738,7 +759,7 @@ export default class DataverseFiles extends Component{
                         <Row style={{marginTop:'2vh', marginBottom:'5vh'}}>
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
-                            <div style={{textAlign: 'center', paddingTop:'2vh', paddingBottom:'3vh'}}>
+                            <div id="ADAID" style={{textAlign: 'center', paddingTop:'2vh', paddingBottom:'3vh'}}>
                                 <span>ADAID: </span>
                                 <Divider />
                             </div>
@@ -842,7 +863,7 @@ export default class DataverseFiles extends Component{
                         <Row style={{marginBottom:'5vh'}} >
                             <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
                                 <div style={{textAlign: 'center', paddingBottom:'3vh'}}>
-                                    <Button type="primary" htmlType="submit" disabled={!systemStore.doiValid} loading={isLoading}>
+                                    <Button type="primary" htmlType="submit" disabled={!systemStore.doiValid && fileList.length===0} loading={isLoading}>
                                         Submit
                                     </Button>
                                 </div>
@@ -850,7 +871,8 @@ export default class DataverseFiles extends Component{
                         </Row>
 
                     </Form>
-                    <div ref={ref => {this.finalResult_Existing = ref}}>
+
+                    <div id="finalResult" ref={ref => {this.finalResult_Existing = ref}}>
                         {
                             systemStore.showfinalResultDVFiles?(
 
