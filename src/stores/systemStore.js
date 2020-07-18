@@ -22,6 +22,7 @@ export class SystemStore{
     @observable showfinalResult = false
     @observable showfinalResultDVFiles = false
     @observable fileList=[]
+    @observable selectedRowKeys = []
     @observable lastFileList=[]
     @observable doiValid=false
     @observable doiMessage=null
@@ -159,6 +160,19 @@ export class SystemStore{
         this.localTargetKeys = this.localTargetKeys.filter(file=> file !== filename)
         this.remoteTargetKeys = this.remoteTargetKeys.filter(file=> file !== filename)
     }
+    @action copyToolFileListOnChange(selectedRowKeys){
+        this.selectedRowKeys = selectedRowKeys
+    }
+    @action resetCopyToolSelectedRowKeys(){
+        this.selectedRowKeys = []
+    }
+    @action regainCopyToolSelectedRowKeys(){
+        let rowKeys = []
+        for(let file of this.fileList){
+            rowKeys.push(file.id)
+        }
+        this.selectedRowKeys = rowKeys
+    }
     @action getFileListByDOI(doi, server, userid){
         console.log(server)
         const data = {
@@ -173,6 +187,7 @@ export class SystemStore{
                 console.log("got result")
                 if (res.status ===201){
                     if (this.lastFileList.length >0){
+                        console.log("this step")
                         let filteredList = this.fileList.filter(ele=>!this.lastFileList.includes(ele.filename))
                         this.fileList = [...filteredList, ...res.data.fileList]
                         //this.fileList = res.data
@@ -185,10 +200,14 @@ export class SystemStore{
                         return true
                     }
                     else {
+                        console.log("that step")
                         let lastFiles = []
+                        let rowKeys = []
                         for (let file of res.data.fileList){
+                            rowKeys.push(file.id)
                             lastFiles.push(file.filename)
                         }
+                        this.selectedRowKeys = rowKeys
                         this.lastFileList = lastFiles
                         this.fileList = [...this.fileList, ...res.data.fileList]
                         //this.fileList = res.data

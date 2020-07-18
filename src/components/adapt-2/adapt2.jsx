@@ -1,6 +1,6 @@
 import React, {Component, useState} from 'react';
 import { inject, observer } from 'mobx-react';
-import { Switch, Route, withRouter, Link } from 'react-router-dom';
+import { Switch, Route, withRouter } from 'react-router-dom';
 import API_URL from '../../config'
 import 'antd/es/spin/style/css';
 import {Upload, Button, message, notification, Collapse, Popover, Col, Row, Anchor} from 'antd';
@@ -12,6 +12,7 @@ import systemStore from "../../stores/systemStore";
 import FinalResult from "./finalResult";
 const { Dragger } = Upload;
 const { Panel } = Collapse;
+const { Link } = Anchor;
 
 @inject('routingStore', 'systemStore', 'authStore')
 @observer
@@ -281,7 +282,10 @@ export default class Adapt2 extends Component{
         />
         </Popover>
     );
-
+    handleAnchorClick = (e, link) => {
+        e.preventDefault();
+        console.log(link);
+    };
 
     render() {
         const { uploading, fileList, formdata, finalFiles, formReset, adaID, doi, returnedFiles } = this.state;
@@ -321,16 +325,30 @@ export default class Adapt2 extends Component{
             <div style={{background: 'white', paddingTop:'2%'}}>
                 <div style={{ margin: 'auto'}}>
                     <Row>
-                        <Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 1 }} md={{ span: 1, offset: 1 }} lg={{ span: 2, offset: 2 }} xl={{ span: 2, offset: 3 }} xxl={{ span: 2, offset: 4 }}>
+                        <Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 1 }} md={{ span: 1, offset: 1 }} lg={{ span: 2, offset: 2 }} xl={{ span: 2, offset: 3 }} xxl={{ span: 2, offset: 2 }}>
                             <Anchor
-                                offsetTop={350}
+                                onClick={this.handleAnchorClick}
+                                offsetTop={150}
                             >
-                                <Popover placement="bottomRight" title={`Instruction`} content={content} overlayStyle={{ width: '50vw'}}>
-                                    <Button>Instruction</Button>
-                                </Popover>
+                                <Link href="#uploadFiles" title="Upload Files (optional)"/>
+                                <Link href="#Metadata" title="Metadata"/>
+                                {
+                                    systemStore.showfinalResultDVFiles?
+                                        <Link href="#finalResult" title="Final Result"/>: null
+                                }
+                                {/*<Link href="#components-anchor-demo-basic" title="Basic demo" />*/}
                             </Anchor>
                         </Col>
-                        <Col xs={{ span: 20, offset: 1 }} sm={{ span: 20, offset: 0 }} md={{ span: 18, offset: 1 }} lg={{ span: 16, offset: 0 }} xl={{ span: 14, offset: 0 }} xxl={{ span: 12, offset: 0 }}>
+                        {/*<Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 1 }} md={{ span: 1, offset: 1 }} lg={{ span: 2, offset: 2 }} xl={{ span: 2, offset: 3 }} xxl={{ span: 2, offset: 4 }}>*/}
+                        {/*    <Anchor*/}
+                        {/*        offsetTop={350}*/}
+                        {/*    >*/}
+                        {/*        <Popover placement="bottomRight" title={`Instruction`} content={content} overlayStyle={{ width: '50vw'}}>*/}
+                        {/*            <Button>Instruction</Button>*/}
+                        {/*        </Popover>*/}
+                        {/*    </Anchor>*/}
+                        {/*</Col>*/}
+                        <Col xs={{ span: 20, offset: 1 }} sm={{ span: 20, offset: 0 }} md={{ span: 18, offset: 1 }} lg={{ span: 16, offset: 0 }} xl={{ span: 14, offset: 0 }} xxl={{ span: 14, offset: 1 }}>
                             <div style={{marginTop: '3%', paddingBottom: '3%', textAlign:'center'}}>
                                 <Button
                                     form="createDataset"
@@ -350,7 +368,7 @@ export default class Adapt2 extends Component{
                             // expandIconPosition={expandIconPosition}
                         >
                             <Panel header="Files" key="1" extra={this.extraInfo("Click or drag file(s) to this area to upload to the newly created ADA folder")}>
-                                <div >
+                                <div id="uploadFiles">
                                     <Dragger {...props}>
                                         <p className="ant-upload-drag-icon">
                                             <InboxOutlined />
@@ -363,7 +381,10 @@ export default class Adapt2 extends Component{
                                 </div>
                             </Panel>
                             <Panel header="Dataset" key="2" extra={this.extraInfo("Create a dataset along with the ADAID and upload the files to that dataset")}>
-                                <DataverseForm handleFormData={this.handleUpload} files={fileList} formReset={formReset}/>
+                                <div id="Metadata">
+                                    <DataverseForm handleFormData={this.handleUpload} files={fileList} formReset={formReset}/>
+                                </div>
+
                             </Panel>
 
                         </Collapse>

@@ -17,7 +17,8 @@ import {
     Skeleton,
     Upload,
     Transfer,
-    TreeSelect
+    TreeSelect,
+    Radio
 } from 'antd';
 import { inject, observer } from 'mobx-react';
 import API_URL from '../../config'
@@ -72,9 +73,9 @@ export default class CopyTool extends Component{
         doiMessage: null,
         isLoading: false,
         fileList:[],
-        selectedRowKeys:[],
         localTargetKeys:[],
-        remoteTargetKeys:[]
+        remoteTargetKeys:[],
+        copyRange: null
     }
     componentDidMount() {
         this.props.systemStore.handleFinalResultClose()
@@ -267,10 +268,20 @@ export default class CopyTool extends Component{
         this.props.systemStore.checkDVPermission('production', dvID, dvName, 'ADD_DS', true)
 
     }
+    copyRangeOnChange = e =>{
+        console.log(e.target.value)
+        if(e.target.value === 2){
+            this.props.systemStore.resetCopyToolSelectedRowKeys()
+        }
+        else {
+            this.props.systemStore.regainCopyToolSelectedRowKeys()
+        }
+        this.setState({copyRange: e.target.value})
+    }
 
     render() {
         const { authStore, systemStore, files, formReset } = this.props
-        const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, localTargetKeys, remoteTargetKeys } = this.state
+        const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, copyRange } = this.state
         const serverList = toJS(authStore.serverList)
         const datasource = systemStore.fileList
         const user = toJS(authStore.currentUser)
@@ -279,15 +290,20 @@ export default class CopyTool extends Component{
         console.log(fileList)
         //console.log(toJS(authStore.productionDVList))
         //console.log(treeData)
-        //console.log(toJS(datasource))
+        console.log(toJS(datasource))
         //console.log(toJS(systemStore.lastFileList))
-        console.log(systemStore.remoteTargetKeys)
+        console.log(toJS(systemStore.selectedRowKeys))
         const rowSelection = {
-            // selectedRowKeys: datasource.map(ele=>ele.id),
+            selectedRowKeys: systemStore.selectedRowKeys,
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-                this.setState({ selectedRowKeys });
+                //this.setState({ selectedRowKeys });
+                systemStore.copyToolFileListOnChange(selectedRowKeys)
             },
+            getCheckboxProps: record => ({
+                disabled: copyRange === 2, // Column configuration not to be checked
+                name: record.name,
+            }),
         };
         const props = {
             onRemove: file => {
@@ -324,6 +340,11 @@ export default class CopyTool extends Component{
             },
             fileList,
         };
+        const radioStyle = {
+            display: 'block',
+            height: '30px',
+            lineHeight: '30px',
+        };
 
         return (
             <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}} >
@@ -348,7 +369,7 @@ export default class CopyTool extends Component{
                             {/*border:'1px solid #BFBFBF'*/}
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
                                 <div style={{textAlign: 'center', paddingTop:'2vh'}}>
-                                    <span>Origin Dataset: </span>
+                                    <span>Source Dataset: </span>
                                     <Divider />
                                 </div>
                                 <Form.Item
@@ -392,119 +413,53 @@ export default class CopyTool extends Component{
                                             <Spin spinning={systemStore.isDoiLoading} delay={20} indicator={doiLoadingIcon} />
                                         </div>: null
                                 }
+                                <Form.Item
+                                    label="Copy Range"
+                                    name="copyRange"
+                                    //wrapperCol={{ span: 16, offset:4 }}
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: "Please select copy range.",
+                                        },
+                                    ]}
+                                >
+                                    <Radio.Group
+                                        onChange={this.copyRangeOnChange}
+                                    >
+                                        <Radio style={radioStyle} value={1}>
+                                            Metadata & Files
+                                        </Radio>
+                                        <Radio style={radioStyle} value={2}>
+                                            Metadata Only
+                                        </Radio>
+                                        <Radio style={radioStyle} value={3}>
+                                            Files Only
+                                        </Radio>
+                                    </Radio.Group>
+                                </Form.Item>
                             </Col>
                         </Row>
-                        {/*<Row style={{marginTop:'2vh', marginBottom:'2vh'}}>*/}
-                        {/*    <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>*/}
-
-                        {/*        <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'0vh'}}>*/}
-                        {/*            <span>Dataset Details: </span>*/}
-                        {/*            <Divider />*/}
-
-                        {/*        </div>*/}
-                        {/*        <Row style={{ marginBottom:'2vh' }}>*/}
-                        {/*            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>*/}
-                        {/*                <div>*/}
-                        {/*                    <Dragger {...props}>*/}
-                        {/*                        <p className="ant-upload-drag-icon">*/}
-                        {/*                            <InboxOutlined />*/}
-                        {/*                        </p>*/}
-                        {/*                        <p className="ant-upload-text">Click or drag file to this area to upload</p>*/}
-                        {/*                        <p className="ant-upload-hint">*/}
-                        {/*                            Both single and multiple file upload are supported.*/}
-                        {/*                        </p>*/}
-                        {/*                    </Dragger>*/}
-                        {/*                </div>*/}
-                        {/*            </Col>*/}
-                        {/*        </Row>*/}
-                        {/*    </Col>*/}
-                        {/*</Row>*/}
+                        <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
+                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
+                                <div style={{textAlign: 'center', paddingTop:'2vh'}}>
+                                    <span>Files to copy: </span>
+                                    <Divider />
+                                </div>
+                                <Table
+                                    rowSelection={{
+                                        type: 'checkbox',
+                                        ...rowSelection,
+                                    }}
+                                    columns={columns}
+                                    dataSource={datasource}
+                                    rowKey={'id'}
+                                />
+                            </Col>
+                        </Row>
 
 
-                        {/*<Row style={{marginTop:'2vh', marginBottom:'2vh'}}>*/}
-                        {/*    <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>*/}
 
-                        {/*        <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>*/}
-                        {/*            <span>File List: </span>*/}
-                        {/*            <Divider />*/}
-
-                        {/*        </div>*/}
-                        {/*        <Row style={{ marginBottom:'2vh' }}>*/}
-                        {/*            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>*/}
-                        {/*                <div style={{textAlign:'center'}}>*/}
-                        {/*                    <Transfer*/}
-                        {/*                        dataSource={datasource}*/}
-                        {/*                        showSearch*/}
-                        {/*                        listStyle={{*/}
-                        {/*                            width: 350,*/}
-                        {/*                            height: 400,*/}
-                        {/*                            textAlign:'left'*/}
-                        {/*                        }}*/}
-                        {/*                        operations={['Add to ADA Directory', 'Revert']}*/}
-                        {/*                        targetKeys={systemStore.localTargetKeys}*/}
-                        {/*                        //this.state.localTargetKeys*/}
-                        {/*                        onChange={(ele)=>systemStore.setLocalKeys(ele)}*/}
-                        {/*                        //this.handleLocalTransferChange*/}
-                        {/*                        render={item => `${item.filename}`}*/}
-                        {/*                        rowKey={record => record.filename}*/}
-                        {/*                        //footer={this.renderFooter}*/}
-                        {/*                    />*/}
-                        {/*                </div>*/}
-
-                        {/*            </Col>*/}
-                        {/*        </Row>*/}
-                        {/*        <Row style={{ marginBottom:'5vh', marginTop:'5vh' }}>*/}
-                        {/*            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>*/}
-                        {/*                <div style={{textAlign:'center'}}>*/}
-                        {/*                    <Transfer*/}
-                        {/*                        dataSource={datasource}*/}
-                        {/*                        showSearch*/}
-                        {/*                        listStyle={{*/}
-                        {/*                            width: 350,*/}
-                        {/*                            height: 400,*/}
-                        {/*                            textAlign:'left'*/}
-                        {/*                        }}*/}
-                        {/*                        operations={['Add to Dataset', 'Revert']}*/}
-                        {/*                        targetKeys={systemStore.remoteTargetKeys}*/}
-                        {/*                        //this.state.remoteTargetKeys*/}
-                        {/*                        onChange={(ele)=>systemStore.setRemoteKeys(ele)}*/}
-                        {/*                        //this.handleRemoteTransferChange*/}
-                        {/*                        render={item => `${item.filename}`}*/}
-                        {/*                        rowKey={record => record.filename}*/}
-                        {/*                        disabled={this.state.newADAID || systemStore.adaFolderInfoErrorMsg?true:false}*/}
-                        {/*                        //footer={this.renderFooter}*/}
-                        {/*                    />*/}
-                        {/*                </div>*/}
-
-                        {/*            </Col>*/}
-                        {/*        </Row>*/}
-                        {/*    </Col>*/}
-                        {/*</Row>*/}
-                        {/*<Row style={{marginTop:'2vh', marginBottom:'2vh'}}>*/}
-                        {/*    <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>*/}
-
-                        {/*        <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'0vh'}}>*/}
-                        {/*            <span>Upload Files: </span>*/}
-                        {/*            <Divider />*/}
-
-                        {/*        </div>*/}
-                        {/*        <Row style={{ marginBottom:'2vh' }}>*/}
-                        {/*            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>*/}
-                        {/*                <div>*/}
-                        {/*                    <Dragger {...props}>*/}
-                        {/*                        <p className="ant-upload-drag-icon">*/}
-                        {/*                            <InboxOutlined />*/}
-                        {/*                        </p>*/}
-                        {/*                        <p className="ant-upload-text">Click or drag file to this area to upload</p>*/}
-                        {/*                        <p className="ant-upload-hint">*/}
-                        {/*                            Both single and multiple file upload are supported.*/}
-                        {/*                        </p>*/}
-                        {/*                    </Dragger>*/}
-                        {/*                </div>*/}
-                        {/*            </Col>*/}
-                        {/*        </Row>*/}
-                        {/*    </Col>*/}
-                        {/*</Row>*/}
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
                                 <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>
