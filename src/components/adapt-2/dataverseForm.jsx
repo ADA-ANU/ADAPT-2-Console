@@ -114,7 +114,7 @@ export default class DataverseForm extends Component{
         const { authStore, systemStore, files, formReset } = this.props
         const serverList = toJS(authStore.serverList)
         const user = toJS(authStore.currentUser)
-        const dataverses = toJS(authStore.Dataverses)
+        const dataverses = toJS(authStore.newDVList)
         console.log(user)
         console.log(serverList)
         console.log(this.state.selectedDataverse)
@@ -171,7 +171,8 @@ export default class DataverseForm extends Component{
                                 serverList && serverList.length>0?
                                     serverList.map(server=>{
                                         return(
-                                            <Select.Option key={server.id} value={server.alias}>{server.servername} ({server.url})</Select.Option>
+                                            server.id !== 2?
+                                            <Select.Option key={server.id} value={server.alias}>{server.servername} ({server.url})</Select.Option>: null
                                         )
                                     }):<Select.Option value={0}>Loading</Select.Option>
 

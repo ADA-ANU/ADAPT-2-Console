@@ -80,11 +80,12 @@ export default class CopyTool extends Component{
     componentDidMount() {
         this.props.systemStore.handleFinalResultClose()
         this.props.systemStore.handleFinalResultDVFilesClose()
+        this.props.systemStore.handlePermission(true)
         this.props.systemStore.resetFileList()
         this.props.authStore.resetProdSubDVs()
     }
     finalResult_Existing=React.createRef()
-    fileFormRef = React.createRef();
+    copyToolFormRef = React.createRef();
 
 
 
@@ -260,11 +261,11 @@ export default class CopyTool extends Component{
         })
 
     }
-    dataverseOnChange =(value) => {
+    dataverseOnChange =(value, label) => {
         console.log(`selected ${value}`);
-
+        console.log(`selected ${label}`);
         const dvID = value
-        const dvName = 'aaaa'
+        const dvName = label
         this.props.systemStore.checkDVPermission('production', dvID, dvName, 'ADD_DS', true)
 
     }
@@ -278,6 +279,17 @@ export default class CopyTool extends Component{
         }
         this.setState({copyRange: e.target.value})
     }
+    serverOnChange =(value) => {
+        console.log(`selected ${value}`);
+        this.copyToolFormRef.current.setFieldsValue({
+            dataverse: undefined,
+        })
+        this.props.authStore.setCTServer(value)
+        // this.setState({
+        //     selectedServer: value
+        // })
+
+    }
 
     render() {
         const { authStore, systemStore, files, formReset } = this.props
@@ -285,14 +297,14 @@ export default class CopyTool extends Component{
         const serverList = toJS(authStore.serverList)
         const datasource = systemStore.fileList
         const user = toJS(authStore.currentUser)
-        const treeData = authStore.productionDVList
-        const adaFolderList = authStore.adaFolderList
-        console.log(fileList)
+        const treeData = Object.keys(authStore.ctDVList).length>0 && authStore.ctSelectedServer?authStore.ctDVList[authStore.ctSelectedServer].dataverses: []
+        const selectedServer = authStore.ctSelectedServer
+        //console.log(fileList)
         //console.log(toJS(authStore.productionDVList))
-        //console.log(treeData)
-        console.log(toJS(datasource))
+        console.log(toJS(treeData))
+        //console.log(toJS(datasource))
         //console.log(toJS(systemStore.lastFileList))
-        console.log(toJS(systemStore.selectedRowKeys))
+        //console.log(toJS(systemStore.selectedRowKeys))
         const rowSelection = {
             selectedRowKeys: systemStore.selectedRowKeys,
             onChange: (selectedRowKeys, selectedRows) => {
@@ -352,7 +364,7 @@ export default class CopyTool extends Component{
                     {/*<a href="#API" className="anchor">#</a>*/}
                     <Form
                         id="dataverseFiles"
-                        ref={this.fileFormRef}
+                        ref={this.copyToolFormRef}
                         onFinish={this.onFinish}
                         labelCol={{ span: 6 }}
                         wrapperCol={{ span: 16, offset:1 }}
@@ -463,10 +475,39 @@ export default class CopyTool extends Component{
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
                                 <div style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>
-                                    <span>Destination Dataverse (Production): </span>
+                                    <span>Destination Dataverse: </span>
                                     <Divider />
 
                                 </div>
+                                <Form.Item
+                                    label="Server"
+                                    name="server"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: "Please select a dataverse server.",
+                                        },
+                                    ]}
+                                >
+                                    <Select
+                                        placeholder="Select a server"
+                                        //disabled={!this.state.createDataset}
+                                        onChange={this.serverOnChange}
+                                    >
+                                        {
+                                            serverList && serverList.length>0?
+                                                serverList.map(server=>{
+                                                    return(
+                                                        <Select.Option key={server.id} value={server.alias}>{server.servername} ({server.url})</Select.Option>
+                                                    )
+                                                }):<Select.Option value={0}>Loading</Select.Option>
+
+                                        }
+                                        {/*<Select.Option value="self">Self Deposit (deposit.ada.edu.au)</Select.Option>*/}
+                                        {/*<Select.Option value="production">Production Deposit (dataverse.ada.edu.au)</Select.Option>*/}
+                                        {/*<Select.Option value="test">Test Deposit (dataverse-test.ada.edu.au)</Select.Option>*/}
+                                    </Select>
+                                </Form.Item>
                                 <Form.Item
                                     label="Dataverse"
                                     name="dataverse"
@@ -484,7 +525,7 @@ export default class CopyTool extends Component{
                                         //allowClear
                                         autoClearSearchValue='false'
                                         dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                                        //disabled={this.state.selectedServer ===null}
+                                        disabled={selectedServer ===null}
                                         placeholder="Select a dataverse"
                                         optionFilterProp="children"
                                         onChange={this.dataverseOnChange}
@@ -506,8 +547,8 @@ export default class CopyTool extends Component{
                         <Row style={{marginBottom:'5vh'}} >
                             <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
                                 <div style={{textAlign: 'center', paddingBottom:'3vh'}}>
-                                    <Button type="primary" htmlType="submit" disabled={!systemStore.doiValid} loading={isLoading}>
-                                        Submit
+                                    <Button type="primary" htmlType="submit" disabled={!systemStore.doiValid || !systemStore.dataversePermissionValid} loading={isLoading}>
+                                        COPY
                                     </Button>
                                 </div>
                             </Col>

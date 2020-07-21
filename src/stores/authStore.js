@@ -14,8 +14,10 @@ class AuthStore {
     @observable Dataverses ={}
     @observable dataverseList = []
     @observable adaFolderList  =[]
-    @observable initProdDVList = []
-    @observable productionDVList = []
+    @observable initCTDVList = []
+    @observable ctDVList = {}
+    @observable ctSelectedServer = null
+    @observable newDVList = {}
     //@observable isLoading = false;
     //@observable errors = undefined;
     //@observable ws = undefined;
@@ -116,9 +118,9 @@ class AuthStore {
             .then(action(json=>{
 
                 this.networkError = false
-                this.Dataverses = json.msg
-                this.initProdDVList = json.prod
-                this.productionDVList = json.prod
+                this.newDVList = json.msg
+                //this.initCTDVList = json.prod
+                this.ctDVList = json.msg
             }))
             .catch(err => {
                 this.networkError = true
@@ -126,10 +128,14 @@ class AuthStore {
             })
     }
     @action resetProdSubDVs(){
-        this.productionDVList = this.initProdDVList
+        //this.ctDVList = this.initCTDVList
+        this.ctSelectedServer = null
+    }
+    @action setCTServer(server){
+        this.ctSelectedServer = server
     }
     @action getSubDataverses(dvID){
-        return fetch(API_URL.getSubDVs + dvID)
+        return fetch(API_URL.getSubDVs + dvID + `/${this.ctSelectedServer}`)
             .then(action( res=>{
                 if (res.status === 201){
                     return res.json()
@@ -140,8 +146,8 @@ class AuthStore {
             }))
             .then(action(json=>{
                 console.log(json)
-                let data = this.productionDVList.concat(json)
-                this.productionDVList = data
+                let data = this.ctDVList[this.ctSelectedServer].dataverses.concat(json)
+                this.ctDVList[this.ctSelectedServer].dataverses = data
                 return true
             }))
             .catch(err => {

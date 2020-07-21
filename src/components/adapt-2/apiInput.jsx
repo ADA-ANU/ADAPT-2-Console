@@ -125,8 +125,8 @@ export default class APIInput extends Component{
 const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, isLoading, errorMsg }) => {
     const [form] = Form.useForm();
     const NeededAPIs = toJS(neededAPIs)
-    console.log(NeededAPIs)
-    console.log(APIs)
+    //console.log(NeededAPIs)
+    //console.log(APIs)
     const footer = errorMsg? ([<Button key="cancel" onClick={onCancel}>
         Return
     </Button>]):(

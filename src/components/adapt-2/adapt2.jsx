@@ -51,7 +51,7 @@ export default class Adapt2 extends Component{
         this.props.systemStore.handleFinalResultClose()
         const { newDataset, server, dataverse, title, authorFields, email, description, subject, uploadSwitch, firstName, lastName } = form
         const { fileList } = this.state;
-        console.log(authorFields)
+        console.log(form)
 
 
         this.setState({
