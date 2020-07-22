@@ -18,6 +18,7 @@ export class SystemStore{
     @observable checkDVID = null
     @observable checkPermissionType = null
     @observable dataversePermissionValid = true
+    @observable datasetPermissionValid = true
     @observable dataverseSubjects = []
     @observable showfinalResult = false
     @observable showfinalResultDVFiles = false
@@ -26,8 +27,11 @@ export class SystemStore{
     @observable selectedRowNames = []
     @observable lastFileList=[]
     @observable doiValid=false
+    @observable destinationDOIValid=false
     @observable doiMessage=null
+    @observable destinationDOIMessage=null
     @observable isDoiLoading = false
+    @observable isDestinationDoiLoading = false
     @observable finalResultDataset = {}
     @observable finalResultAdaid = null
     @observable finalResultDOI = null
@@ -132,6 +136,7 @@ export class SystemStore{
         this.fileList = filteredList
         this.adaFolderInfoErrorMsg = null
         this.resetKeys()
+        this.selectedRowKeys = []
     }
 
     @action popupInputModal(serverAlias){
@@ -215,7 +220,7 @@ export class SystemStore{
                             lastFiles.push(file.filename)
                             fileNames.push(file.filename)
                         }
-                        this.selectedRowKeys = rowKeys
+                        //this.selectedRowKeys = rowKeys
                         this.selectedRowNames = fileNames
                         this.lastFileList = lastFiles
                         this.fileList = [...this.fileList, ...res.data.fileList]
@@ -259,7 +264,10 @@ export class SystemStore{
                     }
                 }
 
-            })).finally(()=>this.isDoiLoading = false)
+            })).finally(()=>{
+                this.isDoiLoading = false
+                return false
+            })
 
         // return fetch(API_URL.QUERY_SITE + `getDatasetFileListByDOI/${doi}/${server}`)
         //     .then(action(res => res.json()))
@@ -267,6 +275,69 @@ export class SystemStore{
         //     .catch(err => err)
     }
 
+    @action getFileListByDestinationDOI(doi, server, userid){
+        console.log(server)
+        const data = {
+            doi: doi,
+            server: server,
+            userid: userid
+        }
+        this.isDestinationDoiLoading = true
+        console.log("send request")
+        return axios.post(API_URL.Get_Dataset_FileList_ByDOI, data)
+            .then(action(res=>{
+                console.log("got result")
+                if (res.status ===201){
+
+                    this.destinationDOIValid = true
+                    return true
+
+                }
+                else {
+                    //this.fileList = []
+                    this.destinationDOIValid = false
+                    return false
+                }
+            })).catch(action(err=>{
+                if (err.response) {
+                    //this.fileList = []
+                    this.destinationDOIValid = false
+                    if (err.response.status ===404){
+                        this.destinationDOIMessage = 'DOI not found'
+                    }
+                    else if (err.response.status ===401){
+                        this.destinationDOIMessage = 'No permission to view'
+                        this.handleAPIInputErrorMsg(`${PERMISSION_CATEGORY.VIEW_UNPUBLISHED_DV.errorMsg} in doi:${doi} dataset.`)
+                        this.handleAPIInputModal(true)
+                        //this.resetKeys()
+                        //this.resetFileList()
+                    }
+                    else if (err.response.status ===402){
+                        this.popupInputModal(server)
+                        //this.resetKeys()
+                        //this.resetFileList()
+                    }
+                    else {
+                        authStore.networkError = true
+                        authStore.networkErrorMessage = err.response.data
+                        //this.resetKeys()
+                        //this.resetFileList()
+                    }
+                }
+
+            })).finally(()=>this.isDestinationDoiLoading = false)
+
+        // return fetch(API_URL.QUERY_SITE + `getDatasetFileListByDOI/${doi}/${server}`)
+        //     .then(action(res => res.json()))
+        //     .then(json=>console.log(json))
+        //     .catch(err => err)
+    }
+
+    @action resetDestinationURL(){
+        this.destinationDOIValid = false
+        this.destinationDOIMessage = null
+        this.isDestinationDoiLoading = false
+    }
     @action getDatasetInfoByADAID(adaid, userid){
         const data = {
             adaid: adaid,
@@ -354,6 +425,54 @@ export class SystemStore{
                 if (err.response) {
                     if (err.response.status ===401){
                         this.setCheck(serverAlias, dvID, PERMISSION_CATEGORY[permissionType].type)
+                        let servers = toJS(authStore.serverList)
+                        for (let server of servers){
+                            if (server.alias === serverAlias){
+                                this.handleFailedAPI(server.id, 2, `Bad api key, please enter the correct one.`)
+                                this.handleAPIInputModal(true)
+                            }
+                        }
+
+                    }
+
+                }
+
+            })).finally(()=>this.isDoiLoading = false)
+
+    }
+
+    @action checkDSPermission(serverAlias, doi, permissionType, modalOpen){
+        const data = {
+            userid: toJS(authStore.currentUser).userID,
+            server: serverAlias,
+            doi: doi,
+            request: PERMISSION_CATEGORY[permissionType].type
+        }
+        this.isDoiLoading = true
+        return axios.post(API_URL.Check_DS_Permission, data)
+            .then(action(res=>{
+                if (res.data.permission === false){
+                    if (modalOpen){
+                        // this.setCheck(server, dvID, permissionType)
+                        //let servers = toJS(this.props.authStore.serverList)
+                        this.datasetPermissionValid = false
+                        this.handleAPIInputErrorMsg(`${PERMISSION_CATEGORY[permissionType].errorMsg} ${res.data.dsName}.`)
+                        this.handleAPIInputModal(true)
+                    }
+                    else {
+                        this.datasetPermissionValid = false
+                        return false
+                    }
+
+                }
+                else{
+                    this.datasetPermissionValid = true
+                }
+            })).catch(action(err=>{
+                this.datasetPermissionValid = false
+                if (err.response) {
+                    if (err.response.status ===401){
+                        this.setCheck(serverAlias, res.data.dsName, PERMISSION_CATEGORY[permissionType].type)
                         let servers = toJS(authStore.serverList)
                         for (let server of servers){
                             if (server.alias === serverAlias){

@@ -14,7 +14,10 @@ const PERMISSION_CATEGORY = {
         errorMsg: "Sorry, you don't have permission to download files "
     },
     EDIT_DV: 'EditDataverse',
-    EDIT_DS: 'EditDataset',
+    EDIT_DS: {
+        type: 'EditDataset',
+        errorMsg: "Sorry, you don't have permission to edit "
+    },
     MANAGE_DV_PERMISSIONS: 'ManageDataversePermissions',
     MANAGE_DS_PERMISSIONS: 'ManageDatasetPermissions',
     PUBLISH_DV: 'PublishDataverse',

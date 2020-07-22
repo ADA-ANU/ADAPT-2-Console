@@ -31,7 +31,7 @@ export default class FinalResult extends Component{
         //const files = systemStore.finalResultFiles
         const localFiles = systemStore.finalResultLocalFiles
         const remoteFiles = systemStore.finalResultRemoteFiles
-        const { server, dataverse, title, firstName, lastName, authorFields, email, description, subject, uploadSwitch, newDataset, datasetURL } = dataset
+        const { server, dataverse, title, firstName, lastName, authorFields, email, description, subject, uploadSwitch, newDataset, datasetURL, metaData } = dataset
 
         const serverList = toJS(authStore.serverList)
         let data =[]
@@ -140,6 +140,20 @@ export default class FinalResult extends Component{
 
                                     </>
                                     :null
+                            }
+                            {
+                                metaData && metaData ===true?
+                                    <Paragraph>
+                                        <Text
+                                            strong
+                                            style={{
+                                                fontSize: 16,
+                                            }}
+                                        >
+                                            Metadata created
+
+                                        </Text>
+                                    </Paragraph>: null
                             }
 
                             <Paragraph>

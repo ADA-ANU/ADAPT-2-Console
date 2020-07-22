@@ -21,6 +21,7 @@ const API_URL = {
     Get_Subjects: ROOT +'api/getSubjects',
     Delete_Img: ROOT +'api/deleteImg/',
     Check_DV_Permission: ROOT + 'api/dvPermissionSpecific',
+    Check_DS_Permission: ROOT + 'api/getDSPermissions',
     getADAFolderInfo: ROOT + 'api/getADAFolderInfo',
     uploadFilesFromExsitingPage: ROOT + 'api/uploadFilesFromExsitingPage',
     getSubDVs: ROOT + 'api/getSubDVs/',
