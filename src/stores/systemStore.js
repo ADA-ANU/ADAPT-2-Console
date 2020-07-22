@@ -23,6 +23,7 @@ export class SystemStore{
     @observable showfinalResultDVFiles = false
     @observable fileList=[]
     @observable selectedRowKeys = []
+    @observable selectedRowNames = []
     @observable lastFileList=[]
     @observable doiValid=false
     @observable doiMessage=null
@@ -160,8 +161,13 @@ export class SystemStore{
         this.localTargetKeys = this.localTargetKeys.filter(file=> file !== filename)
         this.remoteTargetKeys = this.remoteTargetKeys.filter(file=> file !== filename)
     }
-    @action copyToolFileListOnChange(selectedRowKeys){
+    @action copyToolFileListOnChange(selectedRowKeys, selectedRows){
         this.selectedRowKeys = selectedRowKeys
+        let fileNames = []
+        for (let row of selectedRows){
+            fileNames.push(row.filename)
+        }
+        this.selectedRowNames = fileNames
     }
     @action resetCopyToolSelectedRowKeys(){
         this.selectedRowKeys = []
@@ -203,11 +209,14 @@ export class SystemStore{
                         console.log("that step")
                         let lastFiles = []
                         let rowKeys = []
+                        let fileNames = []
                         for (let file of res.data.fileList){
                             rowKeys.push(file.id)
                             lastFiles.push(file.filename)
+                            fileNames.push(file.filename)
                         }
                         this.selectedRowKeys = rowKeys
+                        this.selectedRowNames = fileNames
                         this.lastFileList = lastFiles
                         this.fileList = [...this.fileList, ...res.data.fileList]
                         //this.fileList = res.data

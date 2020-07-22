@@ -101,16 +101,17 @@ export default class CopyTool extends Component{
         this.setState({isLoading: true})
         this.props.systemStore.handleFinalResultDVFilesClose()
         console.log(form)
-        const { dataverse } = form
+        const { dataverse, copyRange, destinationServer } = form
         const { doi, doiMessage } = this.state
         console.log(this.state)
 
         const obj = {
             destinationDVID: dataverse,
             userid: toJS(this.props.authStore.currentUser).userID,
-            destinationServer: 'production',
+            destinationServer: destinationServer,
             originServer: doiMessage,
-            originDOI: doi
+            originDOI: doi,
+            copyRange: copyRange
 
         }
         const json = JSON.stringify(obj);
@@ -262,8 +263,8 @@ export default class CopyTool extends Component{
 
     }
     dataverseOnChange =(value, label) => {
-        console.log(`selected ${value}`);
-        console.log(`selected ${label}`);
+        //console.log(`selected ${value}`);
+        //console.log(`selected ${label}`);
         const dvID = value
         const dvName = label
         this.props.systemStore.checkDVPermission('production', dvID, dvName, 'ADD_DS', true)
@@ -301,16 +302,16 @@ export default class CopyTool extends Component{
         const selectedServer = authStore.ctSelectedServer
         //console.log(fileList)
         //console.log(toJS(authStore.productionDVList))
-        console.log(toJS(treeData))
+        //console.log(toJS(treeData))
         //console.log(toJS(datasource))
         //console.log(toJS(systemStore.lastFileList))
-        //console.log(toJS(systemStore.selectedRowKeys))
+        console.log(toJS(systemStore.selectedRowNames))
         const rowSelection = {
             selectedRowKeys: systemStore.selectedRowKeys,
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
                 //this.setState({ selectedRowKeys });
-                systemStore.copyToolFileListOnChange(selectedRowKeys)
+                systemStore.copyToolFileListOnChange(selectedRowKeys, selectedRows)
             },
             getCheckboxProps: record => ({
                 disabled: copyRange === 2, // Column configuration not to be checked
@@ -458,6 +459,7 @@ export default class CopyTool extends Component{
                                     <span>Files to copy: </span>
                                     <Divider />
                                 </div>
+
                                 <Table
                                     rowSelection={{
                                         type: 'checkbox',
@@ -467,6 +469,7 @@ export default class CopyTool extends Component{
                                     dataSource={datasource}
                                     rowKey={'id'}
                                 />
+
                             </Col>
                         </Row>
 
@@ -481,7 +484,7 @@ export default class CopyTool extends Component{
                                 </div>
                                 <Form.Item
                                     label="Server"
-                                    name="server"
+                                    name="destinationServer"
                                     rules={[
                                         {
                                             required: true,
