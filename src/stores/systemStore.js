@@ -424,10 +424,14 @@ export class SystemStore{
                 this.dataversePermissionValid = false
                 if (err.response) {
                     if (err.response.status ===401){
+                        console.log("permission 401 error")
                         this.setCheck(serverAlias, dvID, PERMISSION_CATEGORY[permissionType].type)
+                        console.log(toJS(authStore.serverList))
+                        console.log(serverAlias)
                         let servers = toJS(authStore.serverList)
                         for (let server of servers){
                             if (server.alias === serverAlias){
+                                console.log("found server")
                                 this.handleFailedAPI(server.id, 2, `Bad api key, please enter the correct one.`)
                                 this.handleAPIInputModal(true)
                             }

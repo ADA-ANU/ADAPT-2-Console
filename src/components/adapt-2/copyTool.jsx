@@ -359,8 +359,13 @@ export default class CopyTool extends Component{
     }
     copyRangeOnChange = e =>{
         console.log(e.target.value)
+
         if(e.target.value === 2){
             this.props.systemStore.resetCopyToolSelectedRowKeys()
+        }
+        else if(e.target.value === 3){
+            this.props.systemStore.handlePermission(true)
+            this.props.systemStore.regainCopyToolSelectedRowKeys()
         }
         else {
             this.props.systemStore.regainCopyToolSelectedRowKeys()
@@ -562,7 +567,7 @@ export default class CopyTool extends Component{
                                     >
                                         <Radio.Group
                                             onChange={this.copyRangeOnChange}
-                                            disabled={!systemStore.doiValid || !systemStore.dataversePermissionValid}
+                                            disabled={!systemStore.doiValid}
                                         >
                                             <Radio style={radioStyle} value={1}>
                                                 Metadata & Files

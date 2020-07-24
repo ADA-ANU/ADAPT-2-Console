@@ -203,7 +203,8 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, neededAPIs, APIs, i
                     </div>: null
                 }
                 {
-                    APIs.length>0&& NeededAPIs.length>0 && NeededAPIs[0].id !== 2?
+                    //&& NeededAPIs[0].id !== 2
+                    APIs.length>0&& NeededAPIs.length>0?
                         NeededAPIs.map(api=>{
                             const tempAPI = APIs.filter(e=>e.id === api.id)[0]
                             return (<Form.Item
