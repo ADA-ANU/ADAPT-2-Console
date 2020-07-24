@@ -458,7 +458,7 @@ export default class CopyTool extends Component{
             //console.log("systemStore.doiValid", systemStore.doiValid, "systemStore.dataversePermissionValid", systemStore.dataversePermissionValid)
             //console.log("systemStore.destinationDOIValid", systemStore.destinationDOIValid, "systemStore.datasetPermissionValid", systemStore.datasetPermissionValid)
             if (copyRange !==3){
-                if(systemStore.doiValid && systemStore.dataversePermissionValid && systemStore.datasetPermissionValid)
+                if(systemStore.doiValid && systemStore.dataversePermissionValid)
                     return false
                 else return true
             }

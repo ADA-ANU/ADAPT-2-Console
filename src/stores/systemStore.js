@@ -403,8 +403,10 @@ export class SystemStore{
         this.isDoiLoading = true
         return axios.post(API_URL.Check_DV_Permission, data)
             .then(action(res=>{
+                console.log(res.data)
                 if (res.data === false){
                     if (modalOpen){
+                        console.log("permission false modalOpen")
                         // this.setCheck(server, dvID, permissionType)
                         //let servers = toJS(this.props.authStore.serverList)
                         this.dataversePermissionValid = false
@@ -412,12 +414,14 @@ export class SystemStore{
                         this.handleAPIInputModal(true)
                     }
                     else {
+                        console.log("permission false no modalOpen")
                         this.dataversePermissionValid = false
                         return false
                     }
 
                 }
                 else{
+                    console.log("permission true")
                     this.dataversePermissionValid = true
                 }
             })).catch(action(err=>{
