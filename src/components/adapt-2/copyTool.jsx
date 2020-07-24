@@ -161,7 +161,7 @@ export default class CopyTool extends Component{
                             }
                         }
                     } else {
-                        //console.log(err)
+                        console.log(err.response.data)
                         this.openNotificationWithIcon('error', 'files', `${err.response.data}, please try again.`)
                     }
 
