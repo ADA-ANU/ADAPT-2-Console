@@ -197,6 +197,7 @@ export class SystemStore{
             .then(action(res=>{
                 console.log("got result")
                 if (res.status ===201){
+
                     if (this.lastFileList.length >0){
                         console.log("this step")
                         let filteredList = this.fileList.filter(ele=>!this.lastFileList.includes(ele.filename))
@@ -204,9 +205,12 @@ export class SystemStore{
                         //this.fileList = res.data
                         this.doiValid = true
                         let lastFiles = []
+                        let fileNames = []
                         for (let file of res.data.fileList){
                             lastFiles.push(file.filename)
+                            fileNames.push(file.filename)
                         }
+                        this.selectedRowNames = fileNames
                         this.lastFileList = lastFiles
                         return true
                     }

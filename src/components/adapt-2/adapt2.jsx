@@ -333,7 +333,7 @@ export default class Adapt2 extends Component{
                                 <Link href="#uploadFiles" title="Upload Files (optional)"/>
                                 <Link href="#Metadata" title="Metadata"/>
                                 {
-                                    systemStore.showfinalResultDVFiles?
+                                    systemStore.showfinalResult?
                                         <Link href="#finalResult" title="Final Result"/>: null
                                 }
                                 {/*<Link href="#components-anchor-demo-basic" title="Basic demo" />*/}
@@ -402,7 +402,7 @@ export default class Adapt2 extends Component{
                                 </Button>
                             </div>
                             {/*dataset={formdata} adaid={adaID} doi={doi} files={returnedFiles}*/}
-                            <div ref={ref => {this.finalResult_New = ref}}>
+                            <div id="finalResult" ref={ref => {this.finalResult_New = ref}}>
                                 {
                                     systemStore.showfinalResult?<FinalResult clearResult={this.clearResult}/>: null
                                 }
