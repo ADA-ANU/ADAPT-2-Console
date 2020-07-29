@@ -14,7 +14,7 @@ import {
     notification,
     Anchor,
     List,
-    Skeleton,
+    Popover,
     Upload,
     Transfer,
     TreeSelect,
@@ -80,7 +80,7 @@ export default class CopyTool extends Component{
         fileList:[],
         localTargetKeys:[],
         remoteTargetKeys:[],
-        copyRange: null
+        //copyRange: null
     }
     componentDidMount() {
         this.props.systemStore.handleFinalResultClose()
@@ -227,8 +227,9 @@ export default class CopyTool extends Component{
                         this.setState({doiMessage:temp[0].alias})
                         if (value.indexOf('doi:')>0){
                             this.copyToolFormRef.current.setFieldsValue({
-                                copyRange: undefined
+                                copyRange: 1
                             })
+                            this.props.systemStore.setCopyRange(1)
                             const userid = toJS(this.props.authStore.currentUser).userID
                             let doi = value.split('doi:')[1]
                             if (doi.includes('&version=')){
@@ -370,7 +371,8 @@ export default class CopyTool extends Component{
         else {
             this.props.systemStore.regainCopyToolSelectedRowKeys()
         }
-        this.setState({copyRange: e.target.value})
+        //this.setState({copyRange: e.target.value})
+        this.props.systemStore.setCopyRange(e.target.value)
     }
     serverOnChange =(value) => {
         console.log(`selected ${value}`);
@@ -390,7 +392,8 @@ export default class CopyTool extends Component{
 
     render() {
         const { authStore, systemStore, files, formReset } = this.props
-        const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, copyRange, destinationDOIMessage } = this.state
+        const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, destinationDOIMessage } = this.state
+        const copyRange = systemStore.copyRange
         const serverList = toJS(authStore.serverList)
         const datasource = systemStore.fileList
         const user = toJS(authStore.currentUser)
@@ -400,7 +403,7 @@ export default class CopyTool extends Component{
         //console.log(toJS(authStore.productionDVList))
         //console.log(toJS(treeData))
         //console.log(toJS(datasource))
-        //console.log(toJS(systemStore.lastFileList))
+        console.log(copyRange)
         console.log(toJS(systemStore.selectedRowNames))
         const rowSelection = {
             selectedRowKeys: systemStore.selectedRowKeys,
@@ -481,7 +484,7 @@ export default class CopyTool extends Component{
                         labelCol={{ span: 6 }}
                         wrapperCol={{ span: 16, offset:1 }}
                         layout="horizontal"
-                        initialValues={{ server: undefined, dataverse: undefined, doi: undefined, subject: undefined}}
+                        initialValues={{ server: undefined, dataverse: undefined, doi: undefined, subject: undefined, copyRange: 1}}
                         size={"middle"}
                     >
                         <Row>
@@ -499,7 +502,7 @@ export default class CopyTool extends Component{
                                     <Link href="#sourceDS" title="Source Dataset"/>
                                     <Link href="#copyRange" title="Copy Range"/>
                                     <Link href="#fileList" title="File List"/>
-                                    <Link href="#destinationDV" title={copyRange !== 3?"Destination Dataverse": "Destination Dataset"}/>
+                                    <Link href="#destinationDV" title={copyRange !== 3?"Destination Dataverse": "Existing Destination Dataset"}/>
                                     {
                                         systemStore.showfinalResultDVFiles?
                                             <Link href="#finalResult" title="Final Result"/>: null
@@ -565,23 +568,29 @@ export default class CopyTool extends Component{
                                             },
                                         ]}
                                     >
+
                                         <Radio.Group
                                             onChange={this.copyRangeOnChange}
                                             disabled={!systemStore.doiValid}
                                         >
-                                            <Radio style={radioStyle} value={1}>
-                                                Metadata & Files
-                                            </Radio>
-                                            <Radio style={radioStyle} value={2}>
-                                                Metadata Only
-                                            </Radio>
-                                            <Radio style={radioStyle} value={3}>
-                                                Files Only
-                                            </Radio>
+                                            <Popover placement="rightTop" content="creates a new Dataset draft in destination Dataverse" trigger="hover">
+                                                <Radio style={radioStyle} value={1}>
+                                                    Metadata & Files
+                                                </Radio>
+                                            </Popover>
+                                            <Popover placement="rightTop" content="creates a new Dataset draft in destination Dataverse" trigger="hover">
+                                                <Radio style={radioStyle} value={2}>
+                                                    Metadata Only
+                                                </Radio>
+                                            </Popover>
+                                            <Popover placement="rightTop" content="copies to an existing Destination Dataset" trigger="hover">
+                                                <Radio style={radioStyle} value={3}>
+                                                    Files Only
+                                                </Radio>
+                                            </Popover>
                                         </Radio.Group>
                                     </Form.Item>
                                 </div>
-
                             </Col>
                         </Row>
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
@@ -609,7 +618,7 @@ export default class CopyTool extends Component{
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
                                 <div id="destinationDV" style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'2vh'}}>
-                                    <span>{copyRange !==3?'Destination Dataverse:': 'Destination Dataset:' }</span>
+                                    <span>{copyRange !==3?'Destination Dataverse:': 'Existing Destination Dataset:' }</span>
                                     <Divider />
 
                                 </div>

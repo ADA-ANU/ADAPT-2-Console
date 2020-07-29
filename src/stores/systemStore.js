@@ -42,6 +42,7 @@ export class SystemStore{
     @observable adaFolderInfoErrorMsg = null
     @observable localTargetKeys = []
     @observable remoteTargetKeys = []
+    @observable copyRange = 1
 
 
     constructor() {
@@ -81,7 +82,9 @@ export class SystemStore{
             .then(action(res => res.json()))
             .catch(err => err)
         }
-
+    @action setCopyRange(value){
+        this.copyRange = value
+    }
     @action handleAPIInputModal(open) {
         this.apiInputOpen = open
     }
@@ -206,10 +209,13 @@ export class SystemStore{
                         this.doiValid = true
                         let lastFiles = []
                         let fileNames = []
+                        let rowKeys = []
                         for (let file of res.data.fileList){
                             lastFiles.push(file.filename)
                             fileNames.push(file.filename)
+                            rowKeys.push(file.id)
                         }
+                        this.selectedRowKeys = rowKeys
                         this.selectedRowNames = fileNames
                         this.lastFileList = lastFiles
                         return true
@@ -224,7 +230,7 @@ export class SystemStore{
                             lastFiles.push(file.filename)
                             fileNames.push(file.filename)
                         }
-                        //this.selectedRowKeys = rowKeys
+                        this.selectedRowKeys = rowKeys
                         this.selectedRowNames = fileNames
                         this.lastFileList = lastFiles
                         this.fileList = [...this.fileList, ...res.data.fileList]
