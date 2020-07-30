@@ -565,13 +565,6 @@ export default class CopyTool extends Component{
                                             <Spin spinning={systemStore.isDoiLoading} delay={20} indicator={doiLoadingIcon} />
                                         </div>: null
                                 }
-                                <InfoCircleOutlined
-                                    onClick={event => {
-                                        // If you don't want click extra trigger collapse, you can prevent this:
-                                        event.stopPropagation();
-                                    }}
-                                />
-                                <LoadingOutlined/>
                                 <div id="copyRange">
                                     <Form.Item
                                         label="Copy Range"
@@ -589,30 +582,25 @@ export default class CopyTool extends Component{
                                             onChange={this.copyRangeOnChange}
                                             disabled={!systemStore.doiValid}
                                         >
-                                            <div style={radioStyle}>
+                                            {/*<div style={radioStyle}>*/}
                                                 <Radio value={1}>
                                                     Metadata & Files
                                                 </Radio>
                                                 {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
-                                                <InfoCircleOutlined
-                                                    onClick={event => {
-                                                        // If you don't want click extra trigger collapse, you can prevent this:
-                                                        event.stopPropagation();
-                                                    }}
-                                                />
-                                            </div>
-                                            <div style={radioStyle}>
+
+                                            {/*</div>*/}
+                                            {/*<div style={radioStyle}>*/}
                                                 <Radio value={2}>
                                                     Metadata Only
                                                 </Radio>
                                                 {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
-                                            </div>
-                                            <div style={radioStyle}>
+                                            {/*</div>*/}
+                                            {/*<div style={radioStyle}>*/}
                                                 <Radio value={3}>
                                                     Files Only
                                                 </Radio>
                                                 {this.extraInfo("copies to an existing Destination Dataset")}
-                                            </div>
+                                            {/*</div>*/}
                                         </Radio.Group>
                                     </Form.Item>
                                 </div>
