@@ -566,6 +566,7 @@ export default class CopyTool extends Component{
                                         </div>: null
                                 }
                                 <div id="copyRange">
+                                    {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
                                     <Form.Item
                                         label="Copy Range"
                                         name="copyRange"
@@ -577,6 +578,7 @@ export default class CopyTool extends Component{
                                             },
                                         ]}
                                     >
+                                        {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
 
                                         <Radio.Group
                                             onChange={this.copyRangeOnChange}
