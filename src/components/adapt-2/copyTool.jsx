@@ -587,6 +587,12 @@ export default class CopyTool extends Component{
                                                     Metadata & Files
                                                 </Radio>
                                                 {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
+                                                <InfoCircleOutlined
+                                                    onClick={event => {
+                                                        // If you don't want click extra trigger collapse, you can prevent this:
+                                                        event.stopPropagation();
+                                                    }}
+                                                />
                                             </div>
                                             <div style={radioStyle}>
                                                 <Radio value={2}>
