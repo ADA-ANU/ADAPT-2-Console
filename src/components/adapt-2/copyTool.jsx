@@ -565,6 +565,13 @@ export default class CopyTool extends Component{
                                             <Spin spinning={systemStore.isDoiLoading} delay={20} indicator={doiLoadingIcon} />
                                         </div>: null
                                 }
+                                <InfoCircleOutlined
+                                    onClick={event => {
+                                        // If you don't want click extra trigger collapse, you can prevent this:
+                                        event.stopPropagation();
+                                    }}
+                                />
+                                <LoadingOutlined/>
                                 <div id="copyRange">
                                     <Form.Item
                                         label="Copy Range"
