@@ -589,7 +589,7 @@ export default class CopyTool extends Component{
                                                     Metadata & Files
                                                 </Radio>
                                                 {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
-
+                                                <LoadingOutlined/>
                                             {/*</div>*/}
                                             {/*<div style={radioStyle}>*/}
                                                 <Radio value={2}>
