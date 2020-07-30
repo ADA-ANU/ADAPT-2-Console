@@ -566,7 +566,6 @@ export default class CopyTool extends Component{
                                         </div>: null
                                 }
                                 <div id="copyRange">
-                                    {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
                                     <Form.Item
                                         label="Copy Range"
                                         name="copyRange"
@@ -578,31 +577,28 @@ export default class CopyTool extends Component{
                                             },
                                         ]}
                                     >
-                                        {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
-
                                         <Radio.Group
                                             onChange={this.copyRangeOnChange}
                                             disabled={!systemStore.doiValid}
                                         >
-                                            {/*<div style={radioStyle}>*/}
+                                            <div style={radioStyle}>
                                                 <Radio value={1}>
-                                                    Metadata & Files
+                                                    Metadata & Files {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
                                                 </Radio>
-                                                {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
-                                                <LoadingOutlined/>
-                                            {/*</div>*/}
-                                            {/*<div style={radioStyle}>*/}
+
+                                            </div>
+                                            <div style={radioStyle}>
                                                 <Radio value={2}>
-                                                    Metadata Only
+                                                    Metadata Only {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
                                                 </Radio>
-                                                {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
-                                            {/*</div>*/}
-                                            {/*<div style={radioStyle}>*/}
+
+                                            </div>
+                                            <div style={radioStyle}>
                                                 <Radio value={3}>
-                                                    Files Only
+                                                    Files Only {this.extraInfo("copies to an existing Destination Dataset")}
                                                 </Radio>
-                                                {this.extraInfo("copies to an existing Destination Dataset")}
-                                            {/*</div>*/}
+
+                                            </div>
                                         </Radio.Group>
                                     </Form.Item>
                                 </div>
