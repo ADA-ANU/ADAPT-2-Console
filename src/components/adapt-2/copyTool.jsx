@@ -26,7 +26,7 @@ import 'antd/es/spin/style/css';
 import APIInput from "./apiInput";
 import { toJS } from 'mobx'
 import axios from 'axios'
-import { MinusCircleOutlined, InboxOutlined, LoadingOutlined } from '@ant-design/icons';
+import { MinusCircleOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import DynamicField from "./dynamicFields";
 import FinalResult from "./finalResult";
 //import { HashLink as Link } from 'react-router-hash-link';
@@ -389,7 +389,16 @@ export default class CopyTool extends Component{
         e.preventDefault();
         console.log(link);
     };
-
+    extraInfo = (content) => (
+        <Popover placement="topLeft" content={content} arrowPointAtCenter>
+            <InfoCircleOutlined
+                onClick={event => {
+                    // If you don't want click extra trigger collapse, you can prevent this:
+                    event.stopPropagation();
+                }}
+            />
+        </Popover>
+    );
     render() {
         const { authStore, systemStore, files, formReset } = this.props
         const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, destinationDOIMessage } = this.state
@@ -573,21 +582,24 @@ export default class CopyTool extends Component{
                                             onChange={this.copyRangeOnChange}
                                             disabled={!systemStore.doiValid}
                                         >
-                                            <Popover placement="rightTop" content="creates a new Dataset draft in destination Dataverse" trigger="hover">
-                                                <Radio style={radioStyle} value={1}>
+                                            <div style={radioStyle}>
+                                                <Radio value={1}>
                                                     Metadata & Files
                                                 </Radio>
-                                            </Popover>
-                                            <Popover placement="rightTop" content="creates a new Dataset draft in destination Dataverse" trigger="hover">
-                                                <Radio style={radioStyle} value={2}>
+                                                {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
+                                            </div>
+                                            <div style={radioStyle}>
+                                                <Radio value={2}>
                                                     Metadata Only
                                                 </Radio>
-                                            </Popover>
-                                            <Popover placement="rightTop" content="copies to an existing Destination Dataset" trigger="hover">
-                                                <Radio style={radioStyle} value={3}>
+                                                {this.extraInfo("creates a new Dataset draft in destination Dataverse")}
+                                            </div>
+                                            <div style={radioStyle}>
+                                                <Radio value={3}>
                                                     Files Only
                                                 </Radio>
-                                            </Popover>
+                                                {this.extraInfo("copies to an existing Destination Dataset")}
+                                            </div>
                                         </Radio.Group>
                                     </Form.Item>
                                 </div>
