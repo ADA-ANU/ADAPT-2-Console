@@ -79,6 +79,7 @@ export default class DataverseFiles extends Component{
         this.props.systemStore.handleFinalResultClose()
         this.props.systemStore.handleFinalResultDVFilesClose()
         this.props.systemStore.resetFileList()
+        this.props.systemStore.resetUploadedFileList()
     }
     finalResult_Existing=React.createRef()
     fileFormRef = React.createRef();
@@ -387,6 +388,7 @@ export default class DataverseFiles extends Component{
                     if (temp.length ===1){
                         this.setState({doiMessage:temp[0].alias})
                         if (value.indexOf('doi')>0){
+                            this.props.systemStore.resetFileList()
                             const userid = toJS(this.props.authStore.currentUser).userID
                             const newURL = value.replace("%3A", ":").replace("%2F", "/")
                             let doi = newURL.split('doi:')[1]
@@ -420,7 +422,7 @@ export default class DataverseFiles extends Component{
                 doi: null,
                 server: null
             })
-            this.fileFormRef.current.resetFields()
+            //this.fileFormRef.current.resetFields()
         }
     }
     // onSelectChange = selectedRowKeys => {
@@ -451,9 +453,10 @@ export default class DataverseFiles extends Component{
         console.log(fileList)
         console.log(localTargetKeys)
         console.log(remoteTargetKeys)
-        console.log(datasource)
+        console.log(selectedADAFolder)
         console.log(toJS(systemStore.lastFileList))
-        //console.log(datasource)
+        console.log(toJS(systemStore.localTargetKeys))
+        console.log(toJS(systemStore.remoteTargetKeys))
         const rowSelection = {
             // selectedRowKeys: datasource.map(ele=>ele.id),
             onChange: (selectedRowKeys, selectedRows) => {

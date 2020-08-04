@@ -89,6 +89,7 @@ export default class CopyTool extends Component{
         this.props.systemStore.resetFileList()
         this.props.authStore.resetProdSubDVs()
         this.props.systemStore.resetDestinationURL()
+        this.props.systemStore.resetUploadedFileList()
     }
     finalResult_CopyTool=React.createRef()
     copyToolFormRef = React.createRef();

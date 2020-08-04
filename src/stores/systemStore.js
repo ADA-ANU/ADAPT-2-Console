@@ -142,6 +142,12 @@ export class SystemStore{
         this.adaFolderInfoErrorMsg = null
         this.resetKeys()
         this.selectedRowKeys = []
+        //this.adaFolderInfo = null
+    }
+    @action resetUploadedFileList(){
+        this.fileList = []
+        this.localTargetKeys = []
+        this.remoteTargetKeys = []
     }
 
     @action popupInputModal(serverAlias){
