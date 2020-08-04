@@ -386,9 +386,10 @@ export default class DataverseFiles extends Component{
                     console.log(temp)
                     if (temp.length ===1){
                         this.setState({doiMessage:temp[0].alias})
-                        if (value.indexOf('doi:')>0){
+                        if (value.indexOf('doi')>0){
                             const userid = toJS(this.props.authStore.currentUser).userID
-                            let doi = value.split('doi:')[1]
+                            const newURL = value.replace("%3A", ":").replace("%2F", "/")
+                            let doi = newURL.split('doi:')[1]
                             this.setState({doi: doi})
                             this.props.systemStore.getFileListByDOI(doi, temp[0].alias, userid)
                         }
@@ -495,6 +496,25 @@ export default class DataverseFiles extends Component{
             },
             fileList,
         };
+        const submitCheck = ()=>{
+            if (!systemStore.doiValid){
+                return true
+            }
+            else {
+                if(systemStore.adaFolderInfoErrorMsg){
+                    if( systemStore.localTargetKeys.length ===0){
+                        return true
+                    }
+                    else return false
+                }
+                else{
+                    if(systemStore.localTargetKeys.length ===0 && systemStore.remoteTargetKeys.length ===0){
+                        return true
+                    }
+                    else return false
+                }
+            }
+        }
 
         return (
             <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}} >
@@ -552,7 +572,7 @@ export default class DataverseFiles extends Component{
                                             {
                                                 //\/.*
                                                 type: 'string',
-                                                pattern: '(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi:.*\\/.*$(?![\\w])',
+                                                pattern: '(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi.*\\.*$(?![\\w])',
                                                 message: 'Please enter a valid doi url.'
                                             }
                                         ]}
@@ -864,8 +884,8 @@ export default class DataverseFiles extends Component{
                         <Row style={{marginBottom:'5vh'}} >
                             <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
                                 <div style={{textAlign: 'center', paddingBottom:'3vh'}}>
-                                    {/*disabled={!systemStore.doiValid && fileList.length===0}*/}
-                                    <Button type="primary" htmlType="submit" loading={isLoading}>
+
+                                    <Button type="primary" htmlType="submit" loading={isLoading} disabled={submitCheck()}>
                                         Submit
                                     </Button>
                                 </div>

@@ -387,7 +387,7 @@ export default class CopyTool extends Component{
     }
     handleAnchorClick = (e, link) => {
         e.preventDefault();
-        console.log(link);
+        //console.log(link);
     };
     extraInfo = (content) => (
         <Popover placement="topLeft" content={content} arrowPointAtCenter>
@@ -503,7 +503,7 @@ export default class CopyTool extends Component{
                         </Row>
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             {/*border:'1px solid #BFBFBF'*/}
-                            <Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 1 }} md={{ span: 1, offset: 1 }} lg={{ span: 2, offset: 2 }} xl={{ span: 2, offset: 3 }} xxl={{ span: 2, offset: 2 }}>
+                            <Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 1 }} md={{ span: 1, offset: 1 }} lg={{ span: 2, offset: 1 }} xl={{ span: 3, offset: 1 }} xxl={{ span: 3, offset: 1 }}>
                                 <Anchor
                                     onClick={this.handleAnchorClick}
                                     offsetTop={150}
@@ -519,7 +519,7 @@ export default class CopyTool extends Component{
                                     {/*<Link href="#components-anchor-demo-basic" title="Basic demo" />*/}
                                 </Anchor>
                             </Col>
-                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 0 }} sm={{ span: 20, offset: 0 }} md={{ span: 18, offset: 1 }} lg={{ span: 16, offset: 0 }} xl={{ span: 14, offset: 0 }} xxl={{ span: 14, offset: 1 }}>
+                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 0 }} sm={{ span: 20, offset: 0 }} md={{ span: 18, offset: 1 }} lg={{ span: 16, offset: 1 }} xl={{ span: 14, offset: 1 }} xxl={{ span: 14, offset: 1 }}>
                                 <div id="sourceDS" style={{textAlign: 'center', paddingTop:'2vh'}}>
                                     <span>Source Dataset: </span>
                                     <Divider />
