@@ -11,12 +11,13 @@ import { HashRouter } from 'react-router-dom';
 import authStore from "./stores/authStore";
 import routingStore from './stores/routingStore'
 import systemStore from "./stores/systemStore";
+import adapt2Store from "./stores/adapt2Store";
 
 const stores = {
     routingStore: routingStore,
     authStore: authStore,
     systemStore: systemStore,
-    // statsStore: statsStore
+    adapt2Store: adapt2Store
 }
 
 const hashHistory = createHashHistory();

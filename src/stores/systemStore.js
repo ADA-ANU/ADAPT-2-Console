@@ -44,9 +44,7 @@ export class SystemStore{
     @observable remoteTargetKeys = []
     @observable copyRange = 1
 
-    @observable adapt2Selection = 1
-    @observable adapt2isLoading = false
-    @observable adapt2ShowFinalResult = false
+
 
 
     constructor() {
@@ -511,13 +509,7 @@ export class SystemStore{
 
     }
 
-    @action adapt2SelectionOnChange(value){
 
-        this.adapt2Selection = value
-    }
-    @action adapt2HandleSubmit(){
-
-    }
 
 
 

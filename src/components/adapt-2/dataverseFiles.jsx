@@ -497,23 +497,31 @@ export default class DataverseFiles extends Component{
             fileList,
         };
         const submitCheck = ()=>{
-            if (!systemStore.doiValid){
+            if(systemStore.localTargetKeys.length ===0 && systemStore.remoteTargetKeys.length ===0){
+
                 return true
             }
-            else {
-                if(systemStore.adaFolderInfoErrorMsg){
-                    if( systemStore.localTargetKeys.length ===0){
-                        return true
-                    }
-                    else return false
-                }
-                else{
-                    if(systemStore.localTargetKeys.length ===0 && systemStore.remoteTargetKeys.length ===0){
-                        return true
-                    }
-                    else return false
-                }
+            else if(systemStore.adaFolderInfoErrorMsg && systemStore.localTargetKeys.length ===0){
+                return true
             }
+            else return false
+            // if (!systemStore.doiValid){
+            //     return true
+            // }
+            // else {
+            //     if(systemStore.adaFolderInfoErrorMsg){
+            //         if( systemStore.localTargetKeys.length ===0){
+            //             return true
+            //         }
+            //         else return false
+            //     }
+            //     else{
+            //         if(systemStore.localTargetKeys.length ===0 && systemStore.remoteTargetKeys.length ===0){
+            //             return true
+            //         }
+            //         else return false
+            //     }
+            // }
         }
 
         return (
@@ -525,7 +533,7 @@ export default class DataverseFiles extends Component{
                         ref={this.fileFormRef}
                         scrollToFirstError={true}
                         onFinish={this.onFinish}
-                        labelCol={{ span: 6 }}
+                        labelCol={{ span: 5 }}
                         wrapperCol={{ span: 16, offset:1 }}
                         layout="horizontal"
                         initialValues={{ server: undefined, dataverse: undefined, doi: undefined, subject: undefined}}
@@ -538,13 +546,13 @@ export default class DataverseFiles extends Component{
                         {/*</Row>*/}
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             {/*border:'1px solid #BFBFBF'*/}
-                            <Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 1 }} md={{ span: 1, offset: 1 }} lg={{ span: 2, offset: 2 }} xl={{ span: 2, offset: 3 }} xxl={{ span: 2, offset: 2 }}>
+                            <Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 1 }} md={{ span: 1, offset: 1 }} lg={{ span: 2, offset: 1 }} xl={{ span: 3, offset: 1 }} xxl={{ span: 3, offset: 1 }}>
                                 <Anchor
                                     onClick={this.handleAnchorClick}
                                     offsetTop={150}
                                 >
-                                    <Link href="#datasetURL" title="Dataset URL (optional)"/>
-                                    <Link href="#uploadFiles" title="Upload Files (optional)"/>
+                                    <Link href="#fileSource" title="File source (choose either)"/>
+                                    {/*<Link href="#uploadFiles" title="Upload Files (optional)"/>*/}
                                     <Link href="#FileList" title="File List"/>
                                     <Link href="#ADAID" title="ADA ID"/>
                                     {
@@ -554,9 +562,9 @@ export default class DataverseFiles extends Component{
                                     {/*<Link href="#components-anchor-demo-basic" title="Basic demo" />*/}
                                 </Anchor>
                             </Col>
-                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 0 }} sm={{ span: 20, offset: 0 }} md={{ span: 18, offset: 1 }} lg={{ span: 16, offset: 0 }} xl={{ span: 14, offset: 0 }} xxl={{ span: 14, offset: 1 }}>
-                                <div id="datasetURL" style={{textAlign: 'center', paddingTop:'2vh'}}>
-                                    <span>Dataset: </span>
+                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 0 }} sm={{ span: 20, offset: 0 }} md={{ span: 18, offset: 1 }} lg={{ span: 16, offset: 1 }} xl={{ span: 14, offset: 1 }} xxl={{ span: 14, offset: 1 }}>
+                                <div id="fileSource" style={{textAlign: 'center', paddingTop:'2vh'}}>
+                                    <span>File Source: </span>
                                     <Divider />
                                 </div>
                                     <Form.Item
@@ -601,17 +609,6 @@ export default class DataverseFiles extends Component{
                                                 <Spin spinning={systemStore.isDoiLoading} delay={20} indicator={doiLoadingIcon} />
                                             </div>: null
                                     }
-                            </Col>
-                        </Row>
-
-                        <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
-                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
-
-                                <div id="uploadFiles" style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'0vh'}}>
-                                    <span>Upload Files: </span>
-                                    <Divider />
-
-                                </div>
                                 <Row style={{ marginBottom:'2vh' }}>
                                     <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>
                                         <div>
@@ -629,6 +626,32 @@ export default class DataverseFiles extends Component{
                                 </Row>
                             </Col>
                         </Row>
+
+                        {/*<Row style={{marginTop:'2vh', marginBottom:'2vh'}}>*/}
+                        {/*    <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>*/}
+
+                        {/*        <div id="uploadFiles" style={{textAlign: 'center', paddingTop:'3vh', paddingBottom:'0vh'}}>*/}
+                        {/*            <span>Upload Files: </span>*/}
+                        {/*            <Divider />*/}
+
+                        {/*        </div>*/}
+                        {/*        <Row style={{ marginBottom:'2vh' }}>*/}
+                        {/*            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 20, offset: 2 }}>*/}
+                        {/*                <div>*/}
+                        {/*                    <Dragger {...props}>*/}
+                        {/*                        <p className="ant-upload-drag-icon">*/}
+                        {/*                            <InboxOutlined />*/}
+                        {/*                        </p>*/}
+                        {/*                        <p className="ant-upload-text">Click or drag file to this area to upload</p>*/}
+                        {/*                        <p className="ant-upload-hint">*/}
+                        {/*                            Both single and multiple file upload are supported.*/}
+                        {/*                        </p>*/}
+                        {/*                    </Dragger>*/}
+                        {/*                </div>*/}
+                        {/*            </Col>*/}
+                        {/*        </Row>*/}
+                        {/*    </Col>*/}
+                        {/*</Row>*/}
                                     {/*<Form.Item*/}
                                     {/*    label="Or"*/}
                                     {/*    //name="uploadSwitch"*/}
@@ -718,6 +741,7 @@ export default class DataverseFiles extends Component{
                                             <div style={{textAlign:'center'}}>
                                                 <Transfer
                                                     dataSource={datasource}
+                                                    pagination
                                                     showSearch
                                                     listStyle={{
                                                         width: 350,

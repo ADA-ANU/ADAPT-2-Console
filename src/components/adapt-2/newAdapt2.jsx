@@ -24,11 +24,12 @@ import { toJS } from 'mobx'
 import DataverseForm from "./dataverseForm";
 import systemStore from "../../stores/systemStore";
 import FinalResult from "./finalResult";
+import {adapt2Store} from "../../stores/adapt2Store";
 const { Dragger } = Upload;
 const { Panel } = Collapse;
 const { Link } = Anchor;
 
-@inject('routingStore', 'systemStore', 'authStore')
+@inject('routingStore', 'systemStore', 'authStore', 'adapt2Store')
 @observer
 export default class newAdapt2 extends Component{
 
@@ -36,23 +37,24 @@ export default class newAdapt2 extends Component{
     finalResult_CopyTool=React.createRef()
     adapt2Ref = React.createRef();
 
-    onFinish = values => {
+    // onFinish = values => {
+    //
+    //     console.log('Received values of form: ', values);
+    //     //this.createDatasetOnChange(false)
+    //     //this.submit(values)
+    // };
 
-        console.log('Received values of form: ', values);
-        //this.createDatasetOnChange(false)
-        this.submit(values)
-    };
     handleRadioChange = e =>{
         console.log(e.target.value)
         const value = e.target.value
-        this.props.systemStore.adapt2SelectionOnChange(value)
+        this.props.adapt2Store.SelectionOnChange(value)
     }
     handleAnchorClick = (e, link) => {
         e.preventDefault();
     };
 
     render() {
-        const { systemStore, authStore } = this.props
+        const { systemStore, authStore, adapt2Store } = this.props
         const radioStyle = {
             display: 'block',
             height: '40px',
@@ -62,17 +64,17 @@ export default class newAdapt2 extends Component{
         return(
             <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}}>
                 <div style={{ margin: 'auto'}}>
-                    <Form
-                        id="adapt2"
-                        ref={this.adapt2Ref}
-                        onFinish={this.onFinish}
-                        scrollToFirstError={true}
-                        labelCol={{ span: 6 }}
-                        wrapperCol={{ span: 16, offset:1 }}
-                        layout="horizontal"
-                        //initialValues={{ server: undefined, dataverse: undefined, doi: undefined, subject: undefined, copyRange: 1}}
-                        size={"middle"}
-                    >
+                    {/*<Form*/}
+                    {/*    id="adapt2"*/}
+                    {/*    ref={this.adapt2Ref}*/}
+                    {/*    onFinish={this.onFinish}*/}
+                    {/*    scrollToFirstError={true}*/}
+                    {/*    labelCol={{ span: 6 }}*/}
+                    {/*    wrapperCol={{ span: 16, offset:1 }}*/}
+                    {/*    layout="horizontal"*/}
+                    {/*    //initialValues={{ server: undefined, dataverse: undefined, doi: undefined, subject: undefined, copyRange: 1}}*/}
+                    {/*    size={"middle"}*/}
+                    {/*>*/}
 
                     <Row>
                         <Col xs={{ span: 1, offset: 0 }} sm={{ span: 1, offset: 1 }} md={{ span: 1, offset: 1 }} lg={{ span: 2, offset: 1 }} xl={{ span: 3, offset: 1 }} xxl={{ span: 3, offset: 1 }}>
@@ -98,11 +100,10 @@ export default class newAdapt2 extends Component{
                                     key="submit"
                                     htmlType="submit"
                                     type="primary"
-                                    onClick={systemStore.adapt2HandleSubmit}
-                                    //disabled={!systemStore.dataversePermissionValid}
-                                    loading={systemStore.adapt2isLoading}
+                                    onClick={adapt2Store.HandleSubmit}
+                                    loading={adapt2Store.isLoading}
                                 >
-                                    {systemStore.adapt2isLoading ? 'Uploading' : 'Get ADAID'}
+                                    {adapt2Store.isLoading ? 'Uploading' : 'Get ADAID'}
                                 </Button>
                             </div>
                         </Col>
@@ -113,8 +114,7 @@ export default class newAdapt2 extends Component{
                             <div style={{paddingTop: '3vh', paddingBottom: '2vh', paddingLeft: '2vw'}}>
                                 <Radio.Group
                                     onChange={this.handleRadioChange}
-                                    //disabled={!systemStore.doiValid}
-                                    value={systemStore.adapt2Selection}
+                                    value={adapt2Store.Selection}
                                 >
                                     <div style={radioStyle}>
                                         <Radio value={1}>
@@ -153,16 +153,15 @@ export default class newAdapt2 extends Component{
                                     key="submit"
                                     htmlType="submit"
                                     type="primary"
-                                    onClick={systemStore.adapt2HandleSubmit}
-                                    //disabled={!systemStore.dataversePermissionValid}
-                                    loading={systemStore.adapt2isLoading}
+                                    onClick={adapt2Store.HandleSubmit}
+                                    loading={adapt2Store.isLoading}
                                 >
-                                    {systemStore.adapt2isLoading ? 'Uploading' : 'Get ADAID'}
+                                    {adapt2Store.isLoading ? 'Uploading' : 'Get ADAID'}
                                 </Button>
                             </div>
                         </Col>
                     </Row>
-                    </Form>
+                    {/*</Form>*/}
                 </div>
 
             </div>
