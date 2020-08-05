@@ -567,7 +567,7 @@ export default class DataverseFiles extends Component{
                             </Col>
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 0 }} sm={{ span: 20, offset: 0 }} md={{ span: 18, offset: 1 }} lg={{ span: 16, offset: 1 }} xl={{ span: 14, offset: 1 }} xxl={{ span: 14, offset: 1 }}>
                                 <div id="fileSource" style={{textAlign: 'center', paddingTop:'2vh'}}>
-                                    <span>File Source: </span>
+                                    <span>File Source (choose either): </span>
                                     <Divider />
                                 </div>
                                     <Form.Item
