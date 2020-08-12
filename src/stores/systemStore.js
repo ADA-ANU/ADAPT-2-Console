@@ -43,6 +43,8 @@ export class SystemStore{
     @observable localTargetKeys = []
     @observable remoteTargetKeys = []
     @observable copyRange = 1
+    @observable adaFolderFileList = []
+    @observable duplicateFileList = []
 
 
 
@@ -56,6 +58,7 @@ export class SystemStore{
     }
     @action setLocalKeys(key){
         this.localTargetKeys = key
+        this.detectDuplicateFiles(key, this.adaFolderFileList)
     }
     @action setRemoteKeys(key){
         this.remoteTargetKeys = key
@@ -195,6 +198,7 @@ export class SystemStore{
         }
         this.selectedRowKeys = rowKeys
     }
+
     @action getFileListByDOI(doi, server, userid){
         console.log(server)
         const data = {
@@ -356,6 +360,14 @@ export class SystemStore{
         this.destinationDOIMessage = null
         this.isDestinationDoiLoading = false
     }
+
+    @action detectDuplicateFiles(array1, array2){
+        let duplicates = array1.filter((val)=> {
+            return array2.indexOf(val) != -1;
+        });
+        this.duplicateFileList = duplicates
+    }
+
     @action getDatasetInfoByADAID(adaid, userid){
         const data = {
             adaid: adaid,
@@ -368,11 +380,16 @@ export class SystemStore{
                     this.adaFolderInfoErrorMsg = null
                     console.log(res.data)
                     this.adaFolderInfo = res.data
+                    console.log(res.adaFolderContent)
+                    this.adaFolderFileList = res.adaFolderContent
+                    this.detectDuplicateFiles(res.adaFolderContent, this.localTargetKeys)
                 }
             })).catch(action(err=>{
                 this.adaFolderInfo = null
                 if (err.response) {
-
+                    console.log(err.response.data.adaFolderContent)
+                    this.adaFolderFileList = err.response.data.adaFolderContent
+                    this.detectDuplicateFiles(err.response.data.adaFolderContent, this.localTargetKeys)
                     if (err.response.status ===404){
                         console.log("404")
                         this.adaFolderInfoErrorMsg = 'DOI not found'
@@ -387,7 +404,7 @@ export class SystemStore{
                     else if (err.response.status ===402){
                         console.log(err.response)
                         this.adaFolderInfoErrorMsg = 'No permission to view'
-                        let serverid = err.response.data
+                        let serverid = err.response.data.msg
                         this.popupInputModalByServerID(serverid)
 
                     }
@@ -396,7 +413,7 @@ export class SystemStore{
 
                     }
                     else {
-                        this.adaFolderInfoErrorMsg = `Error, ${err.response.data}`
+                        this.adaFolderInfoErrorMsg = `Error, ${err.response.data.msg}`
                         // authStore.networkError = true
                         // authStore.networkErrorMessage = err.response.data
 

@@ -441,6 +441,24 @@ export default class DataverseFiles extends Component{
         e.preventDefault();
         console.log(link);
     };
+    openNotification = () => {
+        notification.warning({
+            message: 'Duplicate Files Found',
+            description:
+                (<div>
+                    <span>Following are the duplicates found on the ADA directory {this.state.selectedADAFolder}.</span>
+                    <ol>
+                    {
+                        this.props.systemStore.duplicateFileList.map(file=>{
+                            return <li>{file}</li>
+                        })
+                    }
+                    </ol>
+                </div>),
+            key: 'duplicates',
+            duration: 0,
+        });
+    };
 
     render() {
         const { authStore, systemStore, files, formReset } = this.props
@@ -450,9 +468,13 @@ export default class DataverseFiles extends Component{
         const user = toJS(authStore.currentUser)
         const dataverses = toJS(authStore.Dataverses)
         const adaFolderList = toJS(authStore.adaFolderList)
+        if(systemStore.duplicateFileList.length>0){this.openNotification()}
+        else{
+            notification.close('duplicates')
+        }
         console.log(fileList)
-        console.log(localTargetKeys)
-        console.log(remoteTargetKeys)
+        console.log(systemStore.duplicateFileList)
+        console.log(systemStore.adaFolderFileList)
         console.log(selectedADAFolder)
         console.log(toJS(systemStore.lastFileList))
         console.log(toJS(systemStore.localTargetKeys))
