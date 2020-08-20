@@ -45,6 +45,11 @@ export class SystemStore{
     @observable copyRange = 1
     @observable adaFolderFileList = []
     @observable duplicateFileList = []
+    @observable checkGroupValue = []
+    @observable testFileList = new Map()
+    @observable testSelectedKeys = new Map()
+    @observable testCheck = []
+    @observable regexPrefix = /^[0-9]_$/
 
 
 
@@ -180,6 +185,53 @@ export class SystemStore{
         this.localTargetKeys = this.localTargetKeys.filter(file=> file !== filename)
         this.remoteTargetKeys = this.remoteTargetKeys.filter(file=> file !== filename)
     }
+    @action CheckGroupOnChange(value){
+        this.checkGroupValue = value
+            this.testSelectedKeys.clear()
+            let selectedKeys =[]
+            for(let ele of value){
+                this.testSelectedKeys.set(ele, this.testFileList.get(ele))
+                selectedKeys.push(this.testFileList.get(ele))
+            }
+            // console.log(toJS(selectedKeys))
+            // this.testRowKeys = selectedKeys
+    }
+    @action testAddRowKey(row, selected){
+        const rowKey  = row.filename
+        let prefix = this.regexPrefix.test(rowKey.slice(0, 2))?rowKey.slice(0, 2): 'other'
+        console.log(prefix)
+        if(selected){
+            if(this.testSelectedKeys.has(prefix)){
+                console.log("key found")
+                this.testSelectedKeys.set(prefix, [...this.testSelectedKeys.get(prefix), row])
+            }
+            else{
+                console.log("key not found")
+                //this.testCheck = [...this.testCheck, prefix]
+                this.testSelectedKeys.set(prefix, [row])
+            }
+        }
+        else{
+            console.log("deselect checkbox", rowKey)
+            let files = [...this.testSelectedKeys.get(prefix)]
+            console.log(files)
+            const result = files.filter(ele=>ele.filename !==rowKey)
+
+            //console.log(bbb.length)
+            this.testSelectedKeys.set(prefix, result)
+        }
+
+    }
+    @action prefixFilter(prefix){
+        let result = []
+        for(let file of this.fileList){
+            if(file.filename.slice(0, 2) === `${prefix}_`){
+                result.push(file.filename)
+            }
+        }
+        this.selectedRowKeys = result
+    }
+
     @action copyToolFileListOnChange(selectedRowKeys, selectedRows){
         this.selectedRowKeys = selectedRowKeys
         let fileNames = []
@@ -198,6 +250,39 @@ export class SystemStore{
         }
         this.selectedRowKeys = rowKeys
     }
+    @action sortFileList(fileList){
+        let prefixes = []
+        let prefix1 = []
+        let prefix2 = []
+        console.log("start iteration")
+        for(let file of fileList){
+            let prefix = file.filename.slice(0,2)
+            if(!this.regexPrefix.test(prefix)){
+                prefix = 'other'
+            }
+            console.log(prefix)
+            if(!prefixes.includes(prefix)){
+                console.log("no prefix found")
+                prefixes.push(prefix)
+                this.testFileList.set(prefix, [file])
+
+            }
+            else{
+                this.testFileList.set(prefix, [...this.testFileList.get(prefix), file])
+            }
+            // if(file.filename.slice(0,2) ==="1_"){
+            //     prefix1.push(file)
+            // }
+            // else if(file.filename.slice(0,2) ==="2_"){
+            //     prefix2.push(file)
+            // }
+        }
+        this.testCheck = prefixes
+        console.log("finished iteration")
+        // this.testFileList.set("1", prefix1)
+        // this.testFileList.set("2", prefix2)
+    }
+
 
     @action getFileListByDOI(doi, server, userid){
         console.log(server)
@@ -212,7 +297,9 @@ export class SystemStore{
             .then(action(res=>{
                 console.log("got result")
                 if (res.status ===201){
-
+                    console.log(res.data.fileList)
+                    this.sortFileList(res.data.fileList)
+                    console.log("----------------------")
                     if (this.lastFileList.length >0){
                         console.log("this step")
                         let filteredList = this.fileList.filter(ele=>!this.lastFileList.includes(ele.filename))

@@ -19,6 +19,7 @@ import {
     Transfer,
     TreeSelect,
     Radio,
+    Checkbox
 } from 'antd';
 import { inject, observer } from 'mobx-react';
 import API_URL from '../../config'
@@ -59,7 +60,7 @@ const columns = [
 
 @inject('routingStore', 'systemStore', 'authStore')
 @observer
-export default class CopyTool extends Component{
+export default class Test extends Component{
     state={
         createDataset: false,
         doiExisting: false,
@@ -238,13 +239,13 @@ export default class CopyTool extends Component{
                             }
                             this.setState({doi: doi})
                             this.props.systemStore.getFileListByDOI(doi, temp[0].alias, userid)
-                                // .then(res=>{
-                                //     if (res === false){
-                                //         this.copyToolFormRef.current.setFieldsValue({
-                                //             copyRange: undefined
-                                //         })
-                                //     }
-                                // })
+                            // .then(res=>{
+                            //     if (res === false){
+                            //         this.copyToolFormRef.current.setFieldsValue({
+                            //             copyRange: undefined
+                            //         })
+                            //     }
+                            // })
                         }
                         else {
                             console.log("AAAAAAAAAAAAAA")
@@ -343,7 +344,7 @@ export default class CopyTool extends Component{
     onLoadData = treeNode =>{
         const { id } = treeNode.props;
         return new Promise((resolve, reject)=>{
-             this.props.authStore.getSubDataverses(id)
+            this.props.authStore.getSubDataverses(id)
                 .then(res=>resolve())
                 .catch(err=>{
                     console.log(err)
@@ -400,6 +401,9 @@ export default class CopyTool extends Component{
             />
         </Popover>
     );
+
+    plainOptions = ["1","2"]
+
     render() {
         const { authStore, systemStore, files, formReset } = this.props
         const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, destinationDOIMessage } = this.state
@@ -409,12 +413,12 @@ export default class CopyTool extends Component{
         const user = toJS(authStore.currentUser)
         const treeData = Object.keys(authStore.ctDVList).length>0 && authStore.ctSelectedServer?authStore.ctDVList[authStore.ctSelectedServer].dataverses: []
         const selectedServer = authStore.ctSelectedServer
-        console.log(destinationDOIMessage)
+        console.log(systemStore.checkGroupValue)
         //console.log(toJS(authStore.productionDVList))
         //console.log(toJS(treeData))
-        //console.log(toJS(datasource))
-        console.log(copyRange)
-        console.log(toJS(systemStore.selectedRowNames))
+        //console.log([...systemStore.testSelectedKeys.values()].flat().map(ele=>ele.filename))
+
+        console.log(toJS(systemStore.testSelectedKeys))
         const rowSelection = {
             selectedRowKeys: systemStore.selectedRowKeys,
             onChange: (selectedRowKeys, selectedRows) => {
@@ -430,20 +434,38 @@ export default class CopyTool extends Component{
                 Table.SELECTION_ALL,
                 Table.SELECTION_INVERT,
                 {
-                    key: 'odd',
-                    text: 'Select Odd Row',
-                    onSelect: changableRowKeys => {
-                        let newSelectedRowKeys = [];
-                        newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-                            if (index % 2 !== 0) {
-                                return false;
-                            }
-                            return true;
-                        });
-                        this.setState({ selectedRowKeys: newSelectedRowKeys });
+                    key: 'prefix1',
+                    text: 'Select Prefix 1',
+                    onSelect: (changableRowKeys) => {
+                        systemStore.prefixFilter( 1)
+                    },
+                },
+                {
+                    key: 'prefix2',
+                    text: 'Select Prefix 2',
+                    onSelect: (changableRowKeys) => {
+                        systemStore.prefixFilter(2)
                     },
                 }
-                ]
+            ]
+        };
+        const rowSelection2 = {
+            selectedRowKeys: [...systemStore.testSelectedKeys.values()].flat().map(ele=>ele.filename),
+            // onChange: (selectedRowKeys, selectedRows) => {
+            //     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+            //     //this.setState({ selectedRowKeys });
+            //     //systemStore.copyToolFileListOnChange(selectedRowKeys, selectedRows)
+            //     systemStore.testAddRowKey(selectedRows)
+            // },
+            onSelect: (record, selected, selectedRows, nativeEvent) =>{
+                console.log(record)
+                systemStore.testAddRowKey(record, selected)
+            },
+            getCheckboxProps: record => ({
+                disabled: copyRange === 2, // Column configuration not to be checked
+                name: record.name,
+            }),
+            hideSelectAll: true,
         };
         const props = {
             onRemove: file => {
@@ -637,13 +659,33 @@ export default class CopyTool extends Component{
                                     }}
                                     columns={columns}
                                     dataSource={datasource}
-                                    rowKey={'id'}
+                                    rowKey={'filename'}
                                 />
 
                             </Col>
                         </Row>
 
+                        <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
+                            <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
+                                <div id="fileList" style={{textAlign: 'center', paddingTop:'2vh'}}>
+                                    <span>Files to copy2: </span>
+                                    <Divider />
+                                </div>
+                                <div style={{display: "flex", justifyContent: "center", paddingBottom:'3vh'}}>
+                                    <Checkbox.Group options={systemStore.testCheck} onChange={value=>systemStore.CheckGroupOnChange(value)} />
+                                </div>
+                                <Table
+                                    rowSelection={{
+                                        type: 'checkbox',
+                                        ...rowSelection2,
+                                    }}
+                                    columns={columns}
+                                    dataSource={datasource}
+                                    rowKey={'filename'}
+                                />
 
+                            </Col>
+                        </Row>
 
                         <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
@@ -746,20 +788,20 @@ export default class CopyTool extends Component{
                                             </Form.Item>
                                             {
                                                 this.state.destinationServer?
-                                                <div style={{marginLeft:'30%', marginBottom:'1vh'}}><Tag color="default" style={{width: '3vw',textAlign:'center'}}>Server: </Tag>
-                                                <span>{this.state.destinationServer}</span>
-                                                {this.state.destinationDOIMessage?<Tag style={{marginLeft:'1vw'}} color={this.state.doiMessage ==="Server not found."?"#f50":"#87d068"}>{this.state.destinationDOIMessage}</Tag>
-                                                    :null}
-                                                </div>: null
+                                                    <div style={{marginLeft:'30%', marginBottom:'1vh'}}><Tag color="default" style={{width: '3vw',textAlign:'center'}}>Server: </Tag>
+                                                        <span>{this.state.destinationServer}</span>
+                                                        {this.state.destinationDOIMessage?<Tag style={{marginLeft:'1vw'}} color={this.state.doiMessage ==="Server not found."?"#f50":"#87d068"}>{this.state.destinationDOIMessage}</Tag>
+                                                            :null}
+                                                    </div>: null
                                             }
                                             {
                                                 this.state.destinationDOI?
-                                                <div style={{marginLeft:'30%', marginBottom:'5vh'}}>
-                                                <Tag color="default" style={{width: '3vw',textAlign:'center'}}>DOI: </Tag>
-                                                <span>{this.state.destinationDOI}</span><
-                                                Tag style={{marginLeft:'1vw'}} color={systemStore.destinationDOIValid ?"#87d068":"#f50"}>{systemStore.destinationDOIValid?"Valid":systemStore.destinationDOIMessage}</Tag>
-                                                <Spin spinning={systemStore.isDestinationDoiLoading} delay={20} indicator={doiLoadingIcon} />
-                                                </div>: null
+                                                    <div style={{marginLeft:'30%', marginBottom:'5vh'}}>
+                                                        <Tag color="default" style={{width: '3vw',textAlign:'center'}}>DOI: </Tag>
+                                                        <span>{this.state.destinationDOI}</span><
+                                                        Tag style={{marginLeft:'1vw'}} color={systemStore.destinationDOIValid ?"#87d068":"#f50"}>{systemStore.destinationDOIValid?"Valid":systemStore.destinationDOIMessage}</Tag>
+                                                        <Spin spinning={systemStore.isDestinationDoiLoading} delay={20} indicator={doiLoadingIcon} />
+                                                    </div>: null
                                             }
                                         </>
                                 }
@@ -768,15 +810,15 @@ export default class CopyTool extends Component{
                             </Col>
                         </Row>
 
-                        <Row style={{marginBottom:'5vh'}} >
-                            <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
-                                <div style={{textAlign: 'center', paddingBottom:'3vh'}}>
-                                    <Button type="primary" htmlType="submit" disabled={submitCheck()} loading={isLoading}>
-                                        COPY
-                                    </Button>
-                                </div>
-                            </Col>
-                        </Row>
+                        {/*<Row style={{marginBottom:'5vh'}} >*/}
+                        {/*    <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>*/}
+                        {/*        <div style={{textAlign: 'center', paddingBottom:'3vh'}}>*/}
+                        {/*            <Button type="primary" htmlType="submit" disabled={submitCheck()} loading={isLoading}>*/}
+                        {/*                COPY*/}
+                        {/*            </Button>*/}
+                        {/*        </div>*/}
+                        {/*    </Col>*/}
+                        {/*</Row>*/}
 
                     </Form>
                     <div id="finalResult" ref={ref => {this.finalResult_CopyTool = ref}}>
