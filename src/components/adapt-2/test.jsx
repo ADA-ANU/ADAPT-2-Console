@@ -404,6 +404,7 @@ export default class Test extends Component{
 
     plainOptions = ["1","2"]
 
+
     render() {
         const { authStore, systemStore, files, formReset } = this.props
         const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, destinationDOIMessage } = this.state
@@ -445,6 +446,13 @@ export default class Test extends Component{
                     text: 'Select Prefix 2',
                     onSelect: (changableRowKeys) => {
                         systemStore.prefixFilter(2)
+                    },
+                },
+                {
+                    key: 'prefix1&2',
+                    text: 'Select Prefix 1&2',
+                    onSelect: (changableRowKeys) => {
+                        systemStore.prefixFilter(1,2)
                     },
                 }
             ]
@@ -672,7 +680,20 @@ export default class Test extends Component{
                                     <Divider />
                                 </div>
                                 <div style={{display: "flex", justifyContent: "center", paddingBottom:'3vh'}}>
-                                    <Checkbox.Group options={systemStore.testCheck} onChange={value=>systemStore.CheckGroupOnChange(value)} />
+                                    {/*<Checkbox.Group options={systemStore.testCheck} onChange={value=>systemStore.CheckGroupOnChange(value)} />*/}
+                                    {
+                                        systemStore.testCheck.length>0?
+                                            systemStore.testCheck.map(option=>
+                                                <Checkbox
+                                                    indeterminate={systemStore.checkStatus.get(option).indeterminate}
+                                                    onChange={e=>systemStore.handleCheckOnchange(e.target.checked, option)}
+                                                    checked={systemStore.checkStatus.get(option).checked}
+                                                    key={option}
+                                                >
+                                                    {option}
+                                                </Checkbox>
+                                            ): null
+                                    }
                                 </div>
                                 <Table
                                     rowSelection={{

@@ -50,6 +50,7 @@ export class SystemStore{
     @observable testSelectedKeys = new Map()
     @observable testCheck = []
     @observable regexPrefix = /^[0-9]_$/
+    @observable checkStatus = new Map()
 
 
 
@@ -185,6 +186,16 @@ export class SystemStore{
         this.localTargetKeys = this.localTargetKeys.filter(file=> file !== filename)
         this.remoteTargetKeys = this.remoteTargetKeys.filter(file=> file !== filename)
     }
+    @action handleCheckOnchange(isChecked, prefix){
+        if(isChecked){
+            this.updateCheckStatus(prefix, false, true)
+            this.testSelectedKeys.set(prefix, this.testFileList.get(prefix))
+        }
+        else{
+            this.updateCheckStatus(prefix, false, false)
+            this.testSelectedKeys.delete(prefix)
+        }
+    }
     @action CheckGroupOnChange(value){
         this.checkGroupValue = value
             this.testSelectedKeys.clear()
@@ -195,6 +206,15 @@ export class SystemStore{
             }
             // console.log(toJS(selectedKeys))
             // this.testRowKeys = selectedKeys
+    }
+    @action getCheckStatus(prefix){
+        return this.checkStatus.get(prefix)
+    }
+    @action updateCheckStatus(prefix, indeterminate, checked){
+        this.checkStatus.set(prefix, {indeterminate: indeterminate, checked: checked})
+    }
+    @action isFullSelected(prefix){
+        return [...this.testSelectedKeys.get(prefix)].length === [...this.testFileList.get(prefix)].length
     }
     @action testAddRowKey(row, selected){
         const rowKey  = row.filename
@@ -221,14 +241,31 @@ export class SystemStore{
             this.testSelectedKeys.set(prefix, result)
         }
 
+        if(this.isFullSelected(prefix)){
+            this.updateCheckStatus(prefix, false, true)
+        }
+        else{
+            this.updateCheckStatus(prefix, true, false)
+        }
+
     }
-    @action prefixFilter(prefix){
+    @action prefixFilter(prefix1, prefix2){
         let result = []
-        for(let file of this.fileList){
-            if(file.filename.slice(0, 2) === `${prefix}_`){
-                result.push(file.filename)
+        if(!prefix2){
+            for(let file of this.fileList){
+                if(file.filename.slice(0, 2) === `${prefix1}_`){
+                    result.push(file.filename)
+                }
             }
         }
+        else{
+            for(let file of this.fileList){
+                if(file.filename.slice(0, 2) === `${prefix1}_` || `${prefix2}_`){
+                    result.push(file.filename)
+                }
+            }
+        }
+
         this.selectedRowKeys = result
     }
 
@@ -252,17 +289,12 @@ export class SystemStore{
     }
     @action sortFileList(fileList){
         let prefixes = []
-        let prefix1 = []
-        let prefix2 = []
-        console.log("start iteration")
         for(let file of fileList){
             let prefix = file.filename.slice(0,2)
             if(!this.regexPrefix.test(prefix)){
                 prefix = 'other'
             }
-            console.log(prefix)
             if(!prefixes.includes(prefix)){
-                console.log("no prefix found")
                 prefixes.push(prefix)
                 this.testFileList.set(prefix, [file])
 
@@ -270,17 +302,13 @@ export class SystemStore{
             else{
                 this.testFileList.set(prefix, [...this.testFileList.get(prefix), file])
             }
-            // if(file.filename.slice(0,2) ==="1_"){
-            //     prefix1.push(file)
-            // }
-            // else if(file.filename.slice(0,2) ==="2_"){
-            //     prefix2.push(file)
-            // }
         }
         this.testCheck = prefixes
-        console.log("finished iteration")
-        // this.testFileList.set("1", prefix1)
-        // this.testFileList.set("2", prefix2)
+        this.checkStatus.clear()
+        for(let prefix of prefixes){
+            this.checkStatus.set(prefix, {indeterminate: false, checked: false})
+        }
+
     }
 
 
