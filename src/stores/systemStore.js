@@ -46,11 +46,13 @@ export class SystemStore{
     @observable adaFolderFileList = []
     @observable duplicateFileList = []
     @observable checkGroupValue = []
-    @observable testFileList = new Map()
-    @observable testSelectedKeys = new Map()
+    @observable sortedFileList = new Map()
+    @observable localSelectedKeys = new Map()
+    @observable remoteSelectedKeys = new Map()
     @observable testCheck = []
     @observable regexPrefix = /^[0-9]_$/
-    @observable checkStatus = new Map()
+    @observable localCheckStatus = new Map()
+    @observable remoteCheckStatus = new Map()
 
 
 
@@ -152,6 +154,8 @@ export class SystemStore{
         this.resetKeys()
         this.selectedRowKeys = []
         //this.adaFolderInfo = null
+        console.log("removeSelectedDOIFiles")
+        this.removeSelectedDOIFiles(filteredList)
     }
     @action resetUploadedFileList(){
         this.fileList = []
@@ -177,6 +181,7 @@ export class SystemStore{
 
     @action addFileToFileList(file){
         this.fileList = [...this.fileList, file]
+        this.sortFile(file)
     }
     @action deleteFileFromFileList(fileID, filename){
         console.log("deleting")
@@ -185,67 +190,197 @@ export class SystemStore{
         this.fileList = tempList.filter(file=> file.id !== fileID)
         this.localTargetKeys = this.localTargetKeys.filter(file=> file !== filename)
         this.remoteTargetKeys = this.remoteTargetKeys.filter(file=> file !== filename)
+        const prefix = this.getPrefix(filename)
+        if(this.localSelectedKeys.get(prefix)){
+            let newKeys = this.localSelectedKeys.get(prefix).filter(file=>file.filename !== filename)
+            this.localSelectedKeys.set(prefix, newKeys)
+        }
+        if(this.remoteSelectedKeys.get(prefix)){
+            let newKeys = this.remoteSelectedKeys.get(prefix).filter(file=>file.filename !== filename)
+            this.remoteSelectedKeys.set(prefix, newKeys)
+        }
     }
-    @action handleCheckOnchange(isChecked, prefix){
+    @action switchOff(ele){
+        if(ele==='local'){
+            this.localSelectedKeys.clear()
+            const prefixes = [...this.localCheckStatus.keys()]
+            prefixes.map(prefix=>{
+                this.updateCheckStatus(prefix, false, false, 'local')
+                }
+            )
+        }
+        if(ele==='remote'){
+            this.remoteSelectedKeys.clear()
+            const prefixes = [...this.remoteCheckStatus.keys()]
+            prefixes.map(prefix=>{
+                    this.updateCheckStatus(prefix, false, false, 'remote')
+                }
+            )
+        }
+    }
+    @action handleCheckOnchange(isChecked, prefix, ele){
         if(isChecked){
-            this.updateCheckStatus(prefix, false, true)
-            this.testSelectedKeys.set(prefix, this.testFileList.get(prefix))
+            if(ele==='local'){
+                this.updateCheckStatus(prefix, false, true, 'local')
+                this.localSelectedKeys.set(prefix, this.sortedFileList.get(prefix))
+            }
+            else if(ele==='remote'){
+                this.updateCheckStatus(prefix, false, true, 'remote')
+                this.remoteSelectedKeys.set(prefix, this.sortedFileList.get(prefix))
+            }
+
         }
         else{
-            this.updateCheckStatus(prefix, false, false)
-            this.testSelectedKeys.delete(prefix)
+            if(ele==='local'){
+                this.updateCheckStatus(prefix, false, false, 'local')
+                this.localSelectedKeys.delete(prefix)
+            }
+            else if(ele ==='remote'){
+                this.updateCheckStatus(prefix, false, false, 'remote')
+                this.remoteSelectedKeys.delete(prefix)
+            }
+
         }
     }
-    @action CheckGroupOnChange(value){
-        this.checkGroupValue = value
-            this.testSelectedKeys.clear()
-            let selectedKeys =[]
-            for(let ele of value){
-                this.testSelectedKeys.set(ele, this.testFileList.get(ele))
-                selectedKeys.push(this.testFileList.get(ele))
+    // @action CheckGroupOnChange(value){
+    //     this.checkGroupValue = value
+    //         this.testSelectedKeys.clear()
+    //         let selectedKeys =[]
+    //         for(let ele of value){
+    //             this.testSelectedKeys.set(ele, this.testFileList.get(ele))
+    //             selectedKeys.push(this.testFileList.get(ele))
+    //         }
+    //         // console.log(toJS(selectedKeys))
+    //         // this.testRowKeys = selectedKeys
+    // }
+    @action getCheckStatus(prefix, ele){
+        if(ele ==='local'){
+            return this.localCheckStatus.get(prefix)
+        }
+        else if(ele==='remote'){
+            return this.remoteCheckStatus.get(prefix)
+        }
+
+    }
+    @action updateCheckStatus(prefix, indeterminate, checked, ele){
+        if(ele ==='local'){
+            this.localCheckStatus.set(prefix, {indeterminate: indeterminate, checked: checked})
+        }
+        else if(ele==='remote'){
+            this.remoteCheckStatus.set(prefix, {indeterminate: indeterminate, checked: checked})
+        }
+    }
+    @action updateCheckStatusWithNewPrefix(prefix){
+        console.log("prefix ``````````````````")
+
+        if(this.localCheckStatus.get(prefix)){
+            if(this.localCheckStatus.get(prefix).checked ===true){
+                this.updateCheckStatus(prefix, true, false, 'local')
             }
-            // console.log(toJS(selectedKeys))
-            // this.testRowKeys = selectedKeys
+        }
+        else{
+            this.updateCheckStatus(prefix, false, false, 'local')
+        }
+        if(this.remoteCheckStatus.get(prefix)){
+            console.log("prefix detected in remoteCheck")
+            console.log(this.remoteCheckStatus.get(prefix))
+            if(this.remoteCheckStatus.get(prefix).checked ===true){
+
+                this.updateCheckStatus(prefix, true, false, 'remote')
+            }
+        }
+        else{
+            this.updateCheckStatus(prefix, false, false, 'remote')
+        }
+        console.log(this.remoteCheckStatus.get(prefix))
+        console.log(this.localCheckStatus.get(prefix))
     }
-    @action getCheckStatus(prefix){
-        return this.checkStatus.get(prefix)
+    @action isFullSelected(prefix, ele){
+        if(ele==='local'){
+            return [...this.localSelectedKeys.get(prefix)].length === [...this.sortedFileList.get(prefix)].length
+        }
+        else if(ele ==='remote'){
+            return [...this.remoteSelectedKeys.get(prefix)].length === [...this.sortedFileList.get(prefix)].length
+        }
     }
-    @action updateCheckStatus(prefix, indeterminate, checked){
-        this.checkStatus.set(prefix, {indeterminate: indeterminate, checked: checked})
+    @action isFullDeselected(prefix, ele){
+        if(ele==='local'){
+            return !this.localSelectedKeys.get(prefix) || [...this.localSelectedKeys.get(prefix)].length === 0
+        }
+        else if(ele ==='remote'){
+            return !this.remoteSelectedKeys.get(prefix) || [...this.remoteSelectedKeys.get(prefix)].length === 0
+        }
+
     }
-    @action isFullSelected(prefix){
-        return [...this.testSelectedKeys.get(prefix)].length === [...this.testFileList.get(prefix)].length
-    }
-    @action testAddRowKey(row, selected){
+    @action localAddRowKey(row, selected){
         const rowKey  = row.filename
         let prefix = this.regexPrefix.test(rowKey.slice(0, 2))?rowKey.slice(0, 2): 'other'
         console.log(prefix)
         if(selected){
-            if(this.testSelectedKeys.has(prefix)){
+            if(this.localSelectedKeys.has(prefix)){
                 console.log("key found")
-                this.testSelectedKeys.set(prefix, [...this.testSelectedKeys.get(prefix), row])
+                this.localSelectedKeys.set(prefix, [...this.localSelectedKeys.get(prefix), row])
             }
             else{
                 console.log("key not found")
                 //this.testCheck = [...this.testCheck, prefix]
-                this.testSelectedKeys.set(prefix, [row])
+                this.localSelectedKeys.set(prefix, [row])
             }
         }
         else{
             console.log("deselect checkbox", rowKey)
-            let files = [...this.testSelectedKeys.get(prefix)]
+            let files = [...this.localSelectedKeys.get(prefix)]
             console.log(files)
             const result = files.filter(ele=>ele.filename !==rowKey)
 
             //console.log(bbb.length)
-            this.testSelectedKeys.set(prefix, result)
+            this.localSelectedKeys.set(prefix, result)
         }
 
-        if(this.isFullSelected(prefix)){
-            this.updateCheckStatus(prefix, false, true)
+        if(this.isFullSelected(prefix, 'local')){
+            this.updateCheckStatus(prefix, false, true, 'local')
+        }
+        else if(this.isFullDeselected(prefix, 'local')){
+            this.updateCheckStatus(prefix, false, false, 'local')
         }
         else{
-            this.updateCheckStatus(prefix, true, false)
+            this.updateCheckStatus(prefix, true, false, 'local')
+        }
+
+    }
+    @action remoteAddRowKey(row, selected){
+        const rowKey  = row.filename
+        let prefix = this.regexPrefix.test(rowKey.slice(0, 2))?rowKey.slice(0, 2): 'other'
+        console.log(prefix)
+        if(selected){
+            if(this.remoteSelectedKeys.has(prefix)){
+                console.log("key found")
+                this.remoteSelectedKeys.set(prefix, [...this.remoteSelectedKeys.get(prefix), row])
+            }
+            else{
+                console.log("key not found")
+                //this.testCheck = [...this.testCheck, prefix]
+                this.remoteSelectedKeys.set(prefix, [row])
+            }
+        }
+        else{
+            console.log("deselect checkbox", rowKey)
+            let files = [...this.remoteSelectedKeys.get(prefix)]
+            console.log(files)
+            const result = files.filter(ele=>ele.filename !==rowKey)
+
+            //console.log(bbb.length)
+            this.remoteSelectedKeys.set(prefix, result)
+        }
+
+        if(this.isFullSelected(prefix, 'remote')){
+            this.updateCheckStatus(prefix, false, true, 'remote')
+        }
+        else if(this.isFullDeselected(prefix, 'remote')){
+            this.updateCheckStatus(prefix, false, false, 'remote')
+        }
+        else{
+            this.updateCheckStatus(prefix, true, false, 'remote')
         }
 
     }
@@ -287,7 +422,86 @@ export class SystemStore{
         }
         this.selectedRowKeys = rowKeys
     }
+    @action getPrefix(filename){
+        let prefix = filename.slice(0,2)
+        if(!this.regexPrefix.test(prefix)){
+            prefix = 'other'
+        }
+        return prefix
+    }
+    @action sortFile(file){
+        let prefix = file.filename.slice(0,2)
+        if(!this.regexPrefix.test(prefix)){
+            prefix = 'other'
+        }
+        this.updateCheckStatusWithNewPrefix(prefix)
+        if(!this.testCheck.includes(prefix)){
+            this.testCheck= [...this.testCheck, prefix]
+            this.sortedFileList.set(prefix, [file])
+
+        }
+        else{
+            this.sortedFileList.set(prefix, [...this.sortedFileList.get(prefix), file])
+        }
+    }
+    @action removeSelectedDOIFiles(newFileList){
+        // this.testCheck =[]
+        // this.sortFileList(newFileList)
+        const localKeys = [...this.localSelectedKeys.keys()]
+        localKeys.map(key=>{
+            const localTemp = this.localSelectedKeys.get(key).filter(file=>file.type && file.type==='local')
+            //console.log(key, selectedKeys)
+            if(localTemp.length>0){
+                this.localSelectedKeys.set(key, localTemp)
+                if(this.localCheckStatus.get(key).checked){
+                    if(this.localSelectedKeys.get(key).length !== localTemp.length){
+                        this.updateCheckStatus(key, true, false, 'local')
+                    }
+                }
+            }
+            else{
+                this.localSelectedKeys.delete(key)
+                const newPrefixes = this.testCheck.filter(item => item!==key)
+                this.testCheck = newPrefixes
+            }
+        })
+
+        const remoteKeys = [...this.remoteSelectedKeys.keys()]
+        remoteKeys.map(key=>{
+            const remoteTemp = this.remoteSelectedKeys.get(key).filter(file=>file.type && file.type==='local')
+            if(remoteTemp.length>0){
+                this.remoteSelectedKeys.set(key, remoteTemp)
+                if(this.remoteSelectedKeys.get(key).checked){
+                    if(this.remoteSelectedKeys.get(key).length !== remoteTemp.length){
+                        this.updateCheckStatus(key, true, false, 'remote')
+                    }
+                }
+            }
+            else{
+                this.remoteSelectedKeys.delete(key)
+                const newPrefixes = this.testCheck.filter(item => item!==key)
+                this.testCheck = newPrefixes
+            }
+        })
+
+
+        // const localSelectedFiles = [...this.localSelectedKeys.keys()]
+        // localSelectedFiles.map(file=>{
+        //
+        // })
+
+
+
+        // this.testCheck.map(prefix => {
+        //     if (!this.localSelectedKeys.get(prefix) || this.localSelectedKeys.get(prefix).length === 0) {
+        //         const newPrefixes = this.testCheck.filter(item => item !== prefix)
+        //         this.testCheck = newPrefixes
+        //     }
+        // })
+
+    }
     @action sortFileList(fileList){
+        console.log(this.testCheck)
         let prefixes = []
         for(let file of fileList){
             let prefix = file.filename.slice(0,2)
@@ -296,19 +510,29 @@ export class SystemStore{
             }
             if(!prefixes.includes(prefix)){
                 prefixes.push(prefix)
-                this.testFileList.set(prefix, [file])
-
+            }
+            if(this.sortedFileList.get(prefix)){
+                this.sortedFileList.set(prefix, [...this.sortedFileList.get(prefix), file])
             }
             else{
-                this.testFileList.set(prefix, [...this.testFileList.get(prefix), file])
+                this.sortedFileList.set(prefix, [file])
+            }
+            // else{
+            //     this.sortedFileList.set(prefix, [...this.sortedFileList.get(prefix), file])
+            // }
+        }
+        for(let prefix of prefixes){
+            console.log(prefix)
+            this.localCheckStatus.set(prefix, {indeterminate: false, checked: false})
+            this.remoteCheckStatus.set(prefix, {indeterminate: false, checked: false})
+            if(!this.testCheck.includes(prefix)){
+                this.testCheck = [...this.testCheck, prefix]
             }
         }
-        this.testCheck = prefixes
-        this.checkStatus.clear()
-        for(let prefix of prefixes){
-            this.checkStatus.set(prefix, {indeterminate: false, checked: false})
-        }
 
+        console.log(this.testCheck)
+        // this.localCheckStatus.clear()
+        // this.remoteCheckStatus.clear()
     }
 
 

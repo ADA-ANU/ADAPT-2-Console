@@ -24,7 +24,10 @@ import { toJS } from 'mobx'
 import DataverseForm from "./dataverseForm";
 import systemStore from "../../stores/systemStore";
 import FinalResult from "./finalResult";
+import NewDatasetWrapper from "./newDatasetWrapper";
 import {adapt2Store} from "../../stores/adapt2Store";
+import NewFileTableWrapper from "./newFileTableWrapper";
+import NewDSnFilesWrapper from "./newDSnFilesWrapper";
 const { Dragger } = Upload;
 const { Panel } = Collapse;
 const { Link } = Anchor;
@@ -32,7 +35,12 @@ const { Link } = Anchor;
 @inject('routingStore', 'systemStore', 'authStore', 'adapt2Store')
 @observer
 export default class newAdapt2 extends Component{
+    constructor(props){
+        super(props)
+        this.state = {
 
+        };
+    }
 
     finalResult_CopyTool=React.createRef()
     adapt2Ref = React.createRef();
@@ -52,7 +60,9 @@ export default class newAdapt2 extends Component{
     handleAnchorClick = (e, link) => {
         e.preventDefault();
     };
-
+    handleForm=(form)=>{
+        console.log(form)
+    }
     render() {
         const { systemStore, authStore, adapt2Store } = this.props
         const radioStyle = {
@@ -60,6 +70,8 @@ export default class newAdapt2 extends Component{
             height: '40px',
             lineHeight: '30px',
         };
+        console.log(adapt2Store.selection)
+        console.log(adapt2Store.adapt2Ref)
 
         return(
             <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}}>
@@ -100,11 +112,18 @@ export default class newAdapt2 extends Component{
                                     key="submit"
                                     htmlType="submit"
                                     type="primary"
-                                    onClick={adapt2Store.HandleSubmit}
+                                    onClick={()=>adapt2Store.handleSubmit()}
                                     loading={adapt2Store.isLoading}
                                 >
                                     {adapt2Store.isLoading ? 'Uploading' : 'Get ADAID'}
                                 </Button>
+                            </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col style={{}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
+                            <div style={{paddingBottom: '1vh'}}>
+                                <span style={{fontSize:'medium',fontWeight:'bold'}}>1. ADAID: </span>
                             </div>
                         </Col>
                     </Row>
@@ -114,7 +133,7 @@ export default class newAdapt2 extends Component{
                             <div style={{paddingTop: '3vh', paddingBottom: '2vh', paddingLeft: '2vw'}}>
                                 <Radio.Group
                                     onChange={this.handleRadioChange}
-                                    value={adapt2Store.Selection}
+                                    value={adapt2Store.selection}
                                 >
                                     <div style={radioStyle}>
                                         <Radio value={1}>
@@ -136,14 +155,17 @@ export default class newAdapt2 extends Component{
                                     </div>
                                 </Radio.Group>
                             </div>
-                            {/*dataset={formdata} adaid={adaID} doi={doi} files={returnedFiles}*/}
-                            <div id="finalResult" ref={ref => {this.finalResult_New = ref}}>
-                                {
-                                    systemStore.showfinalResult?<FinalResult clearResult={this.clearResult}/>: null
-                                }
-                            </div>
+
                         </Col>
                     </Row>
+                    {
+                        adapt2Store.selection ===2?
+                            <>
+                                <NewDSnFilesWrapper handleForm={this.handleForm}/>
+                                <NewDatasetWrapper handleForm={this.handleForm}/>
+                                <NewFileTableWrapper handleForm={this.handleForm}/>
+                            </>: null
+                    }
                     <Row>
                         <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
@@ -153,7 +175,7 @@ export default class newAdapt2 extends Component{
                                     key="submit"
                                     htmlType="submit"
                                     type="primary"
-                                    onClick={adapt2Store.HandleSubmit}
+                                    onClick={()=>adapt2Store.handleSubmit()}
                                     loading={adapt2Store.isLoading}
                                 >
                                     {adapt2Store.isLoading ? 'Uploading' : 'Get ADAID'}
@@ -161,7 +183,20 @@ export default class newAdapt2 extends Component{
                             </div>
                         </Col>
                     </Row>
-                    {/*</Form>*/}
+                    {/*ref => {adapt2Store.adapt2Ref = ref}*/}
+                    <div id="finalResult" ref={adapt2Store.adapt2Ref}>
+                        {
+                            systemStore.showfinalResult?(
+
+                                <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
+                                    <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
+                                        <FinalResult clearResult={this.clearResult} />
+                                    </Col>
+                                </Row>
+
+                            ):null
+                        }
+                    </div>
                 </div>
 
             </div>

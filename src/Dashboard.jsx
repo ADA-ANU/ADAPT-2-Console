@@ -79,7 +79,7 @@ export default class Dashboard extends Component {
                                             {/*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*/}
                                         </SubMenu>
                                         <Menu.Item key="/dashboard/copy-tool"><Link to='/dashboard/copy-tool'>Copy Tool</Link></Menu.Item>
-                                        {/*<Menu.Item key="/dashboard/test"><Link to='/dashboard/test'>Developers' playground</Link></Menu.Item>*/}
+                                        <Menu.Item key="/dashboard/newADAPT2"><Link to='/dashboard/adapt2-test'>New ADAPT2</Link></Menu.Item>
                                         {
                                             user.userEmail === "Mingjing.Peng@anu.edu.au" || user.userEmail === "Marina.McGale@anu.edu.au"?
                                                 <Menu.Item key="/dashboard/test"><Link to='/dashboard/test'>Developers' playground</Link></Menu.Item>
@@ -113,7 +113,11 @@ export default class Dashboard extends Component {
                                     <Route exact path='/dashboard/adapt2-existing' component={DataverseFiles} />
                                     <Route exact path='/dashboard/copy-tool' component={CopyTool} />
                                     <Route exact path='/dashboard/adapt2-test' component={newAdapt2} />
-                                    <Route exact path='/dashboard/test' component={test} />
+                                    {
+                                        user.userEmail === "Mingjing.Peng@anu.edu.au" || user.userEmail === "Marina.McGale@anu.edu.au"?
+                                            <Route exact path='/dashboard/test' component={test} />: null
+                                    }
+                                    {/*<Route exact path='/dashboard/test' component={test} />*/}
                         </Content>
                         <Footer>
                             <hr />

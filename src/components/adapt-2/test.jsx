@@ -39,23 +39,23 @@ const { Link } = Anchor;
 const doiLoadingIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
 
 const columns = [
-    {
-        title: 'ID',
-        dataIndex: 'id',
-    },
+    // {
+    //     title: 'ID',
+    //     dataIndex: 'id',
+    // },
     {
         title: 'File Name',
         dataIndex: 'filename',
     },
-    {
-        title: 'Size',
-        dataIndex: 'filesize',
-    },
-
-    {
-        title: 'MD5',
-        dataIndex: 'md5',
-    }
+    // {
+    //     title: 'Size',
+    //     dataIndex: 'filesize',
+    // },
+    //
+    // {
+    //     title: 'MD5',
+    //     dataIndex: 'md5',
+    // }
 ];
 
 @inject('routingStore', 'systemStore', 'authStore')
@@ -81,6 +81,9 @@ export default class Test extends Component{
         fileList:[],
         localTargetKeys:[],
         remoteTargetKeys:[],
+        switchLocal: false,
+        switchRemote: false
+
         //copyRange: null
     }
     componentDidMount() {
@@ -403,11 +406,20 @@ export default class Test extends Component{
     );
 
     plainOptions = ["1","2"]
+    handleSwitchOnChange=(value, ele)=>{
+        console.log(value, ele)
+        if(ele ==='local'){
+            this.setState({switchLocal: value})
+        }
+        else if(ele ==='remote'){
+            this.setState({switchRemote: value})
+        }
 
+    }
 
     render() {
         const { authStore, systemStore, files, formReset } = this.props
-        const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, destinationDOIMessage } = this.state
+        const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, destinationDOIMessage, switchLocal, switchRemote } = this.state
         const copyRange = systemStore.copyRange
         const serverList = toJS(authStore.serverList)
         const datasource = systemStore.fileList
@@ -457,8 +469,8 @@ export default class Test extends Component{
                 }
             ]
         };
-        const rowSelection2 = {
-            selectedRowKeys: [...systemStore.testSelectedKeys.values()].flat().map(ele=>ele.filename),
+        const rowSelectionLocal = {
+            selectedRowKeys: [...systemStore.localSelectedKeys.values()].flat().map(ele=>ele.filename),
             // onChange: (selectedRowKeys, selectedRows) => {
             //     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
             //     //this.setState({ selectedRowKeys });
@@ -467,7 +479,25 @@ export default class Test extends Component{
             // },
             onSelect: (record, selected, selectedRows, nativeEvent) =>{
                 console.log(record)
-                systemStore.testAddRowKey(record, selected)
+                systemStore.localAddRowKey(record, selected)
+            },
+            getCheckboxProps: record => ({
+                disabled: copyRange === 2, // Column configuration not to be checked
+                name: record.name,
+            }),
+            hideSelectAll: true,
+        };
+        const rowSelectionRemote = {
+            selectedRowKeys: [...systemStore.remoteSelectedKeys.values()].flat().map(ele=>ele.filename),
+            // onChange: (selectedRowKeys, selectedRows) => {
+            //     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+            //     //this.setState({ selectedRowKeys });
+            //     //systemStore.copyToolFileListOnChange(selectedRowKeys, selectedRows)
+            //     systemStore.testAddRowKey(selectedRows)
+            // },
+            onSelect: (record, selected, selectedRows, nativeEvent) =>{
+                console.log(record)
+                systemStore.remoteAddRowKey(record, selected)
             },
             getCheckboxProps: record => ({
                 disabled: copyRange === 2, // Column configuration not to be checked
@@ -679,31 +709,106 @@ export default class Test extends Component{
                                     <span>Files to copy2: </span>
                                     <Divider />
                                 </div>
-                                <div style={{display: "flex", justifyContent: "center", paddingBottom:'3vh'}}>
-                                    {/*<Checkbox.Group options={systemStore.testCheck} onChange={value=>systemStore.CheckGroupOnChange(value)} />*/}
-                                    {
-                                        systemStore.testCheck.length>0?
-                                            systemStore.testCheck.map(option=>
-                                                <Checkbox
-                                                    indeterminate={systemStore.checkStatus.get(option).indeterminate}
-                                                    onChange={e=>systemStore.handleCheckOnchange(e.target.checked, option)}
-                                                    checked={systemStore.checkStatus.get(option).checked}
-                                                    key={option}
-                                                >
-                                                    {option}
-                                                </Checkbox>
-                                            ): null
-                                    }
-                                </div>
-                                <Table
-                                    rowSelection={{
-                                        type: 'checkbox',
-                                        ...rowSelection2,
-                                    }}
-                                    columns={columns}
-                                    dataSource={datasource}
-                                    rowKey={'filename'}
-                                />
+                                <Row>
+                                    <Col span={10} offset={1}>
+                                        <div>
+                                            <Row style={{paddingBottom:'2vh'}}>
+                                                <Col>
+                                                    <span style={{fontSize:'medium',fontWeight:'bold'}}>Upload files to Directory:</span>
+                                                </Col>
+                                                <Col>
+                                                    <div style={{paddingLeft:'1vw'}}>
+                                                        <Switch
+                                                            checkedChildren="Yes"
+                                                            unCheckedChildren="No"
+                                                            defaultChecked={false}
+                                                            onChange={value=>this.handleSwitchOnChange(value, 'local')}
+                                                        />
+                                                    </div>
+                                                </Col>
+                                            </Row>
+                                            <div style={{border:'1px solid #444', borderRadius:'8px', marginBottom: '3vh'}}>
+                                                <div style={{display: "flex", justifyContent: "center", paddingBottom:'3vh', paddingTop:'2vh'}}>
+                                                    {/*<Checkbox.Group options={systemStore.testCheck} onChange={value=>systemStore.CheckGroupOnChange(value)} />*/}
+                                                    {
+                                                        systemStore.testCheck.length>0?
+                                                            systemStore.testCheck.map(option=>
+                                                                <Checkbox
+                                                                    indeterminate={systemStore.localCheckStatus.get(option).indeterminate}
+                                                                    onChange={e=>systemStore.handleCheckOnchange(e.target.checked, option, 'local')}
+                                                                    checked={systemStore.localCheckStatus.get(option).checked}
+                                                                    key={option}
+                                                                    disabled={!switchLocal}
+                                                                >
+                                                                    {option}
+                                                                </Checkbox>
+                                                            ): null
+                                                    }
+                                                </div>
+                                                <Table
+                                                    rowSelection={switchLocal?{
+                                                        type: 'checkbox',
+                                                        ...rowSelectionLocal,
+                                                    }:null}
+                                                    columns={columns}
+                                                    dataSource={datasource}
+                                                    rowKey={'filename'}
+                                                    disabled={!switchLocal}
+                                                />
+                                            </div>
+                                        </div>
+                                    </Col>
+                                    <Col span={10} offset={2}>
+                                        <div>
+                                            <Row  style={{paddingBottom:'2vh'}}>
+                                                <Col>
+                                                    <span style={{fontSize:'medium',fontWeight:'bold'}}>Upload files to Dataset:</span>
+                                                </Col>
+                                                <Col>
+                                                    <div style={{paddingLeft:'1vw'}}>
+                                                        <Switch
+                                                            checkedChildren="Yes"
+                                                            unCheckedChildren="No"
+                                                            defaultChecked={false}
+                                                            onChange={value=>this.handleSwitchOnChange(value, 'remote')}
+                                                        />
+                                                    </div>
+                                                </Col>
+                                            </Row>
+                                            <div style={{border:'1px solid #444', borderRadius:'8px', marginBottom: '3vh'}}>
+                                                <div style={{display: "flex", justifyContent: "center", paddingBottom:'3vh', paddingTop:'2vh'}}>
+                                                    {/*<Checkbox.Group options={systemStore.testCheck} onChange={value=>systemStore.CheckGroupOnChange(value)} />*/}
+                                                    {
+                                                        systemStore.testCheck.length>0?
+                                                            systemStore.testCheck.map(option=>
+                                                                <Checkbox
+                                                                    indeterminate={systemStore.remoteCheckStatus.get(option).indeterminate}
+                                                                    onChange={e=>systemStore.handleCheckOnchange(e.target.checked, option, 'remote')}
+                                                                    checked={systemStore.remoteCheckStatus.get(option).checked}
+                                                                    key={option}
+                                                                    disabled={!switchRemote}
+                                                                >
+                                                                    {option}
+                                                                </Checkbox>
+                                                            ): null
+                                                    }
+                                                </div>
+                                                <Table
+                                                    rowSelection={switchRemote?{
+                                                        type: 'checkbox',
+                                                        ...rowSelectionRemote,
+                                                    }: null}
+                                                    columns={columns}
+                                                    dataSource={datasource}
+                                                    rowKey={'filename'}
+                                                    disabled={!switchRemote}
+                                                />
+                                            </div>
+                                        </div>
+
+                                    </Col>
+                                </Row>
+
 
                             </Col>
                         </Row>

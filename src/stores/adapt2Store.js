@@ -5,10 +5,13 @@ import axios from 'axios'
 import {inject, observer} from "mobx-react";
 import authStore from "./authStore";
 import systemStore from "./systemStore";
+import {notification} from "antd";
+import React from "react";
 
 
 export class adapt2Store{
-    @observable Selection = 1
+
+    @observable selection = 1
     @observable isLoading = false
     @observable ShowFinalResult = false
     @observable newFinalFiles = []
@@ -16,14 +19,33 @@ export class adapt2Store{
     @observable newFormData = {}
     @observable existFinalFiles = []
     @observable existFileList = []
+    @observable adapt2Ref = React.createRef();
+    @observable createDataset = false
+    @observable doiServer = null
+    @observable doi = null
 
+    // constructor() {
+    //
+    //     this.adapt2Ref = React.createRef();
+    //
+    // }
+    scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
+    @action setDoiServer(server){
+        this.doiServer = server
+    }
+    @action setDoi(doi){
+        this.doi = doi
+    }
+    @action handleNewDatasetSwitch(value){
+        this.createDataset = value
+    }
     @action SelectionOnChange(value){
 
-        this.Selection = value
+        this.selection = value
     }
-    @action HandleSubmit(){
+    @action handleSubmit(){
         console.log("submit")
-        if(this.Selection ===1){
+        if(this.selection ===1){
             const obj = {
                 newDataset: false,
                 title: null,
@@ -35,6 +57,7 @@ export class adapt2Store{
                 dataverse: null,
                 uploadSwitch: false,
                 userid: authStore.currentUser.userID,
+                type: 'new'
             }
             const json = JSON.stringify(obj);
             this.isLoading = true
@@ -43,60 +66,47 @@ export class adapt2Store{
                         'Content-Type': 'application/json',
                     }
                 }
-            ).then(res=>res.data)
-                .then(json=>{
-                    if (json.success === true){
-                        console.log(json)
-                        const formData = new FormData();
-                        formData.set('adaid', json.msg.adaid)
-                        formData.set('userid', authStore.currentUser.userID)
-                        formData.set('datasetid', json.msg.dataset.id)
-                        formData.set('server', json.msg.dataverse)
-                        formData.set('uploadSwitch', uploadSwitch)
-                        formData.set('newDataset', newDataset)
-                        formData.set('dataset', JSON.stringify(obj))
-                        formData.set('doi', json.msg.doi)
-
-                        this.newFileList.forEach(file => {
-                            formData.append('file', file);
-                        });
-                    }
-                }).catch(err=>{
+            ).then(action(res=>{
+                console.log(res.data)
+                systemStore.handleFinalResultOpen({}, res.data.msg.adaid)
+                //this.adapt2Ref.scrollIntoView({behavior:'smooth'})
+                //this.scrollToMyRef()
+                this.adapt2Ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            })).catch(err=>{
                 if (err.response) {
                     console.log(err.response.data);
                     console.log(err.response.status);
                     console.log(err.response.headers);
-
-                    this.newFinalFiles = this.newFileList
-                    this.newFileList = []
-                    this.isLoading = false
-                    if (err.response.status ===401){
-                        const servers = authStore.serverList
-                        for (let serv of servers){
-                            if (serv.alias === this.newFormData.server){
-                                systemStore.handleFailedAPI(serv.id, 2, err.response.data)
-                                systemStore.handleAPIInputModal(true)
-                            }
-                        }
-
-                    }
-                    else {
-
-                        this.openNotificationWithIcon('error','files', `${err.response.data.message}, please refresh the page and retry.`)
-                    }
-
+                    this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
                 }
-
                 else {
-                    this.newFinalFiles = this.newFileList
-                    this.newFileList = []
-                    this.isLoading = false
                     this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
                 }
 
-            })
+
+            }).finally(action(()=>{
+                this.isLoading = false
+            }))
         }
     }
+    openNotificationWithIcon = (type,fileName,error) => {
+        if (type === 'success'){
+            notification[type]({
+                message: 'Successful',
+                description:
+                    `You have successfully uploaded file ${fileName}`,
+            });
+        }
+        else {
+            notification[type]({
+                message: 'Submission Failed',
+                description:
+                    `${error}`,
+                duration: 0,
+            });
+        }
+
+    };
 }
 
 export default new adapt2Store()
