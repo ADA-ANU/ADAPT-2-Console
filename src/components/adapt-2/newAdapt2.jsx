@@ -60,7 +60,7 @@ export default class newAdapt2 extends Component{
     handleAnchorClick = (e, link) => {
         e.preventDefault();
     };
-    handleForm=(form)=>{
+    handleSubmit=(form)=>{
         console.log(form)
     }
     render() {
@@ -108,11 +108,11 @@ export default class newAdapt2 extends Component{
 
                             <div style={{marginTop: '3%', paddingBottom: '3%', textAlign:'center'}}>
                                 <Button
-                                    //form="createDataset"
+                                    form="datasetCreation"
                                     key="submit"
                                     htmlType="submit"
                                     type="primary"
-                                    onClick={()=>adapt2Store.handleSubmit()}
+                                    //onClick={()=>adapt2Store.handleOption1Submit()}
                                     loading={adapt2Store.isLoading}
                                 >
                                     {adapt2Store.isLoading ? 'Uploading' : 'Get ADAID'}
@@ -130,7 +130,7 @@ export default class newAdapt2 extends Component{
                     <Row>
                         <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
-                            <div style={{paddingTop: '3vh', paddingBottom: '2vh', paddingLeft: '2vw'}}>
+                            <div style={{paddingTop: '3vh', paddingBottom: '2vh', paddingLeft: '5vw'}}>
                                 <Radio.Group
                                     onChange={this.handleRadioChange}
                                     value={adapt2Store.selection}
@@ -171,12 +171,12 @@ export default class newAdapt2 extends Component{
 
                             <div style={{marginTop: '3%', paddingBottom: '3%', textAlign:'center'}}>
                                 <Button
-                                    //form="createDataset"
+                                    form="datasetCreation"
                                     key="submit"
                                     htmlType="submit"
                                     type="primary"
-                                    onClick={()=>adapt2Store.handleSubmit()}
-                                    loading={adapt2Store.isLoading}
+                                    onClick={adapt2Store.selection ===1?()=>adapt2Store.handleSubmit(): null}
+                                    //loading={adapt2Store.isLoading}
                                 >
                                     {adapt2Store.isLoading ? 'Uploading' : 'Get ADAID'}
                                 </Button>

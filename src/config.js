@@ -25,7 +25,8 @@ const API_URL = {
     getADAFolderInfo: ROOT + 'api/getADAFolderInfo',
     uploadFilesFromExsitingPage: ROOT + 'api/uploadFilesFromExsitingPage',
     getSubDVs: ROOT + 'api/getSubDVs/',
-    createProdDS: ROOT + 'api/createProdDS'
+    createProdDS: ROOT + 'api/createProdDS',
+    Option2Submission: ROOT + 'api/adapt2Option2Submission'
 }
 
 // const PROD_API_URL = {

@@ -30,6 +30,7 @@ import axios from 'axios'
 import { MinusCircleOutlined, InfoCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import DynamicField from "./dynamicFields";
 import FinalResult from "./finalResult";
+import {adapt2Store} from "../../stores/adapt2Store";
 //import { HashLink as Link } from 'react-router-hash-link';
 const { TextArea } = Input;
 // const { Link } = Anchor;
@@ -58,7 +59,7 @@ const columns = [
     // }
 ];
 
-@inject('routingStore', 'systemStore', 'authStore')
+@inject('routingStore', 'systemStore', 'authStore', 'adapt2Store')
 @observer
 export default class FileTable extends Component{
     state={
@@ -98,20 +99,22 @@ export default class FileTable extends Component{
 
     handleSwitchOnChange=(value, ele)=>{
         console.log(value, ele)
-        if(ele ==='local'){
-            this.setState({switchLocal: value})
-        }
-        else if(ele ==='remote'){
-            this.setState({switchRemote: value})
-        }
+        this.props.adapt2Store.handleFileSwitch(value, ele)
+        // if(ele ==='local'){
+        //     this.setState({switchLocal: value})
+        // }
+        // else if(ele ==='remote'){
+        //     this.setState({switchRemote: value})
+        // }
         if(!value){
             this.props.systemStore.switchOff(ele)
         }
     }
 
     render() {
-        const { authStore, systemStore, files, formReset } = this.props
+        const { authStore, systemStore, files, formReset, adapt2Store } = this.props
         const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, destinationDOIMessage, switchLocal, switchRemote } = this.state
+        const { localSwitch, remoteSwitch } = adapt2Store
         const copyRange = systemStore.copyRange
         const serverList = toJS(authStore.serverList)
         const datasource = systemStore.fileList
@@ -121,48 +124,48 @@ export default class FileTable extends Component{
         console.log(systemStore.checkGroupValue)
         //console.log(toJS(authStore.productionDVList))
         //console.log(toJS(treeData))
-        console.log(toJS(systemStore.testCheck))
-        //console.log(systemStore.localCheckStatus)
-        //console.log(systemStore.remoteCheckStatus)
+        //console.log(toJS(systemStore.sortedFileList))
+        console.log(toJS(systemStore.localCheckStatus))
+        console.log(systemStore.testCheck)
         console.log([...systemStore.localSelectedKeys.values()].flat().map(ele=>ele.filename))
         console.log([...systemStore.remoteSelectedKeys.values()].flat().map(ele=>ele.filename))
-        const rowSelection = {
-            selectedRowKeys: systemStore.selectedRowKeys,
-            onChange: (selectedRowKeys, selectedRows) => {
-                console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-                //this.setState({ selectedRowKeys });
-                systemStore.copyToolFileListOnChange(selectedRowKeys, selectedRows)
-            },
-            getCheckboxProps: record => ({
-                disabled: copyRange === 2, // Column configuration not to be checked
-                name: record.name,
-            }),
-            selections: [
-                Table.SELECTION_ALL,
-                Table.SELECTION_INVERT,
-                {
-                    key: 'prefix1',
-                    text: 'Select Prefix 1',
-                    onSelect: (changableRowKeys) => {
-                        systemStore.prefixFilter( 1)
-                    },
-                },
-                {
-                    key: 'prefix2',
-                    text: 'Select Prefix 2',
-                    onSelect: (changableRowKeys) => {
-                        systemStore.prefixFilter(2)
-                    },
-                },
-                {
-                    key: 'prefix1&2',
-                    text: 'Select Prefix 1&2',
-                    onSelect: (changableRowKeys) => {
-                        systemStore.prefixFilter(1,2)
-                    },
-                }
-            ]
-        };
+        // const rowSelection = {
+        //     selectedRowKeys: systemStore.selectedRowKeys,
+        //     onChange: (selectedRowKeys, selectedRows) => {
+        //         console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        //         //this.setState({ selectedRowKeys });
+        //         systemStore.copyToolFileListOnChange(selectedRowKeys, selectedRows)
+        //     },
+        //     getCheckboxProps: record => ({
+        //         disabled: copyRange === 2, // Column configuration not to be checked
+        //         name: record.name,
+        //     }),
+        //     selections: [
+        //         Table.SELECTION_ALL,
+        //         Table.SELECTION_INVERT,
+        //         {
+        //             key: 'prefix1',
+        //             text: 'Select Prefix 1',
+        //             onSelect: (changableRowKeys) => {
+        //                 systemStore.prefixFilter( 1)
+        //             },
+        //         },
+        //         {
+        //             key: 'prefix2',
+        //             text: 'Select Prefix 2',
+        //             onSelect: (changableRowKeys) => {
+        //                 systemStore.prefixFilter(2)
+        //             },
+        //         },
+        //         {
+        //             key: 'prefix1&2',
+        //             text: 'Select Prefix 1&2',
+        //             onSelect: (changableRowKeys) => {
+        //                 systemStore.prefixFilter(1,2)
+        //             },
+        //         }
+        //     ]
+        // };
         const rowSelectionLocal = {
             selectedRowKeys: [...systemStore.localSelectedKeys.values()].flat().map(ele=>ele.filename),
             // onChange: (selectedRowKeys, selectedRows) => {
@@ -230,7 +233,7 @@ export default class FileTable extends Component{
                                                 onChange={e=>systemStore.handleCheckOnchange(e.target.checked, option, 'local')}
                                                 checked={systemStore.localCheckStatus.get(option).checked}
                                                 key={option}
-                                                disabled={!switchLocal}
+                                                disabled={!localSwitch}
                                             >
                                                 {option}
                                             </Checkbox>
@@ -238,14 +241,14 @@ export default class FileTable extends Component{
                                 }
                             </div>
                             <Table
-                                rowSelection={switchLocal?{
+                                rowSelection={localSwitch?{
                                     type: 'checkbox',
                                     ...rowSelectionLocal,
                                 }:null}
                                 columns={columns}
                                 dataSource={datasource}
                                 rowKey={'filename'}
-                                disabled={!switchLocal}
+                                disabled={!localSwitch}
                             />
                         </div>
                     </div>
@@ -278,7 +281,7 @@ export default class FileTable extends Component{
                                                 onChange={e=>systemStore.handleCheckOnchange(e.target.checked, option, 'remote')}
                                                 checked={systemStore.remoteCheckStatus.get(option).checked}
                                                 key={option}
-                                                disabled={!switchRemote}
+                                                disabled={!remoteSwitch}
                                             >
                                                 {option}
                                             </Checkbox>
@@ -286,14 +289,14 @@ export default class FileTable extends Component{
                                 }
                             </div>
                             <Table
-                                rowSelection={switchRemote?{
+                                rowSelection={remoteSwitch?{
                                     type: 'checkbox',
                                     ...rowSelectionRemote,
                                 }: null}
                                 columns={columns}
                                 dataSource={datasource}
                                 rowKey={'filename'}
-                                disabled={!switchRemote}
+                                disabled={!remoteSwitch}
                             />
                         </div>
                     </div>

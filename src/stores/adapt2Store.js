@@ -23,6 +23,8 @@ export class adapt2Store{
     @observable createDataset = false
     @observable doiServer = null
     @observable doi = null
+    @observable localSwitch = false
+    @observable remoteSwitch = false
 
     // constructor() {
     //
@@ -30,11 +32,22 @@ export class adapt2Store{
     //
     // }
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
+
     @action setDoiServer(server){
         this.doiServer = server
     }
     @action setDoi(doi){
         this.doi = doi
+    }
+    @action handleFileSwitch(value, ele){
+
+        if(ele==='local'){
+            this.localSwitch = value
+        }
+        else if(ele === 'remote'){
+            this.remoteSwitch = value
+        }
+
     }
     @action handleNewDatasetSwitch(value){
         this.createDataset = value
@@ -43,10 +56,74 @@ export class adapt2Store{
 
         this.selection = value
     }
-    @action handleSubmit(){
-        console.log("submit")
+    @action handleSubmit(form){
         if(this.selection ===1){
-            const obj = {
+            this.handleOption1Submit()
+        }
+        else if(this.selection ===2){
+            this.handleOption2Submit(form)
+        }
+        else if(this.selection ===3){
+
+        }
+    }
+    @action handleOption1Submit(){
+        console.log("submit")
+        const obj = {
+            newDataset: false,
+            title: null,
+            author: null,
+            email: null,
+            description: null,
+            subject: null,
+            server: null,
+            dataverse: null,
+            uploadSwitch: false,
+            userid: authStore.currentUser.userID,
+            type: 'new'
+        }
+        const json = JSON.stringify(obj);
+        this.isLoading = true
+        axios.post(API_URL.AdaID, json, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then(action(res=>{
+            console.log(res.data)
+            systemStore.handleFinalResultOpen({}, res.data.msg.adaid)
+            //this.adapt2Ref.scrollIntoView({behavior:'smooth'})
+            //this.scrollToMyRef()
+            this.adapt2Ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        })).catch(err=>{
+            if (err.response) {
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+                this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
+            }
+            else {
+                this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
+            }
+
+
+        }).finally(action(()=>{
+            this.isLoading = false
+        }))
+    }
+
+    @action handleOption2Submit(form) {
+        console.log("option2 submitting")
+        systemStore.handleFinalResultClose()
+        const {server, dataverse, title, authorFields, email, description, subject, firstName, lastName} = form
+        //const {fileList} = this.state;
+        console.log(form)
+
+        let obj = {}
+        //let finalDemo = {}
+        if (this.createDataset === false) {
+            obj = {
+                //doi: null,
                 newDataset: false,
                 title: null,
                 author: null,
@@ -55,39 +132,184 @@ export class adapt2Store{
                 subject: null,
                 server: null,
                 dataverse: null,
-                uploadSwitch: false,
+                localUploadSwitch: false,
+                remoteUploadSwitch: false,
                 userid: authStore.currentUser.userID,
-                type: 'new'
+
             }
-            const json = JSON.stringify(obj);
-            this.isLoading = true
-            axios.post(API_URL.AdaID, json, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }
-            ).then(action(res=>{
-                console.log(res.data)
-                systemStore.handleFinalResultOpen({}, res.data.msg.adaid)
-                //this.adapt2Ref.scrollIntoView({behavior:'smooth'})
-                //this.scrollToMyRef()
-                this.adapt2Ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
-            })).catch(err=>{
-                if (err.response) {
-                    console.log(err.response.data);
-                    console.log(err.response.status);
-                    console.log(err.response.headers);
-                    this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
-                }
-                else {
-                    this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
-                }
-
-
-            }).finally(action(()=>{
-                this.isLoading = false
-            }))
+        } else {
+            const dataverseID = dataverse[1]
+            // let subjectIDs =[]
+            // for(let sub of subject){
+            //     subjectIDs.push(sub[1])
+            // }
+            obj = {
+                //doi: doi,
+                newDataset: this.createDataset,
+                title: title,
+                //author: author,
+                author: `${lastName}, ${firstName}`,
+                authorFields: authorFields,
+                email: email,
+                description: description,
+                subject: subject,
+                //subjectIDs
+                server: server,
+                dataverse: dataverseID,
+                localUploadSwitch: this.localSwitch,
+                remoteUploadSwitch: this.remoteSwitch,
+                userid: authStore.currentUser.userID
+            }
         }
+
+        const json = JSON.stringify(obj);
+
+        this.isLoading = true
+
+
+        axios.post(API_URL.AdaID, json, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then(res => res.data)
+            .then(json => {
+                console.log(json)
+                if (json.success === true) {
+                    console.log(json)
+                    //this.setState({adaID: json.msg.adaid})
+                    const formData = new FormData();
+                    formData.set('adaid', json.msg.adaid)
+                    formData.set('userid', authStore.currentUser.userID)
+                    formData.set('datasetid', json.msg.dataset.id)
+                    formData.set('server', json.msg.dataverse)
+                    formData.set('localUploadSwitch', this.localSwitch)
+                    formData.set('remoteUploadSwitch', this.remoteSwitch)
+                    formData.set('newDataset', this.createDataset)
+                    formData.set('dataset', JSON.stringify(obj))
+                    formData.set('doi', json.msg.doi)
+                    formData.set('localFileList', JSON.stringify([...systemStore.localSelectedKeys.values()].flat().map(ele=>ele.filename)))
+                    formData.set('remoteFileList', JSON.stringify([...systemStore.remoteSelectedKeys.values()].flat().map(ele=>ele.filename)))
+
+                    systemStore.uploadedFiles.forEach(file => {
+                        console.log(file)
+                        formData.append('file', file);
+                    });
+                    axios({
+                        url: API_URL.Option2Submission,
+                        method: 'post',
+                        data: formData,
+                        config: {headers: {'Content-Type': 'multipart/form-data'}}
+                    }).then(res => res.data)
+                        .then(data => {
+                            // console.log(data)
+                            // if (data.success === true) {
+                            //     console.log("recovering")
+                            //     this.setState({returnedFiles: data.files})
+                            //     if (newDataset) {
+                            //         const datasetObj = {
+                            //             datasetid: json.msg.dataset.id,
+                            //             server: server,
+                            //             userid: toJS(this.props.authStore.currentUser).userID
+                            //         }
+                            //         const jsonData = JSON.stringify(datasetObj);
+                            //         axios.post(API_URL.Get_DatasetInfo, jsonData, {
+                            //                 headers: {
+                            //                     'Content-Type': 'application/json',
+                            //                 }
+                            //             }
+                            //         ).then(r => r.data)
+                            //             .then(info => {
+                            //                 let doi = info.data.authority ? info.data.authority + '/' + info.data.identifier : null
+                            //                 this.setState({
+                            //                     uploading: false,
+                            //                     finalFiles: fileList,
+                            //                     fileList: [],
+                            //                     //formReset: true,
+                            //                     doi: doi
+                            //                 });
+                            //                 systemStore.handleFinalResultOpen(this.state.formdata, this.state.adaID, this.state.doi, data.files)
+                            //                 this.finalResult_New.scrollIntoView({behavior: 'smooth'})
+                            //             }).catch(err => {
+                            //             if (err.response) {
+                            //                 this.setState({
+                            //                     uploading: false,
+                            //                     finalFiles: fileList,
+                            //                     fileList: [],
+                            //                     //formReset: true,
+                            //
+                            //                 });
+                            //                 systemStore.handleFinalResultOpen(true)
+                            //             }
+                            //         })
+                            //     } else {
+                            //         this.setState({
+                            //             uploading: false,
+                            //             finalFiles: fileList,
+                            //             fileList: [],
+                            //             //formReset: true,
+                            //         });
+                            //         systemStore.handleFinalResultOpen(this.state.formdata, this.state.adaID, this.state.doi, data.files)
+                            //         this.finalResult_New.scrollIntoView({behavior: 'smooth'})
+                            //     }
+                            //
+                            //
+                            // } else {
+                            //     this.setState({
+                            //         uploading: false,
+                            //         finalFiles: fileList,
+                            //         fileList: [],
+                            //         //formReset: true
+                            //     });
+                            //     this.openNotificationWithIcon('error', 'files', data.msg.message)
+                            // }
+                        }).catch(err => {
+                        console.log(err)
+                        // this.setState({
+                        //     uploading: false,
+                        //     finalFiles: fileList,
+                        //     fileList: [],
+                        //     //formReset: true
+                        // });
+                        this.openNotificationWithIcon('error', 'files', err)
+                    })
+                }
+            }).catch(err => {
+            if (err.response) {
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+                // this.setState({
+                //     uploading: false,
+                //     finalFiles: fileList,
+                //     fileList: [],
+                //     //formReset: true
+                // });
+                if (err.response.status === 401) {
+                    const servers = toJS(this.props.authStore.serverList)
+                    for (let serv of servers) {
+                        if (serv.alias === server) {
+                            systemStore.handleFailedAPI(serv.id, 2, err.response.data)
+                            systemStore.handleAPIInputModal(true)
+                        }
+                    }
+
+                } else {
+
+                    this.openNotificationWithIcon('error', 'files', `${err.response.data.message}, please refresh the page and retry.`)
+                }
+
+            } else {
+                // this.setState({
+                //     uploading: false,
+                //     finalFiles: fileList,
+                //     fileList: [],
+                //     //formReset: true
+                // })
+                this.openNotificationWithIcon('error', 'files', `${err}, please refresh the page and retry.`)
+            }
+
+        })
     }
     openNotificationWithIcon = (type,fileName,error) => {
         if (type === 'success'){

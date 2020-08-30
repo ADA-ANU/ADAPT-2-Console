@@ -10,7 +10,7 @@ import DynamicField from "./dynamicFields";
 import FinalResult from "./finalResult";
 const { TextArea } = Input;
 
-@inject('routingStore', 'systemStore', 'authStore')
+@inject('routingStore', 'systemStore', 'authStore', 'adapt2Store')
 @observer
 export default class NewDVForm extends Component{
     state={
@@ -43,11 +43,6 @@ export default class NewDVForm extends Component{
 
     }
 
-    onFinish = values => {
-        console.log('Received values of form: ', values);
-        this.props.handleFormData(values)
-        //this.createDatasetOnChange(false)
-    };
     serverOnChange =(value) => {
         console.log(`selected ${value}`);
         this.props.formRef.current.setFieldsValue({
@@ -96,10 +91,13 @@ export default class NewDVForm extends Component{
     handleSubjectChange= value =>{
         console.log(value)
     }
+    onFinish=value=>{
+        this.props.adapt2Store.handleSubmit(value)
+    }
 
 
     render() {
-        const { authStore, systemStore, files, formReset, createDataset, formRef } = this.props
+        const { authStore, systemStore, files, formReset, createDataset, formRef, adapt2Store } = this.props
         const serverList = toJS(authStore.serverList)
         const user = toJS(authStore.currentUser)
         const dataverses = toJS(authStore.newDVList)
@@ -110,7 +108,7 @@ export default class NewDVForm extends Component{
         return (
             <>
                 <Form
-                    id="createDataset"
+                    id="datasetCreation"
                     ref={formRef}
                     onFinish={this.onFinish}
                     labelCol={{ span: 5 }}
@@ -348,24 +346,24 @@ export default class NewDVForm extends Component{
 
                         </Select>
                     </Form.Item>
-                    <Form.Item
-                        label="Upload files to dataverse "
-                        name="uploadSwitch"
-                        valuePropName="checked"
-                        rules={[
-                            {
-                                required: createDataset,
-                            },
-                        ]}
-                    >
-                        <Switch
-                            // defaultChecked={true}
-                            //checked={this.state.fileUploadSwitch}
-                            disabled={!createDataset || files.length===0}
-                            checkedChildren="Yes"
-                            unCheckedChildren="No"
-                            onChange={this.fileUploadSwitchOnChange}/>
-                    </Form.Item>
+                    {/*<Form.Item*/}
+                    {/*    label="Upload files to dataverse "*/}
+                    {/*    name="uploadSwitch"*/}
+                    {/*    valuePropName="checked"*/}
+                    {/*    rules={[*/}
+                    {/*        {*/}
+                    {/*            required: createDataset,*/}
+                    {/*        },*/}
+                    {/*    ]}*/}
+                    {/*>*/}
+                    {/*    <Switch*/}
+                    {/*        // defaultChecked={true}*/}
+                    {/*        //checked={this.state.fileUploadSwitch}*/}
+                    {/*        disabled={!createDataset || files.length===0}*/}
+                    {/*        checkedChildren="Yes"*/}
+                    {/*        unCheckedChildren="No"*/}
+                    {/*        onChange={this.fileUploadSwitchOnChange}/>*/}
+                    {/*</Form.Item>*/}
 
                 </Form>
                 <APIInput newDatasetSwitch={this.createDatasetOnChange}/>

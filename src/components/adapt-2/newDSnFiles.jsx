@@ -158,7 +158,7 @@ export default class NewDSnFiles extends Component{
                         this.props.adapt2Store.setDoiServer(temp[0].alias)
                         if (value.indexOf('doi')>0){
                             console.log("new list.......")
-                            this.props.systemStore.resetFileList()
+                            //this.props.systemStore.resetFileList()
                             const userid = toJS(this.props.authStore.currentUser).userID
                             const newURL = value.replace("%3A", ":").replace("%2F", "/")
                             let doi = newURL.split('doi:')[1]
@@ -168,7 +168,8 @@ export default class NewDSnFiles extends Component{
                         }
                         else {
                             console.log("AAAAAAAAAAAAAA")
-                            this.props.systemStore.resetFileList()
+                            //this.props.systemStore.resetFileList()
+                            this.props.systemStore.sortFileList([])
                         }
                     }
                     else {
@@ -186,12 +187,14 @@ export default class NewDSnFiles extends Component{
                 this.setState({server: null})
                 this.props.adapt2Store.setDoi(null)
                 console.log("BBBBBBBBBBB")
-                this.props.systemStore.resetFileList()
+                //this.props.systemStore.resetFileList()
+                this.props.systemStore.sortFileList([])
             }
         }
         else if(value.length ===0){
             console.log("CCCCCCCCCCCCCC")
-            this.props.systemStore.resetFileList()
+            //this.props.systemStore.resetFileList()
+            this.props.systemStore.sortFileList([])
             this.setState({
                 doiExisting:false,
                 // doi: null,
@@ -239,8 +242,8 @@ export default class NewDSnFiles extends Component{
 
     render() {
         const { authStore, systemStore, files, formReset, adapt2Store } = this.props
-        const { doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, localTargetKeys, remoteTargetKeys } = this.state
-        //const { fileList } = systemStore
+        const { doiMessage, isLoading, selectedRowKeys, selectedADAFolder, localTargetKeys, remoteTargetKeys } = this.state
+        const { userUploadedFiles } = systemStore
         const { doiServer, doi } = adapt2Store
         const datasource = toJS(systemStore.fileList)
         const user = toJS(authStore.currentUser)
@@ -248,7 +251,7 @@ export default class NewDSnFiles extends Component{
         else{
             notification.close('duplicates')
         }
-        console.log(fileList)
+        //console.log(fileList)
         console.log(systemStore.duplicateFileList)
         console.log(systemStore.adaFolderFileList)
         //console.log(toJS(systemStore.lastFileList))
@@ -279,7 +282,8 @@ export default class NewDSnFiles extends Component{
             multiple: true,
             listType: 'picture',
             beforeUpload: file => {
-                let localfileListIncludes = fileList.includes(file.name)
+                //let localfileListIncludes = fileList.includes(file.name)
+                let localfileListIncludes = userUploadedFiles.includes(file.name)
                 let remoteFileListIncludes = datasource.filter(ele=>ele.filename === file.name).length >0?true:false
                 if (localfileListIncludes || remoteFileListIncludes){
                     this.openNotificationWithIcon('error', 'files', `Duplicate file detected.`)
@@ -289,11 +293,12 @@ export default class NewDSnFiles extends Component{
                         fileList: [...state.fileList, file],
                     }));
                     const tempFile = {id: file.uid, filename:file.name, type:'local'}
-                    this.props.systemStore.addFileToFileList(tempFile)
+                    this.props.systemStore.addFileToFileList(tempFile, file)
                 }
                 return false;
             },
-            fileList,
+            //fileList,
+            userUploadedFiles,
         };
         const submitCheck = ()=>{
             if(systemStore.localTargetKeys.length ===0 && systemStore.remoteTargetKeys.length ===0){

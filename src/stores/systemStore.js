@@ -53,6 +53,8 @@ export class SystemStore{
     @observable regexPrefix = /^[0-9]_$/
     @observable localCheckStatus = new Map()
     @observable remoteCheckStatus = new Map()
+    @observable userUploadedFiles = []
+    @observable uploadedFiles = []
 
 
 
@@ -144,19 +146,7 @@ export class SystemStore{
         this.finalResultRemoteFiles = remoteFiles
     }
 
-    @action resetFileList(){
-        console.log(toJS(this.lastFileList))
-        let filteredList = this.fileList.filter(ele=>!this.lastFileList.includes(ele.filename)
-        )
-        console.log(filteredList)
-        this.fileList = filteredList
-        this.adaFolderInfoErrorMsg = null
-        this.resetKeys()
-        this.selectedRowKeys = []
-        //this.adaFolderInfo = null
-        console.log("removeSelectedDOIFiles")
-        this.removeSelectedDOIFiles(filteredList)
-    }
+
     @action resetUploadedFileList(){
         this.fileList = []
         this.localTargetKeys = []
@@ -179,26 +169,37 @@ export class SystemStore{
         this.handleAPIInputModal(true)
     }
 
-    @action addFileToFileList(file){
+    @action addFileToFileList(file, actualFile){
         this.fileList = [...this.fileList, file]
+        this.userUploadedFiles = [...this.userUploadedFiles, file]
+        this.uploadedFiles = [...this.uploadedFiles, actualFile]
         this.sortFile(file)
+
     }
     @action deleteFileFromFileList(fileID, filename){
         console.log("deleting")
         console.log(fileID)
         const tempList = toJS(this.fileList)
         this.fileList = tempList.filter(file=> file.id !== fileID)
-        this.localTargetKeys = this.localTargetKeys.filter(file=> file !== filename)
-        this.remoteTargetKeys = this.remoteTargetKeys.filter(file=> file !== filename)
+        // this.localTargetKeys = this.localTargetKeys.filter(file=> file !== filename)
+        // this.remoteTargetKeys = this.remoteTargetKeys.filter(file=> file !== filename)
         const prefix = this.getPrefix(filename)
+        console.log(prefix)
+        let newList = this.sortedFileList.get(prefix).filter(file=>file.filename !== filename)
+        this.sortedFileList.set(prefix, newList)
+        // let remoteNewList = this.sortedFileList.get(prefix).filter(file=>file.filename !== filename)
+        // this.sortedFileList.set(prefix, remoteNewList)
         if(this.localSelectedKeys.get(prefix)){
             let newKeys = this.localSelectedKeys.get(prefix).filter(file=>file.filename !== filename)
+            console.log(newKeys)
             this.localSelectedKeys.set(prefix, newKeys)
         }
         if(this.remoteSelectedKeys.get(prefix)){
             let newKeys = this.remoteSelectedKeys.get(prefix).filter(file=>file.filename !== filename)
             this.remoteSelectedKeys.set(prefix, newKeys)
         }
+        const userUploadListTemp = this.userUploadedFiles.filter(ele=>ele.id !== fileID)
+        this.userUploadedFiles = userUploadListTemp
     }
     @action switchOff(ele){
         if(ele==='local'){
@@ -272,26 +273,60 @@ export class SystemStore{
     }
     @action updateCheckStatusWithNewPrefix(prefix){
         console.log("prefix ``````````````````")
-
-        if(this.localCheckStatus.get(prefix)){
-            if(this.localCheckStatus.get(prefix).checked ===true){
+        if(this.localSelectedKeys.get(prefix)){
+            console.log([...this.sortedFileList.get(prefix)].length, [...this.localSelectedKeys.get(prefix)].length)
+            if([...this.sortedFileList.get(prefix)].length === [...this.localSelectedKeys.get(prefix)].length){
+                this.updateCheckStatus(prefix, false, true, 'local')
+            }
+            else{
                 this.updateCheckStatus(prefix, true, false, 'local')
             }
         }
         else{
             this.updateCheckStatus(prefix, false, false, 'local')
         }
-        if(this.remoteCheckStatus.get(prefix)){
-            console.log("prefix detected in remoteCheck")
-            console.log(this.remoteCheckStatus.get(prefix))
-            if(this.remoteCheckStatus.get(prefix).checked ===true){
 
+        // if(this.localCheckStatus.get(prefix)){
+        //     // if(this.localCheckStatus.get(prefix).checked ===true){
+        //     if(this.sortedFileList.get(prefix).length === this.localSelectedKeys.get(prefix).length){
+        //         this.updateCheckStatus(prefix, false, true, 'local')
+        //     }
+        //     else{
+        //         this.updateCheckStatus(prefix, true, false, 'local')
+        //     }
+        //     // }
+        // }
+        // else{
+        //     //this.updateCheckStatus(prefix, false, false, 'local')
+        //     if(this.sortedFileList.get(prefix).length === this.localSelectedKeys.get(prefix).length){
+        //         this.updateCheckStatus(prefix, false, true, 'local')
+        //     }
+        //     else{
+        //         this.updateCheckStatus(prefix, true, false, 'local')
+        //     }
+        // }
+        if(this.remoteSelectedKeys.get(prefix)){
+            if([...this.sortedFileList.get(prefix)].length === [...this.remoteSelectedKeys.get(prefix)].length){
+                this.updateCheckStatus(prefix, false, true, 'remote')
+            }
+            else{
                 this.updateCheckStatus(prefix, true, false, 'remote')
             }
         }
         else{
             this.updateCheckStatus(prefix, false, false, 'remote')
         }
+        // if(this.remoteCheckStatus.get(prefix)){
+        //     console.log("prefix detected in remoteCheck")
+        //     console.log(this.remoteCheckStatus.get(prefix))
+        //     if(this.remoteCheckStatus.get(prefix).checked ===true){
+        //
+        //         this.updateCheckStatus(prefix, true, false, 'remote')
+        //     }
+        // }
+        // else{
+        //     this.updateCheckStatus(prefix, false, false, 'remote')
+        // }
         console.log(this.remoteCheckStatus.get(prefix))
         console.log(this.localCheckStatus.get(prefix))
     }
@@ -429,60 +464,53 @@ export class SystemStore{
         }
         return prefix
     }
-    @action sortFile(file){
-        let prefix = file.filename.slice(0,2)
-        if(!this.regexPrefix.test(prefix)){
-            prefix = 'other'
-        }
-        this.updateCheckStatusWithNewPrefix(prefix)
-        if(!this.testCheck.includes(prefix)){
-            this.testCheck= [...this.testCheck, prefix]
-            this.sortedFileList.set(prefix, [file])
 
-        }
-        else{
-            this.sortedFileList.set(prefix, [...this.sortedFileList.get(prefix), file])
-        }
-    }
     @action removeSelectedDOIFiles(newFileList){
-        // this.testCheck =[]
-        // this.sortFileList(newFileList)
-        const localKeys = [...this.localSelectedKeys.keys()]
-        localKeys.map(key=>{
-            const localTemp = this.localSelectedKeys.get(key).filter(file=>file.type && file.type==='local')
-            //console.log(key, selectedKeys)
-            if(localTemp.length>0){
-                this.localSelectedKeys.set(key, localTemp)
-                if(this.localCheckStatus.get(key).checked){
-                    if(this.localSelectedKeys.get(key).length !== localTemp.length){
-                        this.updateCheckStatus(key, true, false, 'local')
-                    }
-                }
-            }
-            else{
-                this.localSelectedKeys.delete(key)
-                const newPrefixes = this.testCheck.filter(item => item!==key)
-                this.testCheck = newPrefixes
-            }
-        })
+        this.localSelectedKeys = new Map()
+        this.remoteSelectedKeys = new Map()
 
-        const remoteKeys = [...this.remoteSelectedKeys.keys()]
-        remoteKeys.map(key=>{
-            const remoteTemp = this.remoteSelectedKeys.get(key).filter(file=>file.type && file.type==='local')
-            if(remoteTemp.length>0){
-                this.remoteSelectedKeys.set(key, remoteTemp)
-                if(this.remoteSelectedKeys.get(key).checked){
-                    if(this.remoteSelectedKeys.get(key).length !== remoteTemp.length){
-                        this.updateCheckStatus(key, true, false, 'remote')
-                    }
-                }
-            }
-            else{
-                this.remoteSelectedKeys.delete(key)
-                const newPrefixes = this.testCheck.filter(item => item!==key)
-                this.testCheck = newPrefixes
-            }
-        })
+        //this.testCheck =[]
+        //this.sortFileList(newFileList)
+        //const currentLocalKeys = this.localSelectedKeys
+        //const currentRemoteKeys = this.remoteSelectedKeys
+
+
+        // const localKeys = [...this.localSelectedKeys.keys()]
+        // localKeys.map(key=>{
+        //     const localTemp = this.localSelectedKeys.get(key).filter(file=>file.type && file.type==='local')
+        //     //console.log(key, selectedKeys)
+        //     if(localTemp.length>0){
+        //         this.localSelectedKeys.set(key, localTemp)
+        //         if(this.localCheckStatus.get(key).checked){
+        //             if(this.localSelectedKeys.get(key).length !== localTemp.length){
+        //                 this.updateCheckStatus(key, true, false, 'local')
+        //             }
+        //         }
+        //     }
+        //     else{
+        //         this.localSelectedKeys.delete(key)
+        //         const newPrefixes = this.testCheck.filter(item => item!==key)
+        //         this.testCheck = newPrefixes
+        //     }
+        // })
+        //
+        // const remoteKeys = [...this.remoteSelectedKeys.keys()]
+        // remoteKeys.map(key=>{
+        //     const remoteTemp = this.remoteSelectedKeys.get(key).filter(file=>file.type && file.type==='local')
+        //     if(remoteTemp.length>0){
+        //         this.remoteSelectedKeys.set(key, remoteTemp)
+        //         if(this.remoteSelectedKeys.get(key).checked){
+        //             if(this.remoteSelectedKeys.get(key).length !== remoteTemp.length){
+        //                 this.updateCheckStatus(key, true, false, 'remote')
+        //             }
+        //         }
+        //     }
+        //     else{
+        //         this.remoteSelectedKeys.delete(key)
+        //         const newPrefixes = this.testCheck.filter(item => item!==key)
+        //         this.testCheck = newPrefixes
+        //     }
+        // })
 
 
         // const localSelectedFiles = [...this.localSelectedKeys.keys()]
@@ -500,9 +528,50 @@ export class SystemStore{
         // })
 
     }
+    @action resetFileList(){
+        console.log(toJS(this.lastFileList))
+        let filteredList = this.fileList.filter(ele=>!this.lastFileList.includes(ele.filename)
+        )
+        console.log(filteredList)
+        this.fileList = filteredList
+        this.adaFolderInfoErrorMsg = null
+        this.resetKeys()
+        this.selectedRowKeys = []
+        //this.adaFolderInfo = null
+        console.log("removeSelectedDOIFiles")
+        this.removeSelectedDOIFiles(filteredList)
+    }
+    @action sortFile(file){
+        let prefix = file.filename.slice(0,2)
+        if(!this.regexPrefix.test(prefix)){
+            prefix = 'other'
+        }
+
+        if(!this.testCheck.includes(prefix)){
+            this.testCheck= [...this.testCheck, prefix]
+            this.sortedFileList.set(prefix, [file])
+
+        }
+        else{
+            this.sortedFileList.set(prefix, [file, ...this.sortedFileList.get(prefix)])
+        }
+        this.updateCheckStatusWithNewPrefix(prefix)
+    }
     @action sortFileList(fileList){
-        console.log(this.testCheck)
+        console.log(fileList)
+        this.fileList = []
         let prefixes = []
+        this.testCheck =[]
+        //const preSortedArray = [...this.sortedFileList.keys()]
+        this.sortedFileList.clear()
+        this.removeSelectedDOIFiles(this.userUploadedFiles)
+        for(let file of this.userUploadedFiles){
+            this.sortFile(file)
+            this.fileList.push(file)
+        }
+        //this.removeSelectedDOIFiles(this.userUploadedFiles)
+        this.fileList = [...this.fileList, ...fileList]
+
         for(let file of fileList){
             let prefix = file.filename.slice(0,2)
             if(!this.regexPrefix.test(prefix)){
@@ -528,7 +597,9 @@ export class SystemStore{
             if(!this.testCheck.includes(prefix)){
                 this.testCheck = [...this.testCheck, prefix]
             }
+
         }
+
 
         console.log(this.testCheck)
         // this.localCheckStatus.clear()
@@ -555,7 +626,7 @@ export class SystemStore{
                     if (this.lastFileList.length >0){
                         console.log("this step")
                         let filteredList = this.fileList.filter(ele=>!this.lastFileList.includes(ele.filename))
-                        this.fileList = [...filteredList, ...res.data.fileList]
+                        //this.fileList = [...filteredList, ...res.data.fileList]
                         //this.fileList = res.data
                         this.doiValid = true
                         let lastFiles = []
@@ -584,7 +655,7 @@ export class SystemStore{
                         this.selectedRowKeys = rowKeys
                         this.selectedRowNames = fileNames
                         this.lastFileList = lastFiles
-                        this.fileList = [...this.fileList, ...res.data.fileList]
+                        //this.fileList = [...this.fileList, ...res.data.fileList]
                         //this.fileList = res.data
                         this.doiValid = true
                         return true
@@ -603,19 +674,22 @@ export class SystemStore{
                     if (err.response.status ===404){
                         this.doiMessage = 'DOI not found'
                         //this.resetKeys()
-                        this.resetFileList()
+                        //this.resetFileList()
+                        this.sortFileList([])
                     }
                     else if (err.response.status ===401){
                         this.doiMessage = 'No permission to view'
                         this.handleAPIInputErrorMsg(`${PERMISSION_CATEGORY.VIEW_UNPUBLISHED_DV.errorMsg} in doi:${doi} dataset.`)
                         this.handleAPIInputModal(true)
                         //this.resetKeys()
-                        this.resetFileList()
+                        //this.resetFileList()
+                        this.sortFileList([])
                     }
                     else if (err.response.status ===402){
                         this.popupInputModal(server)
                         //this.resetKeys()
-                        this.resetFileList()
+                        //this.resetFileList()
+                        this.sortFileList([])
                     }
                     else {
                         authStore.networkError = true
