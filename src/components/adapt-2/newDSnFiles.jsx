@@ -137,7 +137,7 @@ export default class NewDSnFiles extends Component{
     doiOnChange = e =>{
         const value = e.target.value
         if( value.length >0){
-
+            this.props.adapt2Store.handleSourceURLInput(value)
             this.setState({doiExisting:true})
             // this.fileFormRef.current.setFieldsValue({
             //     dataverse: undefined,
@@ -247,6 +247,7 @@ export default class NewDSnFiles extends Component{
         const { doiServer, doi } = adapt2Store
         const datasource = toJS(systemStore.fileList)
         const user = toJS(authStore.currentUser)
+        console.log(adapt2Store.sourceURL)
         if(systemStore.duplicateFileList.length>0){this.openNotification()}
         else{
             notification.close('duplicates')

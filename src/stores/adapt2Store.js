@@ -25,6 +25,7 @@ export class adapt2Store{
     @observable doi = null
     @observable localSwitch = false
     @observable remoteSwitch = false
+    @observable sourceURL = undefined
 
     // constructor() {
     //
@@ -33,6 +34,9 @@ export class adapt2Store{
     // }
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
 
+    @action handleSourceURLInput(value){
+        this.sourceURL = value
+    }
     @action setDoiServer(server){
         this.doiServer = server
     }
@@ -187,7 +191,9 @@ export class adapt2Store{
                     formData.set('remoteUploadSwitch', this.remoteSwitch)
                     formData.set('newDataset', this.createDataset)
                     formData.set('dataset', JSON.stringify(obj))
-                    formData.set('doi', json.msg.doi)
+                    formData.set('destinationDOI', json.msg.doi)
+                    formData.set('sourceDOI', this.sourceURL)
+                    formData.set('sourceServer', this.doiServer)
                     formData.set('localFileList', JSON.stringify([...systemStore.localSelectedKeys.values()].flat().map(ele=>ele.filename)))
                     formData.set('remoteFileList', JSON.stringify([...systemStore.remoteSelectedKeys.values()].flat().map(ele=>ele.filename)))
 
