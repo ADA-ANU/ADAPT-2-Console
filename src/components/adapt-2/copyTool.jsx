@@ -140,6 +140,7 @@ export default class CopyTool extends Component{
             })
             .catch(err=>{
                 console.log(err)
+                console.log(err.response)
                 if (err.response) {
                     this.setState({
                         isLoading: false
@@ -147,7 +148,9 @@ export default class CopyTool extends Component{
                     if (err.response.status === 403) {
                         const servers = toJS(this.props.authStore.serverList)
                         for (let serv of servers) {
-                            if (serv.alias === form.server) {
+                            //console.log("405 error", form.destinationServer)
+                            if (serv.alias === form.destinationServer) {
+                                console.log("found server", serv.alias)
                                 this.props.systemStore.handleFailedAPI(serv.id, 2, err.response.data)
                                 this.props.systemStore.handleAPIInputModal(true)
                             }
@@ -206,7 +209,7 @@ export default class CopyTool extends Component{
         }
     }
     doiOnChange = e =>{
-        const value = e.target.value
+        const value = e.target.value.replace(/\s+/g, '')
         if( value.length >0){
 
             this.setState({doiExisting:true})
@@ -226,16 +229,21 @@ export default class CopyTool extends Component{
                     console.log(temp)
                     if (temp.length ===1){
                         this.setState({doiMessage:temp[0].alias})
-                        if (value.indexOf('doi:')>0){
+                        if (value.indexOf('doi')>0){
                             this.copyToolFormRef.current.setFieldsValue({
                                 copyRange: 1
                             })
                             this.props.systemStore.setCopyRange(1)
                             const userid = toJS(this.props.authStore.currentUser).userID
-                            let doi = value.split('doi:')[1]
+                            console.log(value)
+                            //const noBlank = value.replace(/\s+/g, '')
+                            const newURL = value.split("%3A").join(":").split("%2F").join("/")
+                            console.log(newURL)
+                            let doi = newURL.split('doi:')[1]
                             if (doi.includes('&version=')){
                                 doi = doi.split('&version=')[0]
                             }
+                            console.log(doi)
                             this.setState({doi: doi})
                             this.props.systemStore.getFileListByDOI(doi, temp[0].alias, userid)
                                 // .then(res=>{
@@ -278,7 +286,7 @@ export default class CopyTool extends Component{
     }
 
     destinationDOIOnChange = e =>{
-        const value = e.target.value
+        const value = e.target.value.replace(/\s+/g, '')
         if( value.length >0){
 
             this.setState({destinationDOIExisting:true})
@@ -298,9 +306,11 @@ export default class CopyTool extends Component{
                     console.log(temp)
                     if (temp.length ===1){
                         this.setState({destinationDOIMessage:temp[0].alias})
-                        if (value.indexOf('doi:')>0){
+                        if (value.indexOf('doi')>0){
                             const userid = toJS(this.props.authStore.currentUser).userID
-                            let doi = value.split('doi:')[1]
+                            //const noBlank = value.replace(/\s+/g, '')
+                            const newURL = value.split("%3A").join(":").split("%2F").join("/")
+                            let doi = newURL.split('doi:')[1]
                             if (doi.includes('&version=')){
                                 doi = doi.split('&version=')[0]
                             }
@@ -555,7 +565,7 @@ export default class CopyTool extends Component{
                                         {
                                             //\/.*
                                             type: 'string',
-                                            pattern: '(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi:.*\\/.*$(?![\\w])',
+                                            pattern: '(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi.*\\.*$(?![\\w])',
                                             message: 'Please enter a valid doi url.'
                                         }
                                     ]}
@@ -732,7 +742,7 @@ export default class CopyTool extends Component{
                                                     {
                                                         //\/.*
                                                         type: 'string',
-                                                        pattern: '(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi:.*\\/.*$(?![\\w])',
+                                                        pattern: '(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi.*\\.*$(?![\\w])',
                                                         message: 'Please enter a valid doi url.'
                                                     }
                                                 ]}

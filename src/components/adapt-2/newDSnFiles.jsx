@@ -160,7 +160,7 @@ export default class NewDSnFiles extends Component{
                             console.log("new list.......")
                             //this.props.systemStore.resetFileList()
                             const userid = toJS(this.props.authStore.currentUser).userID
-                            const newURL = value.replace("%3A", ":").replace("%2F", "/")
+                            const newURL = value.split("%3A").join(":").split("%2F").join("/")
                             let doi = newURL.split('doi:')[1]
                             //this.setState({doi: doi})
                             this.props.adapt2Store.setDoi(doi)
