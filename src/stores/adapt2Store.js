@@ -29,12 +29,17 @@ export class adapt2Store{
     @observable sourceURL = undefined
     @observable inputSource = 1
     @observable DSnFilesFormRef = null
+    @observable selectedADAFolder = null
     // constructor() {
     //
     //     this.adapt2Ref = React.createRef();
     //
     // }
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
+    @action adaFolderOnChange(value){
+        console.log(value)
+        this.selectedADAFolder = value
+    }
     @action setSourceServer(server){
         this.sourceServer = server
     }
@@ -93,6 +98,7 @@ export class adapt2Store{
     @action SelectionOnChange(value){
 
         this.selection = value
+        this.selectedADAFolder = null
     }
     @action handleSubmit(form){
         if(this.selection ===1){
@@ -152,6 +158,7 @@ export class adapt2Store{
 
     @action handleOption2Submit(form) {
         console.log("option2 submitting")
+        this.isLoading = true
         systemStore.handleFinalResultClose()
         const {server, dataverse, title, authorFields, email, description, subject, firstName, lastName} = form
         //const {fileList} = this.state;
@@ -201,9 +208,6 @@ export class adapt2Store{
         }
 
         const json = JSON.stringify(obj);
-
-        this.isLoading = true
-
 
         axios.post(API_URL.AdaID, json, {
                 headers: {
@@ -263,57 +267,26 @@ export class adapt2Store{
                                     ).then(r => r.data)
                                         .then(info => {
                                             let doi = info.data.authority ? info.data.authority + '/' + info.data.identifier : null
-                                            // this.setState({
-                                            //     uploading: false,
-                                            //     finalFiles: fileList,
-                                            //     fileList: [],
-                                            //     //formReset: true,
-                                            //     doi: doi
-                                            // });
+
                                             form['newDataset'] = this.createDataset
                                             systemStore.handleFinalResultOpen(form, json.msg.adaid, doi, data.localFiles, data.remoteFiles)
                                             //this.finalResult_New.scrollIntoView({behavior: 'smooth'})
+                                            this.isLoading = false
                                         }).catch(err => {
                                         if (err.response) {
-                                            // this.setState({
-                                            //     uploading: false,
-                                            //     finalFiles: fileList,
-                                            //     fileList: [],
-                                            //     //formReset: true,
-                                            //
-                                            // });
+                                            this.isLoading = false
                                             systemStore.handleFinalResultOpen(true)
                                         }
                                     })
                                 } else {
-                                    // this.setState({
-                                    //     uploading: false,
-                                    //     finalFiles: fileList,
-                                    //     fileList: [],
-                                    //     //formReset: true,
-                                    // });
+                                    this.isLoading = false
                                     systemStore.handleFinalResultOpen(form, json.msg.adaid, null, data.localFiles)
                                     //this.finalResult_New.scrollIntoView({behavior: 'smooth'})
                                 }
 
-
-                            // } else {
-                            //     // this.setState({
-                            //     //     uploading: false,
-                            //     //     finalFiles: fileList,
-                            //     //     fileList: [],
-                            //     //     //formReset: true
-                            //     // });
-                            //     this.openNotificationWithIcon('error', 'files', data.msg.message)
-                            // }
                         }).catch(err => {
                         console.log(err)
-                        // this.setState({
-                        //     uploading: false,
-                        //     finalFiles: fileList,
-                        //     fileList: [],
-                        //     //formReset: true
-                        // });
+                        this.isLoading = false
                         this.openNotificationWithIcon('error', 'files', err)
                     })
                 }
@@ -322,12 +295,7 @@ export class adapt2Store{
                 console.log(err.response.data);
                 console.log(err.response.status);
                 console.log(err.response.headers);
-                // this.setState({
-                //     uploading: false,
-                //     finalFiles: fileList,
-                //     fileList: [],
-                //     //formReset: true
-                // });
+
                 if (err.response.status === 401) {
                     const servers = toJS(authStore.serverList)
                     for (let serv of servers) {
@@ -343,16 +311,12 @@ export class adapt2Store{
                 }
 
             } else {
-                // this.setState({
-                //     uploading: false,
-                //     finalFiles: fileList,
-                //     fileList: [],
-                //     //formReset: true
-                // })
+
                 this.openNotificationWithIcon('error', 'files', `${err}, please refresh the page and retry.`)
             }
+            this.isLoading = false
 
-        }).finally(()=>this.isLoading = false)
+        })
     }
     openNotificationWithIcon = (type,fileName,error) => {
         if (type === 'success'){

@@ -167,7 +167,7 @@ export default class FinalResult extends Component{
                                                 fontSize: 16,
                                             }}
                                         >
-                                            <div style={{paddingBottom:"2vh"}}>
+                                            <div style={{paddingBottom:"2vh", paddingTop:'2vh'}}>
                                                 <Text style={{fontWeight: "bold"}}>Files Stored on D10:</Text>
                                             </div>
 

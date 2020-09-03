@@ -26,14 +26,14 @@ import DataverseForm from "./dataverseForm";
 import systemStore from "../../stores/systemStore";
 import FinalResult from "./finalResult";
 import {adapt2Store} from "../../stores/adapt2Store";
-import FileTable from "./fileTable";
+import NewDVForm from "./newDVForm";
 const { Dragger } = Upload;
 const { Panel } = Collapse;
 const { Link } = Anchor;
 
 @inject('routingStore', 'systemStore', 'authStore', 'adapt2Store')
 @observer
-export default class NewFileTableWrapper extends Component{
+export default class Option2DatasetWrapper extends Component{
     state={
         //createDataset: false,
         fileUploadSwitch: true,
@@ -71,16 +71,29 @@ export default class NewFileTableWrapper extends Component{
                 <div style={{ margin: 'auto'}}>
                     <Row style={{paddingBottom:'1vh', paddingTop: '1vh'}}>
                         <Col style={{}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
-                            <span style={{fontSize:'medium',fontWeight:'bold'}}>4. Select Files to be Reserved and/or Curated:</span>
+                            <Row>
+                                <Col>
+                                    <span style={{fontSize:'medium',fontWeight:'bold'}}>3. Create Dataset for ADAID:</span>
+                                </Col>
+                                <Col>
+                                    <div style={{paddingLeft:'1vw'}}>
+                                        <Switch
+                                            checkedChildren="Yes"
+                                            unCheckedChildren="No"
+                                            defaultChecked={false}
+                                            onChange={this.handleSwitchOnChange}
+                                        />
+                                    </div>
+                                </Col>
+                            </Row>
                         </Col>
                     </Row>
                     <Row>
                         <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
-                            <div style={{paddingTop: '3vh', paddingBottom: '2vh'}}>
+                            <div style={{paddingTop: '3vh', paddingBottom: '2vh', paddingLeft: '2vw'}}>
                                 {/*files={fileList} formReset={formReset}*/}
-                                {/*<NewDVForm handleFormData={handleForm} createDataset={createDataset} files={[]} formRef={this.formRef}/>*/}
-                                <FileTable />
+                                <NewDVForm handleFormData={handleForm} createDataset={createDataset} files={[]} formRef={this.formRef}/>
                             </div>
 
                         </Col>

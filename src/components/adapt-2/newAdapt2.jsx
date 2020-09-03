@@ -16,7 +16,7 @@ import {
     Radio,
     Form,
     Divider,
-    Table
+    Table, Select
 } from 'antd';
 import { UploadOutlined, InboxOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import axios from 'axios'
@@ -24,10 +24,10 @@ import { toJS } from 'mobx'
 import DataverseForm from "./dataverseForm";
 import systemStore from "../../stores/systemStore";
 import FinalResult from "./finalResult";
-import NewDatasetWrapper from "./newDatasetWrapper";
+import Option2DatasetWrapper from "./option2DatasetWrapper";
 import {adapt2Store} from "../../stores/adapt2Store";
-import NewFileTableWrapper from "./newFileTableWrapper";
-import NewDSnFilesWrapper from "./newDSnFilesWrapper";
+import Option2FileTableWrapper from "./option2FileTableWrapper";
+import Option2DSnFilesWrapper from "./option2DSnFilesWrapper";
 const { Dragger } = Upload;
 const { Panel } = Collapse;
 const { Link } = Anchor;
@@ -71,6 +71,7 @@ export default class newAdapt2 extends Component{
             height: '40px',
             lineHeight: '30px',
         };
+        const adaFolderList = authStore.adaFolderList
         const submitCheck = ()=>{
             //console.log("systemStore.doiValid", systemStore.doiValid, "systemStore.dataversePermissionValid", systemStore.dataversePermissionValid)
             //console.log("systemStore.destinationDOIValid", systemStore.destinationDOIValid, "systemStore.datasetPermissionValid", systemStore.datasetPermissionValid)
@@ -165,10 +166,39 @@ export default class newAdapt2 extends Component{
 
                                     </div>
                                     <div style={radioStyle}>
-                                        <Radio value={3}>
-                                            Existing ADAID - select on existing ADAID and add files
-                                        </Radio>
+                                        <Row>
+                                            <Col>
+                                                <Radio value={3}>
+                                                    Existing ADAID - select on existing ADAID and add files
+                                                </Radio>
+                                            </Col>
+                                            <Col>
+                                                <div style={{paddingLeft: '1vw'}}>
+                                                    <Select
+                                                        value={adapt2Store.selectedADAFolder}
+                                                        style={{ width: '100%' }}
+                                                        placeholder="select a ADA folder"
+                                                        allowClear
+                                                        size={"small"}
+                                                        disabled={adapt2Store.selection !== 3}
+                                                        //defaultValue={['china']}
+                                                        onChange={e=>adapt2Store.adaFolderOnChange(e)}
+                                                        optionLabelProp="label"
+                                                    >
+                                                        {
+                                                            adaFolderList && adaFolderList.length>0?
+                                                                adaFolderList.map((folder,index)=>
+                                                                    <Select.Option value={folder} key={index} label={folder}>
+                                                                        {folder}
+                                                                    </Select.Option>
+                                                                ):null
 
+                                                        }
+                                                    </Select>
+                                                </div>
+
+                                            </Col>
+                                        </Row>
                                     </div>
                                 </Radio.Group>
                             </div>
@@ -178,9 +208,17 @@ export default class newAdapt2 extends Component{
                     {
                         adapt2Store.selection ===2?
                             <>
-                                <NewDSnFilesWrapper handleForm={this.handleForm}/>
-                                <NewDatasetWrapper handleForm={this.handleForm}/>
-                                <NewFileTableWrapper handleForm={this.handleForm}/>
+                                <Option2DSnFilesWrapper handleForm={this.handleForm}/>
+                                <Option2DatasetWrapper handleForm={this.handleForm}/>
+                                <Option2FileTableWrapper handleForm={this.handleForm}/>
+                            </>: null
+                    }
+                    {
+                        adapt2Store.selection ===3?
+                            <>
+                                <Option2DSnFilesWrapper handleForm={this.handleForm}/>
+                                <Option2DatasetWrapper handleForm={this.handleForm}/>
+                                <Option2FileTableWrapper handleForm={this.handleForm}/>
                             </>: null
                     }
                     <Row>
@@ -193,7 +231,7 @@ export default class newAdapt2 extends Component{
                                     htmlType="submit"
                                     type="primary"
                                     onClick={adapt2Store.selection ===1?()=>adapt2Store.handleSubmit(): null}
-                                    //loading={adapt2Store.isLoading}
+                                    loading={adapt2Store.isLoading}
                                     disabled={submitCheck()}
                                 >
                                     {adapt2Store.isLoading ? 'Uploading' : 'Get ADAID'}

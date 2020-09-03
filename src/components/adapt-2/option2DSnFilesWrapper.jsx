@@ -27,13 +27,20 @@ import systemStore from "../../stores/systemStore";
 import FinalResult from "./finalResult";
 import {adapt2Store} from "../../stores/adapt2Store";
 import NewDVForm from "./newDVForm";
+import NewDSnFiles from "./newDSnFiles";
 const { Dragger } = Upload;
 const { Panel } = Collapse;
 const { Link } = Anchor;
 
+
+const inputSource = [
+    { label: 'URL', value: 1 },
+    { label: 'Upload', value: 2 },
+];
+
 @inject('routingStore', 'systemStore', 'authStore', 'adapt2Store')
 @observer
-export default class NewDatasetWrapper extends Component{
+export default class Option2DSnFilesWrapper extends Component{
     state={
         //createDataset: false,
         fileUploadSwitch: true,
@@ -46,20 +53,10 @@ export default class NewDatasetWrapper extends Component{
     adapt2Ref = React.createRef();
     formRef = React.createRef();
 
-
-
-
-    handleSwitchOnChange = (checked)=>{
-        console.log("create button value change to "+ checked)
-        // this.setState({
-        //     createDataset: checked
-        // })
-        this.props.adapt2Store.handleNewDatasetSwitch(checked)
-        if (checked === false){
-            this.formRef.current.resetFields()
-            this.props.systemStore.handlePermission(true)
-        }
-    }
+    inputSourceOnChange = e => {
+        console.log('input source changed to', e.target.value);
+        this.props.adapt2Store.handleInputSourceChange(e.target.value)
+    };
     render() {
         const { systemStore, authStore, adapt2Store, handleForm } = this.props
         const { createDataset } = adapt2Store
@@ -73,15 +70,17 @@ export default class NewDatasetWrapper extends Component{
                         <Col style={{}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
                             <Row>
                                 <Col>
-                                    <span style={{fontSize:'medium',fontWeight:'bold'}}>3. Create Dataset for ADAID:</span>
+                                    <span style={{fontSize:'medium',fontWeight:'bold'}}>2. Select Source of Files to be Uploaded:</span>
                                 </Col>
                                 <Col>
-                                    <div style={{paddingLeft:'1vw'}}>
-                                        <Switch
-                                            checkedChildren="Yes"
-                                            unCheckedChildren="No"
-                                            defaultChecked={false}
-                                            onChange={this.handleSwitchOnChange}
+                                    <div style={{paddingLeft: '1vw'}}>
+                                        <Radio.Group
+                                            options={inputSource}
+                                            onChange={this.inputSourceOnChange}
+                                            value={adapt2Store.inputSource}
+                                            optionType="button"
+                                            buttonStyle="solid"
+                                            size="small"
                                         />
                                     </div>
                                 </Col>
@@ -91,9 +90,10 @@ export default class NewDatasetWrapper extends Component{
                     <Row>
                         <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
-                            <div style={{paddingTop: '3vh', paddingBottom: '2vh', paddingLeft: '2vw'}}>
+                            <div style={{paddingTop: '3vh', paddingBottom: '2vh'}}>
                                 {/*files={fileList} formReset={formReset}*/}
-                                <NewDVForm handleFormData={handleForm} createDataset={createDataset} files={[]} formRef={this.formRef}/>
+                                {/*<NewDVForm handleFormData={handleForm} createDataset={createDataset} files={[]} formRef={this.formRef}/>*/}
+                                <NewDSnFiles />
                             </div>
 
                         </Col>
