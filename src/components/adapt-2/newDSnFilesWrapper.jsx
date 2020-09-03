@@ -32,6 +32,12 @@ const { Dragger } = Upload;
 const { Panel } = Collapse;
 const { Link } = Anchor;
 
+
+const inputSource = [
+    { label: 'URL', value: 1 },
+    { label: 'Upload', value: 2 },
+];
+
 @inject('routingStore', 'systemStore', 'authStore', 'adapt2Store')
 @observer
 export default class NewDSnFilesWrapper extends Component{
@@ -47,20 +53,10 @@ export default class NewDSnFilesWrapper extends Component{
     adapt2Ref = React.createRef();
     formRef = React.createRef();
 
-
-
-
-    handleSwitchOnChange = (checked)=>{
-        console.log("create button value change to "+ checked)
-        // this.setState({
-        //     createDataset: checked
-        // })
-        this.props.adapt2Store.handleNewDatasetSwitch(checked)
-        if (checked === false){
-            this.formRef.current.resetFields()
-            this.props.systemStore.handlePermission(true)
-        }
-    }
+    inputSourceOnChange = e => {
+        console.log('input source changed to', e.target.value);
+        this.props.adapt2Store.handleInputSourceChange(e.target.value)
+    };
     render() {
         const { systemStore, authStore, adapt2Store, handleForm } = this.props
         const { createDataset } = adapt2Store
@@ -72,7 +68,23 @@ export default class NewDSnFilesWrapper extends Component{
                 <div style={{ margin: 'auto'}}>
                     <Row style={{paddingBottom:'1vh', paddingTop: '1vh'}}>
                         <Col style={{}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
-                            <span style={{fontSize:'medium',fontWeight:'bold'}}>2. Select Source of Files to be Uploaded:</span>
+                            <Row>
+                                <Col>
+                                    <span style={{fontSize:'medium',fontWeight:'bold'}}>2. Select Source of Files to be Uploaded:</span>
+                                </Col>
+                                <Col>
+                                    <div style={{paddingLeft: '1vw'}}>
+                                        <Radio.Group
+                                            options={inputSource}
+                                            onChange={this.inputSourceOnChange}
+                                            value={adapt2Store.inputSource}
+                                            optionType="button"
+                                            buttonStyle="solid"
+                                            size="small"
+                                        />
+                                    </div>
+                                </Col>
+                            </Row>
                         </Col>
                     </Row>
                     <Row>

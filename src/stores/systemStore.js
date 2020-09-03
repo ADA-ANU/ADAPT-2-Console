@@ -4,6 +4,7 @@ import PERMISSION_CATEGORY from '../permissionConfig'
 import axios from 'axios'
 import {inject, observer} from "mobx-react";
 import authStore from "./authStore";
+import adapt2Store from "./adapt2Store";
 
 
 export class SystemStore{
@@ -173,7 +174,8 @@ export class SystemStore{
         this.fileList = [...this.fileList, file]
         this.userUploadedFiles = [...this.userUploadedFiles, file]
         this.uploadedFiles = [...this.uploadedFiles, actualFile]
-        this.sortFile(file)
+        this.sortFile(file, 'add')
+        adapt2Store.handleFileSwitch(true, 'local')
 
     }
     @action deleteFileFromFileList(fileID, filename){
@@ -187,6 +189,11 @@ export class SystemStore{
         console.log(prefix)
         let newList = this.sortedFileList.get(prefix).filter(file=>file.filename !== filename)
         this.sortedFileList.set(prefix, newList)
+        if(newList.length ===0){
+            if(this.testCheck.indexOf(prefix) !== -1) {
+                this.testCheck.splice(this.testCheck.indexOf(prefix), 1);
+            }
+        }
         // let remoteNewList = this.sortedFileList.get(prefix).filter(file=>file.filename !== filename)
         // this.sortedFileList.set(prefix, remoteNewList)
         if(this.localSelectedKeys.get(prefix)){
@@ -541,7 +548,7 @@ export class SystemStore{
         console.log("removeSelectedDOIFiles")
         this.removeSelectedDOIFiles(filteredList)
     }
-    @action sortFile(file){
+    @action sortFile(file, type){
         let prefix = file.filename.slice(0,2)
         if(!this.regexPrefix.test(prefix)){
             prefix = 'other'
@@ -554,6 +561,14 @@ export class SystemStore{
         }
         else{
             this.sortedFileList.set(prefix, [file, ...this.sortedFileList.get(prefix)])
+        }
+        if(type && type ==='add'){
+            if(this.localSelectedKeys.get(prefix)){
+                this.localSelectedKeys.set(prefix, [file, ...this.localSelectedKeys.get(prefix)])
+            }
+            else{
+                this.localSelectedKeys.set(prefix, [file])
+            }
         }
         this.updateCheckStatusWithNewPrefix(prefix)
     }

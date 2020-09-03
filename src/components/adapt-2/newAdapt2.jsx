@@ -63,6 +63,7 @@ export default class newAdapt2 extends Component{
     handleSubmit=(form)=>{
         console.log(form)
     }
+
     render() {
         const { systemStore, authStore, adapt2Store } = this.props
         const radioStyle = {
@@ -70,6 +71,21 @@ export default class newAdapt2 extends Component{
             height: '40px',
             lineHeight: '30px',
         };
+        const submitCheck = ()=>{
+            //console.log("systemStore.doiValid", systemStore.doiValid, "systemStore.dataversePermissionValid", systemStore.dataversePermissionValid)
+            //console.log("systemStore.destinationDOIValid", systemStore.destinationDOIValid, "systemStore.datasetPermissionValid", systemStore.datasetPermissionValid)
+            if (adapt2Store.selection !==1){
+                if(adapt2Store.createDataset && !systemStore.dataversePermissionValid){
+                    return true
+                }
+            }
+            else {
+                return false
+                // if(systemStore.doiValid && systemStore.dataversePermissionValid && systemStore.destinationDOIValid && systemStore.datasetPermissionValid)
+                //     return false
+                // else return true
+            }
+        }
         console.log(adapt2Store.selection)
         console.log(adapt2Store.adapt2Ref)
 
@@ -114,6 +130,7 @@ export default class newAdapt2 extends Component{
                                     type="primary"
                                     //onClick={()=>adapt2Store.handleOption1Submit()}
                                     loading={adapt2Store.isLoading}
+                                    disabled={submitCheck()}
                                 >
                                     {adapt2Store.isLoading ? 'Uploading' : 'Get ADAID'}
                                 </Button>
@@ -177,6 +194,7 @@ export default class newAdapt2 extends Component{
                                     type="primary"
                                     onClick={adapt2Store.selection ===1?()=>adapt2Store.handleSubmit(): null}
                                     //loading={adapt2Store.isLoading}
+                                    disabled={submitCheck()}
                                 >
                                     {adapt2Store.isLoading ? 'Uploading' : 'Get ADAID'}
                                 </Button>

@@ -21,7 +21,7 @@ export default class NewDVForm extends Component{
         selectedDataverse: null
     }
 
-    //formRef = React.createRef();
+    formRef = React.createRef();
 
     fileUploadSwitchOnChange = (checked)=>{
         this.setState({

@@ -209,11 +209,12 @@ export default class FileTable extends Component{
                     <div>
                         <Row style={{paddingBottom:'2vh'}}>
                             <Col>
-                                <span style={{fontSize:'medium',fontWeight:'bold'}}>Upload files to Directory:</span>
+                                <span style={{fontSize:'medium',fontWeight:'bold'}}>Upload to Directory (Preservation):</span>
                             </Col>
                             <Col>
                                 <div style={{paddingLeft:'1vw'}}>
                                     <Switch
+                                        checked={adapt2Store.localSwitch}
                                         checkedChildren="Yes"
                                         unCheckedChildren="No"
                                         defaultChecked={false}
@@ -259,15 +260,17 @@ export default class FileTable extends Component{
                     <div>
                         <Row  style={{paddingBottom:'2vh'}}>
                             <Col>
-                                <span style={{fontSize:'medium',fontWeight:'bold'}}>Upload files to Dataset:</span>
+                                <span style={{fontSize:'medium',fontWeight:'bold'}}>Upload to Dataset (Curation):</span>
                             </Col>
                             <Col>
                                 <div style={{paddingLeft:'1vw'}}>
                                     <Switch
+                                        checked={adapt2Store.remoteSwitch}
                                         checkedChildren="Yes"
                                         unCheckedChildren="No"
                                         defaultChecked={false}
                                         onChange={value=>this.handleSwitchOnChange(value, 'remote')}
+                                        disabled={!adapt2Store.createDataset && adapt2Store.selection ===2}
                                     />
                                 </div>
                             </Col>

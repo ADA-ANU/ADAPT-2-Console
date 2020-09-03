@@ -75,14 +75,16 @@ export default class NewDSnFiles extends Component{
         localTargetKeys:[],
         remoteTargetKeys:[]
     }
+    fileFormRef = React.createRef();
     componentDidMount() {
         this.props.systemStore.handleFinalResultClose()
         this.props.systemStore.handleFinalResultDVFilesClose()
         this.props.systemStore.resetFileList()
         this.props.systemStore.resetUploadedFileList()
+        this.props.adapt2Store.setFormRef(this.fileFormRef)
     }
     finalResult_Existing=React.createRef()
-    fileFormRef = React.createRef();
+
 
     resetState = ()=>{
         this.setState({
@@ -154,7 +156,8 @@ export default class NewDSnFiles extends Component{
                     let temp = servers.filter(serv=>serv.url ===ser)
                     console.log(temp)
                     if (temp.length ===1){
-                        this.setState({server: ser})
+                        //this.setState({server: ser})
+                        this.props.adapt2Store.setSourceServer(ser)
                         //this.setState({doiMessage:temp[0].alias})
                         this.props.adapt2Store.setDoiServer(temp[0].alias)
                         if (value.indexOf('doi')>0){
@@ -175,18 +178,21 @@ export default class NewDSnFiles extends Component{
                     }
                     else {
                         //this.setState({doiMessage:"Server not found."})
-                        this.setState({server: ser})
+                        //this.setState({server: ser})
+                        this.props.adapt2Store.setSourceServer(ser)
                         this.props.adapt2Store.setDoiServer("Server not found.")
                     }
                     //this.setState({server: ser})
                 }
                 else {
-                    this.setState({server: server})
+                    //this.setState({server: server})
+                    this.props.adapt2Store.setSourceServer(server)
                     this.props.adapt2Store.setDoiServer(null)
                 }
             }
             else{
-                this.setState({server: null})
+                //this.setState({server: null})
+                this.props.adapt2Store.setSourceServer(null)
                 this.props.adapt2Store.setDoi(null)
                 console.log("BBBBBBBBBBB")
                 //this.props.systemStore.resetFileList()
@@ -200,8 +206,9 @@ export default class NewDSnFiles extends Component{
             this.setState({
                 doiExisting:false,
                 // doi: null,
-                server: null
+                //server: null
             })
+            this.props.adapt2Store.setSourceServer(null)
             this.props.adapt2Store.setDoi(null)
             this.props.adapt2Store.setDoiServer(null)
             //this.fileFormRef.current.resetFields()
@@ -246,10 +253,10 @@ export default class NewDSnFiles extends Component{
         const { authStore, systemStore, files, formReset, adapt2Store } = this.props
         const { server, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, localTargetKeys, remoteTargetKeys } = this.state
         const { userUploadedFiles } = systemStore
-        const { doiServer, doi } = adapt2Store
+        const { doiServer, doi, sourceServer } = adapt2Store
         const datasource = toJS(systemStore.fileList)
         const user = toJS(authStore.currentUser)
-        console.log(server)
+        //console.log(server)
         if(systemStore.duplicateFileList.length>0){this.openNotification()}
         else{
             notification.close('duplicates')
@@ -329,50 +336,57 @@ export default class NewDSnFiles extends Component{
                         initialValues={{ server: undefined, dataverse: undefined, doi: undefined, subject: undefined}}
                         size={"middle"}
                     >
-
-                        <Form.Item
-                            label="Dataset URL"
-                            name="doi"
-                            hasFeedback
-                            rules={[
-                                {
-                                    required: systemStore.localTargetKeys.length >0 || systemStore.remoteTargetKeys.length >0?systemStore.doiValid?false:false:true,
-                                    //required: localTargetKeys.length && remoteTargetKeys.length ===0?this.state.doiExisting ===false && this.state.serverExisting ===false ||this.state.doiExisting? true: false: false,
-                                    message: "Please enter DOI.",
-                                },
-                                {
-                                    //\/.*
-                                    type: 'string',
-                                    pattern: '(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi.*\\.*$(?![\\w])',
-                                    message: 'Please enter a valid doi url.'
-                                }
-                            ]}
-                        >
-                            <Input
-                                placeholder="E.g. https://dataverse-dev.ada.edu.au/dataset.xhtml?persistentId=doi:10.5072/FK2/XS0BPD"
-                                disabled={this.state.serverExisting}
-                                onChange={this.doiOnChange}
-                            />
-
-                        </Form.Item>
                         {
-                            this.state.server?
-                                <div style={{marginLeft:'21%', marginBottom:'1vh'}}><Tag color="default" style={{width: '3vw',textAlign:'center'}}>Server: </Tag>
-                                    <span>{this.state.server}</span>
-                                    {doiServer?<Tag style={{marginLeft:'1vw'}} color={doiServer ==="Server not found."?"#f50":"#87d068"}>{doiServer}</Tag>
-                                        :null}
-                                </div>: null
+                            adapt2Store.inputSource ===1?
+                                <>
+                                    <Form.Item
+                                        label="Dataset URL"
+                                        name="doi"
+                                        hasFeedback
+                                        rules={[
+                                            {
+                                                required: systemStore.localTargetKeys.length >0 || systemStore.remoteTargetKeys.length >0?systemStore.doiValid?false:false:true,
+                                                //required: localTargetKeys.length && remoteTargetKeys.length ===0?this.state.doiExisting ===false && this.state.serverExisting ===false ||this.state.doiExisting? true: false: false,
+                                                message: "Please enter DOI.",
+                                            },
+                                            {
+                                                //\/.*
+                                                type: 'string',
+                                                pattern: '(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi.*\\.*$(?![\\w])',
+                                                message: 'Please enter a valid doi url.'
+                                            }
+                                        ]}
+                                    >
+                                        <Input
+                                            placeholder="E.g. https://dataverse-dev.ada.edu.au/dataset.xhtml?persistentId=doi:10.5072/FK2/XS0BPD"
+                                            disabled={this.state.serverExisting}
+                                            onChange={this.doiOnChange}
+                                        />
+
+                                    </Form.Item>
+                                    {
+                                        // this.state.server?
+                                        sourceServer?
+                                            <div style={{marginLeft:'21%', marginBottom:'1vh'}}><Tag color="default" style={{width: '3vw',textAlign:'center'}}>Server: </Tag>
+                                                <span>{sourceServer}</span>
+                                                {doiServer?<Tag style={{marginLeft:'1vw'}} color={doiServer ==="Server not found."?"#f50":"#87d068"}>{doiServer}</Tag>
+                                                    :null}
+                                            </div>: null
+                                    }
+
+                                    {
+                                        doi?
+                                        <div style={{marginLeft:'21%', marginBottom:'2vh'}}>
+                                        <Tag color="default" style={{width: '3vw',textAlign:'center'}}>DOI: </Tag>
+                                        <span>{doi}</span>
+                                        <Tag style={{marginLeft:'1vw'}} color={systemStore.doiValid ?"#87d068":"#f50"}>{systemStore.doiValid?"Valid":systemStore.doiMessage}</Tag>
+                                        <Spin spinning={systemStore.isDoiLoading} delay={20} indicator={doiLoadingIcon} />
+                                        </div>: null
+                                    }
+                                </>: null
                         }
                         {
-                            doi?
-                                <div style={{marginLeft:'21%', marginBottom:'5vh'}}>
-                                    <Tag color="default" style={{width: '3vw',textAlign:'center'}}>DOI: </Tag>
-                                    <span>{doi}</span>
-                                    <Tag style={{marginLeft:'1vw'}} color={systemStore.doiValid ?"#87d068":"#f50"}>{systemStore.doiValid?"Valid":systemStore.doiMessage}</Tag>
-                                    <Spin spinning={systemStore.isDoiLoading} delay={20} indicator={doiLoadingIcon} />
-                                </div>: null
-                        }
-
+                            adapt2Store.inputSource ===2?
                                 <div style={{width:'83%', margin: 'auto'}}>
                                     <Dragger {...props}>
                                         <p className="ant-upload-drag-icon">
@@ -384,6 +398,10 @@ export default class NewDSnFiles extends Component{
                                         </p>
                                     </Dragger>
                                 </div>
+                                : null
+                        }
+
+
 
                     </Form>
                     <APIInput getFileList={this.getFileList}/>
