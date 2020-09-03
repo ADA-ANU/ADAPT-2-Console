@@ -154,6 +154,7 @@ export default class NewDSnFiles extends Component{
                     let temp = servers.filter(serv=>serv.url ===ser)
                     console.log(temp)
                     if (temp.length ===1){
+                        this.setState({server: ser})
                         //this.setState({doiMessage:temp[0].alias})
                         this.props.adapt2Store.setDoiServer(temp[0].alias)
                         if (value.indexOf('doi')>0){
@@ -174,9 +175,10 @@ export default class NewDSnFiles extends Component{
                     }
                     else {
                         //this.setState({doiMessage:"Server not found."})
+                        this.setState({server: ser})
                         this.props.adapt2Store.setDoiServer("Server not found.")
                     }
-                    this.setState({server: ser})
+                    //this.setState({server: ser})
                 }
                 else {
                     this.setState({server: server})
@@ -198,7 +200,7 @@ export default class NewDSnFiles extends Component{
             this.setState({
                 doiExisting:false,
                 // doi: null,
-                // server: null
+                server: null
             })
             this.props.adapt2Store.setDoi(null)
             this.props.adapt2Store.setDoiServer(null)
@@ -242,12 +244,12 @@ export default class NewDSnFiles extends Component{
 
     render() {
         const { authStore, systemStore, files, formReset, adapt2Store } = this.props
-        const { doiMessage, isLoading, selectedRowKeys, selectedADAFolder, localTargetKeys, remoteTargetKeys } = this.state
+        const { server, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, localTargetKeys, remoteTargetKeys } = this.state
         const { userUploadedFiles } = systemStore
         const { doiServer, doi } = adapt2Store
         const datasource = toJS(systemStore.fileList)
         const user = toJS(authStore.currentUser)
-        console.log(adapt2Store.sourceURL)
+        console.log(server)
         if(systemStore.duplicateFileList.length>0){this.openNotification()}
         else{
             notification.close('duplicates')

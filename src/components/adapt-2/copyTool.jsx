@@ -366,7 +366,7 @@ export default class CopyTool extends Component{
         //console.log(`selected ${label}`);
         const dvID = value
         const dvName = label
-        this.props.systemStore.checkDVPermission('production', dvID, dvName, 'ADD_DS', true)
+        this.props.systemStore.checkDVPermission(this.props.authStore.ctSelectedServer, dvID, dvName, 'ADD_DS', true)
 
     }
     copyRangeOnChange = e =>{
@@ -519,7 +519,7 @@ export default class CopyTool extends Component{
                         ref={this.copyToolFormRef}
                         onFinish={this.onFinish}
                         scrollToFirstError={true}
-                        labelCol={{ span: 6 }}
+                        labelCol={{ span: 5 }}
                         wrapperCol={{ span: 16, offset:1 }}
                         layout="horizontal"
                         initialValues={{ server: undefined, dataverse: undefined, doi: undefined, subject: undefined, copyRange: 1}}

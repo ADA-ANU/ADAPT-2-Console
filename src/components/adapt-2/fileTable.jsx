@@ -240,16 +240,18 @@ export default class FileTable extends Component{
                                         ): null
                                 }
                             </div>
-                            <Table
-                                rowSelection={localSwitch?{
-                                    type: 'checkbox',
-                                    ...rowSelectionLocal,
-                                }:null}
-                                columns={columns}
-                                dataSource={datasource}
-                                rowKey={'filename'}
-                                disabled={!localSwitch}
-                            />
+                            <div style={{paddingBottom:'2vh'}}>
+                                <Table
+                                    rowSelection={localSwitch?{
+                                        type: 'checkbox',
+                                        ...rowSelectionLocal,
+                                    }:null}
+                                    columns={columns}
+                                    dataSource={datasource}
+                                    rowKey={'filename'}
+                                    disabled={!localSwitch}
+                                />
+                            </div>
                         </div>
                     </div>
                 </Col>
@@ -288,16 +290,18 @@ export default class FileTable extends Component{
                                         ): null
                                 }
                             </div>
-                            <Table
-                                rowSelection={remoteSwitch?{
-                                    type: 'checkbox',
-                                    ...rowSelectionRemote,
-                                }: null}
-                                columns={columns}
-                                dataSource={datasource}
-                                rowKey={'filename'}
-                                disabled={!remoteSwitch}
-                            />
+                            <div style={{paddingBottom:'2vh'}}>
+                                <Table
+                                    rowSelection={remoteSwitch?{
+                                        type: 'checkbox',
+                                        ...rowSelectionRemote,
+                                    }: null}
+                                    columns={columns}
+                                    dataSource={datasource}
+                                    rowKey={'filename'}
+                                    disabled={!remoteSwitch}
+                                />
+                            </div>
                         </div>
                     </div>
 

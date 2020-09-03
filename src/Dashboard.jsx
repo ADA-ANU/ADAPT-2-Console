@@ -79,7 +79,11 @@ export default class Dashboard extends Component {
                                             {/*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*/}
                                         </SubMenu>
                                         <Menu.Item key="/dashboard/copy-tool"><Link to='/dashboard/copy-tool'>Copy Tool</Link></Menu.Item>
-                                        <Menu.Item key="/dashboard/newADAPT2"><Link to='/dashboard/adapt2-test'>New ADAPT2</Link></Menu.Item>
+                                        {
+                                            user.userEmail === "Mingjing.Peng@anu.edu.au"?
+                                                <Menu.Item key="/dashboard/newADAPT2"><Link to='/dashboard/adapt2-test'>New ADAPT2</Link></Menu.Item>
+                                                : null
+                                        }
                                         {
                                             user.userEmail === "Mingjing.Peng@anu.edu.au" || user.userEmail === "Marina.McGale@anu.edu.au"?
                                                 <Menu.Item key="/dashboard/test"><Link to='/dashboard/test'>Developers' playground</Link></Menu.Item>
