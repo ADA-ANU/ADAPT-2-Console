@@ -67,7 +67,7 @@ export default class Option2DatasetWrapper extends Component{
 
 
         return(
-            <div style={{background: 'white', paddingTop:'1%', paddingBottom:'2vh'}}>
+            <div style={{background: 'white', paddingTop:'3vh', paddingBottom:'2vh'}}>
                 <div style={{ margin: 'auto'}}>
                     <Row style={{paddingBottom:'1vh', paddingTop: '1vh'}}>
                         <Col style={{}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
@@ -91,7 +91,7 @@ export default class Option2DatasetWrapper extends Component{
                     <Row>
                         <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
-                            <div style={{paddingTop: '3vh', paddingBottom: '2vh', paddingLeft: '2vw'}}>
+                            <div style={{paddingTop: '3vh', paddingBottom: '2vh'}}>
                                 {/*files={fileList} formReset={formReset}*/}
                                 <NewDVForm handleFormData={handleForm} createDataset={createDataset} files={[]} formRef={this.formRef}/>
                             </div>

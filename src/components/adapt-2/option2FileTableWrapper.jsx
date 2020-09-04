@@ -67,7 +67,7 @@ export default class Option2FileTableWrapper extends Component{
 
 
         return(
-            <div style={{background: 'white', paddingTop:'1%', paddingBottom:'2vh'}}>
+            <div style={{background: 'white', paddingTop:'3vh', paddingBottom:'2vh'}}>
                 <div style={{ margin: 'auto'}}>
                     <Row style={{paddingBottom:'1vh', paddingTop: '1vh'}}>
                         <Col style={{}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
