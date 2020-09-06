@@ -362,8 +362,8 @@ export default class CopyTool extends Component{
 
     }
     dataverseOnChange =(value, label) => {
-        //console.log(`selected ${value}`);
-        //console.log(`selected ${label}`);
+        console.log(`selected ${value}`);
+        console.log(`selected ${label}`);
         const dvID = value
         const dvName = label
         this.props.systemStore.checkDVPermission(this.props.authStore.ctSelectedServer, dvID, dvName, 'ADD_DS', true)

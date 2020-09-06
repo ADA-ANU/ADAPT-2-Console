@@ -47,7 +47,15 @@ export default class Option2DatasetWrapper extends Component{
     formRef = React.createRef();
 
 
+    test =()=>{
+        this.props.adapt2Store.setDVFormServer('dev')
+        this.formRef.current.setFieldsValue({
+            server: 'dev',
+            dataverse: 1866,
+            subject: ["Agricultural Sciences", "Arts and Humanities"]
 
+        })
+    }
 
     handleSwitchOnChange = (checked)=>{
         console.log("create button value change to "+ checked)
@@ -83,6 +91,17 @@ export default class Option2DatasetWrapper extends Component{
                                             defaultChecked={false}
                                             onChange={this.handleSwitchOnChange}
                                         />
+                                    </div>
+                                </Col>
+                                <Col>
+                                    <div style={{paddingLeft:'1vw'}}>
+                                        <Button
+
+                                            type="primary"
+                                            onClick={this.test}
+                                        >
+                                            test
+                                        </Button>
                                     </div>
                                 </Col>
                             </Row>

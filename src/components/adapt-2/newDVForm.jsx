@@ -1,5 +1,5 @@
 import React, {Component, useState} from 'react';
-import { Form, Input, Select, Switch, Button, ConfigProvider, Modal, Row, Col } from 'antd';
+import {Form, Input, Select, Switch, Button, ConfigProvider, Modal, Row, Col, TreeSelect} from 'antd';
 import { inject, observer } from 'mobx-react';
 import API_URL from '../../config'
 import 'antd/es/spin/style/css';
@@ -48,19 +48,35 @@ export default class NewDVForm extends Component{
         this.props.formRef.current.setFieldsValue({
             dataverse: undefined,
         })
-        this.setState({
-            selectedServer: value
-        })
+        // this.setState({
+        //     selectedServer: value
+        // })
+        this.props.adapt2Store.setDVFormServer(value)
 
     }
 
-    dataverseOnChange =(value) => {
+    onLoadData = treeNode =>{
+        const { id } = treeNode.props;
+        return new Promise((resolve, reject)=>{
+            this.props.authStore.getSubDataversesForAdapt2(id)
+                .then(res=>resolve())
+                .catch(err=>{
+                    console.log(err)
+                }).catch(e=>{
+                    console.log(e)
+            })
+        })
+
+    }
+    dataverseOnChange =(value, label) => {
         console.log(`selected ${value}`);
         //const userid = toJS(this.props.authStore.currentUser).userID
         const serverValue = this.props.formRef.current.getFieldValue("server")
         const servers = toJS(this.props.authStore.serverList)
-        const dvID = value[1]
-        const dvName = value[0]
+        // const dvID = value[1]
+        // const dvName = value[0]
+        const dvID = value
+        const dvName = label
         this.props.systemStore.checkDVPermission(serverValue, dvID, dvName, 'ADD_DS', true)
         // .then(res=>{
         //     if (res === false){
@@ -101,10 +117,12 @@ export default class NewDVForm extends Component{
         const serverList = toJS(authStore.serverList)
         const user = toJS(authStore.currentUser)
         const dataverses = toJS(authStore.newDVList)
+        const treeData = Object.keys(authStore.newDVList).length>0 && adapt2Store.dvFormSelectedServer?authStore.newDVList[adapt2Store.dvFormSelectedServer].dataverses: []
         console.log(user)
         console.log(serverList)
         console.log(this.state.selectedDataverse)
         console.log(dataverses)
+        console.log(toJS(systemStore.dataverseSubjects))
         return (
             <>
                 <Form
@@ -139,17 +157,17 @@ export default class NewDVForm extends Component{
                     {/*    />*/}
                     {/*</Form.Item>*/}
                     <Form.Item
-                        label="Server"
+                        label="Dataverse"
                         name="server"
                         rules={[
                             {
                                 required: createDataset,
-                                message: "Please select a dataverse server.",
+                                message: "Please select a dataverse.",
                             },
                         ]}
                     >
                         <Select
-                            placeholder="Select a server"
+                            placeholder="Select a dataverse"
                             disabled={!createDataset}
                             onChange={this.serverOnChange}
                         >
@@ -169,39 +187,61 @@ export default class NewDVForm extends Component{
                         </Select>
                     </Form.Item>
                     <Form.Item
-                        label="Dataverse"
+                        label="Sub-Dataverse"
                         name="dataverse"
                         rules={[
                             {
                                 required: createDataset,
-                                message: "Please select a dataverse.",
+                                message: "Please select a sub-dataverse.",
                             },
                         ]}
                     >
-                        <Select
+                        <TreeSelect
+                            treeDataSimpleMode
                             showSearch
-                            disabled={!createDataset || this.state.selectedServer === null}
-                            placeholder="Select a dataverse"
+                            //allowClear
+                            autoClearSearchValue='false'
+                            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                            disabled={!createDataset || adapt2Store.dvFormSelectedServer === null}
+                            placeholder="Select a sub-dataverse"
                             optionFilterProp="children"
                             onChange={this.dataverseOnChange}
-                            loading={Object.keys(dataverses).length < 1}
+                            loadData={this.onLoadData}
+                            loading={true}
+                            filterTreeNode={(value, node)=>node.title.toLowerCase().indexOf(value.toLowerCase())>=0}
                             // onFocus={this.dataverseOnFocus}
                             // onBlur={this.dataverseOnBlur}
                             // onSearch={this.dataverseOnSearch}
-                            filterOption={(input, option) =>
-                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
+                            // filterOption={(input, option) =>
+                            //     option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            // }
+                            treeData={treeData}
                         >
-                            {
-                                Object.keys(dataverses).length > 0 && this.state.selectedServer?
-                                    dataverses[this.state.selectedServer].dataverses.map(dataverse=>{
-                                        return(
-                                            <Select.Option key={dataverse.id} value={[dataverse.title, dataverse.id]}>{dataverse.title}</Select.Option>
-                                        )
-                                    }):null
-//<Select.Option value={0}>Loading <LoadingOutlined style={{ fontSize: 24 }} spin /></Select.Option>
-                            }
-                        </Select>
+                        </TreeSelect>
+{/*                        <Select*/}
+{/*                            showSearch*/}
+{/*                            disabled={!createDataset || this.state.selectedServer === null}*/}
+{/*                            placeholder="Select a sub-dataverse"*/}
+{/*                            optionFilterProp="children"*/}
+{/*                            onChange={this.dataverseOnChange}*/}
+{/*                            loading={Object.keys(dataverses).length < 1}*/}
+{/*                            // onFocus={this.dataverseOnFocus}*/}
+{/*                            // onBlur={this.dataverseOnBlur}*/}
+{/*                            // onSearch={this.dataverseOnSearch}*/}
+{/*                            filterOption={(input, option) =>*/}
+{/*                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0*/}
+{/*                            }*/}
+{/*                        >*/}
+{/*                            {*/}
+{/*                                Object.keys(dataverses).length > 0 && this.state.selectedServer?*/}
+{/*                                    dataverses[this.state.selectedServer].dataverses.map(dataverse=>{*/}
+{/*                                        return(*/}
+{/*                                            <Select.Option key={dataverse.id} value={[dataverse.title, dataverse.id]}>{dataverse.title}</Select.Option>*/}
+{/*                                        )*/}
+{/*                                    }):null*/}
+{/*//<Select.Option value={0}>Loading <LoadingOutlined style={{ fontSize: 24 }} spin /></Select.Option>*/}
+{/*                            }*/}
+{/*                        </Select>*/}
                     </Form.Item>
                     {/*<Form.Item*/}
                     {/*    label="Dataset DOI"*/}

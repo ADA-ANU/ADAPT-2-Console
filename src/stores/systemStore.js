@@ -804,23 +804,25 @@ export class SystemStore{
         this.isADAFolderInfoLoading = true
         return axios.post(API_URL.getADAFolderInfo, data)
             .then(action(res=>{
+                console.log(res)
                 if (res.status ===201){
                     this.adaFolderInfoErrorMsg = null
                     console.log(res.data)
                     this.adaFolderInfo = res.data
-                    console.log(res.adaFolderContent)
-                    this.adaFolderFileList = res.adaFolderContent
-                    this.detectDuplicateFiles(res.adaFolderContent, this.localTargetKeys)
+                    console.log(res.data.adaFolderContent)
+                    this.adaFolderFileList = res.data.adaFolderContent
+                    this.detectDuplicateFiles(res.data.adaFolderContent, this.localTargetKeys)
                 }
             })).catch(action(err=>{
                 this.adaFolderInfo = null
+                console.log(err)
                 if (err.response) {
-                    console.log(err.response.data.adaFolderContent)
+                    console.log(err.response)
                     this.adaFolderFileList = err.response.data.adaFolderContent
                     this.detectDuplicateFiles(err.response.data.adaFolderContent, this.localTargetKeys)
                     if (err.response.status ===404){
                         console.log("404")
-                        this.adaFolderInfoErrorMsg = 'DOI not found'
+                        this.adaFolderInfoErrorMsg = err.response.data.msg?err.response.data.msg:'DOI not found'
 
                     }
                     else if (err.response.status ===401){

@@ -29,17 +29,36 @@ export class adapt2Store{
     @observable sourceURL = undefined
     @observable inputSource = 1
     @observable DSnFilesFormRef = null
-    @observable selectedADAFolder = null
+    @observable selectedADAFolder = undefined
+    @observable dvFormSelectedServer = null
     // constructor() {
     //
     //     this.adapt2Ref = React.createRef();
     //
     // }
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
+    @action setDVFormServer(value){
+        this.dvFormSelectedServer = value
+    }
     @action adaFolderOnChange(value){
         console.log(value)
         this.selectedADAFolder = value
+        if (value === undefined){
+            console.log("clearAdaFolderInfo")
+            //systemStore.clearAdaFolderInfoErrorMsg()
+            //this.fileFormRef.current.resetFields()
+        }
+        else {
+            // this.fileFormRef.current.setFieldsValue({
+            //     dataverse: undefined,
+            //     doi: undefined
+            // })
+            //systemStore.clearAdaFolderInfoErrorMsg()
+            let userid = authStore.currentUser.userID
+            systemStore.getDatasetInfoByADAID(value, userid)
+        }
     }
+
     @action setSourceServer(server){
         this.sourceServer = server
     }
@@ -98,7 +117,7 @@ export class adapt2Store{
     @action SelectionOnChange(value){
 
         this.selection = value
-        this.selectedADAFolder = null
+        this.selectedADAFolder = undefined
     }
     @action handleSubmit(form){
         if(this.selection ===1){
@@ -160,7 +179,8 @@ export class adapt2Store{
         console.log("option2 submitting")
         this.isLoading = true
         systemStore.handleFinalResultClose()
-        const {server, dataverse, title, authorFields, email, description, subject, firstName, lastName} = form
+        //const dataverse = this.dvFormSelectedServer
+        const {server, title, dataverse, authorFields, email, description, subject, firstName, lastName} = form
         //const {fileList} = this.state;
         console.log(form)
 
@@ -183,7 +203,7 @@ export class adapt2Store{
 
             }
         } else {
-            const dataverseID = dataverse[1]
+            const dataverseID = dataverse
             // let subjectIDs =[]
             // for(let sub of subject){
             //     subjectIDs.push(sub[1])
@@ -206,7 +226,7 @@ export class adapt2Store{
                 userid: authStore.currentUser.userID
             }
         }
-
+        console.log(obj)
         const json = JSON.stringify(obj);
 
         axios.post(API_URL.AdaID, json, {

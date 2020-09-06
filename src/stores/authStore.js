@@ -1,5 +1,6 @@
 import { observable, action, computed, reaction, createTransformer, toJS } from 'mobx';
 import API_URL from '../config'
+import adapt2Store from "./adapt2Store";
 
 
 class AuthStore {
@@ -134,6 +135,28 @@ class AuthStore {
     @action setCTServer(server){
         this.ctSelectedServer = server
     }
+    @action getSubDataversesForAdapt2(dvID){
+        return fetch(API_URL.getSubDVs + dvID + `/${adapt2Store.dvFormSelectedServer}`)
+            .then(action( res=>{
+                if (res.status === 201){
+                    return res.json()
+                }
+                // else {
+                //     throw new Error('Unable to download dataverse list, please refresh the page to try again.')
+                // }
+            }))
+            .then(action(json=>{
+                console.log(json)
+                let data = this.newDVList[adapt2Store.dvFormSelectedServer].dataverses.concat(json)
+                this.newDVList[adapt2Store.dvFormSelectedServer].dataverses = data
+                return true
+            }))
+            .catch(err => {
+                this.networkError = true
+                this.networkErrorMessage = err
+            })
+    }
+
     @action getSubDataverses(dvID){
         return fetch(API_URL.getSubDVs + dvID + `/${this.ctSelectedServer}`)
             .then(action( res=>{
