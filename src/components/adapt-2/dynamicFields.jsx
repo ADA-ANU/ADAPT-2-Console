@@ -25,7 +25,13 @@ function DynamicField(props) {
             span: 12, offset: 4
         },
     };
+    const presetVales=(cb)=>{
+        props.values.map(ele=>{
+            cb(ele)
+        })
+    }
     console.log(props.required)
+    console.log(props.values)
     return (
         <Form.List name="authorFields">
             {(fields, { add, remove }) => {

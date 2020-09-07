@@ -17,7 +17,7 @@ import {
     Form,
     Divider,
     Table,
-    Switch
+    Switch, Tag
 } from 'antd';
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import axios from 'axios'
@@ -47,15 +47,15 @@ export default class Option2DatasetWrapper extends Component{
     formRef = React.createRef();
 
 
-    test =()=>{
-        this.props.adapt2Store.setDVFormServer('dev')
-        this.formRef.current.setFieldsValue({
-            server: 'dev',
-            dataverse: 1866,
-            subject: ["Agricultural Sciences", "Arts and Humanities"]
-
-        })
-    }
+    // test =()=>{
+    //     this.props.adapt2Store.setDVFormServer('dev')
+    //     this.formRef.current.setFieldsValue({
+    //         server: 'dev',
+    //         dataverse: 1866,
+    //         subject: ["Agricultural Sciences", "Arts and Humanities"]
+    //
+    //     })
+    // }
 
     handleSwitchOnChange = (checked)=>{
         console.log("create button value change to "+ checked)
@@ -63,10 +63,10 @@ export default class Option2DatasetWrapper extends Component{
         //     createDataset: checked
         // })
         this.props.adapt2Store.handleNewDatasetSwitch(checked)
-        if (checked === false){
-            this.formRef.current.resetFields()
-            this.props.systemStore.handlePermission(true)
-        }
+        // if (checked === false){
+        //     this.props.adapt2Store.dvFormRef.current.resetFields()
+        //     this.props.systemStore.handlePermission(true)
+        // }
     }
     render() {
         const { systemStore, authStore, adapt2Store, handleForm } = this.props
@@ -86,24 +86,41 @@ export default class Option2DatasetWrapper extends Component{
                                 <Col>
                                     <div style={{paddingLeft:'1vw'}}>
                                         <Switch
+                                            checked={adapt2Store.createDataset}
                                             checkedChildren="Yes"
                                             unCheckedChildren="No"
                                             defaultChecked={false}
                                             onChange={this.handleSwitchOnChange}
+                                            disabled={systemStore.existingShellDS}
                                         />
                                     </div>
                                 </Col>
-                                <Col>
-                                    <div style={{paddingLeft:'1vw'}}>
-                                        <Button
+                                {/*<Col>*/}
+                                {/*    <div style={{paddingLeft:'1vw'}}>*/}
+                                {/*        <Button*/}
 
-                                            type="primary"
-                                            onClick={this.test}
-                                        >
-                                            test
-                                        </Button>
-                                    </div>
-                                </Col>
+                                {/*            type="primary"*/}
+                                {/*            onClick={this.test}*/}
+                                {/*        >*/}
+                                {/*            test*/}
+                                {/*        </Button>*/}
+                                {/*    </div>*/}
+                                {/*</Col>*/}
+                                {
+                                    systemStore.existingShellDS?
+                                        <Col>
+                                            <div style={{paddingLeft: '1vw'}}>
+                                                <a href={systemStore.returnedURL} target="_blank">{systemStore.returnedURL}</a>
+                                            </div>
+                                        </Col>: null
+                                }
+                                {
+                                    systemStore.adaFolderInfoErrorMsg?
+                                        <Col>
+                                            <Tag style={{marginLeft:'1vw'}} color="#f50">{systemStore.adaFolderInfoErrorMsg}</Tag>
+                                        </Col>
+                                        : null
+                                }
                             </Row>
                         </Col>
                     </Row>
@@ -112,7 +129,7 @@ export default class Option2DatasetWrapper extends Component{
 
                             <div style={{paddingTop: '3vh', paddingBottom: '2vh'}}>
                                 {/*files={fileList} formReset={formReset}*/}
-                                <NewDVForm handleFormData={handleForm} createDataset={createDataset} files={[]} formRef={this.formRef}/>
+                                <NewDVForm handleFormData={handleForm} createDataset={createDataset} files={[]} formRef={adapt2Store.dvFormRef}/>
                             </div>
 
                         </Col>

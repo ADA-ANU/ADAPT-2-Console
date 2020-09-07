@@ -30,7 +30,8 @@ export class adapt2Store{
     @observable inputSource = 1
     @observable DSnFilesFormRef = null
     @observable selectedADAFolder = undefined
-    @observable dvFormSelectedServer = null
+    @observable dvFormSelectedServer = undefined
+    @observable dvFormRef = React.createRef()
     // constructor() {
     //
     //     this.adapt2Ref = React.createRef();
@@ -45,6 +46,8 @@ export class adapt2Store{
         this.selectedADAFolder = value
         if (value === undefined){
             console.log("clearAdaFolderInfo")
+            systemStore.resetReturnedURL()
+            systemStore.resetDVForm()
             //systemStore.clearAdaFolderInfoErrorMsg()
             //this.fileFormRef.current.resetFields()
         }
@@ -112,6 +115,8 @@ export class adapt2Store{
         if(!value){
             this.remoteSwitch = false
             systemStore.switchOff('remote')
+            this.dvFormRef.current.resetFields()
+            systemStore.handlePermission(true)
         }
     }
     @action SelectionOnChange(value){

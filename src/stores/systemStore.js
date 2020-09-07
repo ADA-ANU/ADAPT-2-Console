@@ -56,6 +56,8 @@ export class SystemStore{
     @observable remoteCheckStatus = new Map()
     @observable userUploadedFiles = []
     @observable uploadedFiles = []
+    @observable returnedURL = null
+    @observable existingShellDS = false
 
 
 
@@ -795,6 +797,57 @@ export class SystemStore{
         });
         this.duplicateFileList = duplicates
     }
+    @action resetReturnedURL(){
+        this.returnedURL = null
+    }
+    @action resetDVForm(){
+        adapt2Store.setDVFormServer(undefined)
+        this.returnedURL = null
+        this.adaFolderInfoErrorMsg = null
+        adapt2Store.dvFormRef.current.setFieldsValue({
+            server: undefined,
+            dataverse: undefined,
+            subject: undefined,
+            title: undefined,
+            firstName: undefined,
+            lastName: undefined,
+            email: undefined,
+            description: undefined,
+            authorFields: undefined
+
+        })
+    }
+    @action presetDVForm(form){
+        const { dataverse, server, author, authorFields, description, email, subject, title} = form
+        let subjectNames = subject.map(sub=>{
+            for(let subEle of this.dataverseSubjects){
+                if(subEle.id ===sub){
+                    return subEle.subjectname
+                }
+            }
+        })
+        let authors = authorFields.map(ele=>{
+            const firstname = ele.name.split(', ')[1]
+            const lastname = ele.name.split(', ')[0]
+            return {firstName: firstname, lastName: lastname}
+        })
+        const firstName = author.split(", ")[1]
+        const lastName = author.split(", ")[0]
+        console.log(authors)
+        adapt2Store.setDVFormServer(server)
+        adapt2Store.dvFormRef.current.setFieldsValue({
+            server: server,
+            dataverse: dataverse,
+            subject: subjectNames,
+            title: title,
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            description: description,
+            authorFields: authors
+
+        })
+    }
 
     @action getDatasetInfoByADAID(adaid, userid){
         const data = {
@@ -806,16 +859,22 @@ export class SystemStore{
             .then(action(res=>{
                 console.log(res)
                 if (res.status ===201){
+                    this.existingShellDS = true
                     this.adaFolderInfoErrorMsg = null
-                    console.log(res.data)
+                    //console.log(res.data)
                     this.adaFolderInfo = res.data
-                    console.log(res.data.adaFolderContent)
+                    this.returnedURL = res.data.url
+                    adapt2Store.handleNewDatasetSwitch(false)
+                    this.presetDVForm(res.data)
+                    //console.log(res.data.adaFolderContent)
                     this.adaFolderFileList = res.data.adaFolderContent
                     this.detectDuplicateFiles(res.data.adaFolderContent, this.localTargetKeys)
                 }
             })).catch(action(err=>{
                 this.adaFolderInfo = null
                 console.log(err)
+                this.existingShellDS = false
+                this.resetDVForm()
                 if (err.response) {
                     console.log(err.response)
                     this.adaFolderFileList = err.response.data.adaFolderContent
@@ -823,6 +882,7 @@ export class SystemStore{
                     if (err.response.status ===404){
                         console.log("404")
                         this.adaFolderInfoErrorMsg = err.response.data.msg?err.response.data.msg:'DOI not found'
+                        adapt2Store.handleNewDatasetSwitch(true)
 
                     }
                     else if (err.response.status ===401){

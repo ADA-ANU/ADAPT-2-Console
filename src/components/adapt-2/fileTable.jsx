@@ -202,6 +202,16 @@ export default class FileTable extends Component{
             }),
             hideSelectAll: true,
         };
+        const switchCheck=()=>{
+            if(adapt2Store.selection ===2){
+                if(!adapt2Store.createDataset) return true
+                else return false
+            }
+            else if(adapt2Store.selection ===3){
+                if(!adapt2Store.createDataset && !systemStore.existingShellDS) return true
+                else return false
+            }
+        }
 
         return (
             <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
@@ -270,7 +280,7 @@ export default class FileTable extends Component{
                                         unCheckedChildren="No"
                                         defaultChecked={false}
                                         onChange={value=>this.handleSwitchOnChange(value, 'remote')}
-                                        disabled={!adapt2Store.createDataset && adapt2Store.selection ===2}
+                                        disabled={switchCheck()}
                                     />
                                 </div>
                             </Col>

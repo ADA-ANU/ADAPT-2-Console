@@ -122,7 +122,8 @@ export default class NewDVForm extends Component{
         console.log(serverList)
         console.log(this.state.selectedDataverse)
         console.log(dataverses)
-        console.log(toJS(systemStore.dataverseSubjects))
+        //console.log(toJS(systemStore.dataverseSubjects))
+        console.log(toJS(adapt2Store.testArray))
         return (
             <>
                 <Form
@@ -202,7 +203,7 @@ export default class NewDVForm extends Component{
                             //allowClear
                             autoClearSearchValue='false'
                             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                            disabled={!createDataset || adapt2Store.dvFormSelectedServer === null}
+                            disabled={!createDataset || adapt2Store.dvFormSelectedServer === undefined}
                             placeholder="Select a sub-dataverse"
                             optionFilterProp="children"
                             onChange={this.dataverseOnChange}
@@ -318,7 +319,7 @@ export default class NewDVForm extends Component{
                             disabled={!createDataset}
                         />
                     </Form.Item>
-                    <DynamicField required={createDataset}/>
+                    <DynamicField required={createDataset} values={adapt2Store.testArray}/>
                     <Form.Item
                         label="Contact Email"
                         name="email"
