@@ -132,7 +132,7 @@ export class adapt2Store{
             this.handleOption2Submit(form)
         }
         else if(this.selection ===3){
-
+            this.handleOption3Submit(form)
         }
     }
     @action handleOption1Submit(){
@@ -342,6 +342,87 @@ export class adapt2Store{
             this.isLoading = false
 
         })
+    }
+
+    @action handleOption3Submit(form) {
+        console.log("option3 submitting")
+        this.isLoading = true
+        systemStore.handleFinalResultClose()
+        //const dataverse = this.dvFormSelectedServer
+        const {server, title, dataverse, authorFields, email, description, subject, firstName, lastName} = form
+        //const {fileList} = this.state;
+        console.log(form)
+        console.log(this.doiServer)
+        //this.setState({adaID: json.msg.adaid})
+        const formData = new FormData();
+        formData.set('adaid', this.selectedADAFolder)
+        formData.set('userid', authStore.currentUser.userID)
+        //formData.set('datasetid', json.msg.dataset.id)
+        formData.set('existingShellDS', systemStore.existingShellDS)
+        formData.set('localUploadSwitch', this.localSwitch)
+        formData.set('remoteUploadSwitch', this.remoteSwitch)
+        formData.set('newDataset', this.createDataset)
+        //formData.set('dataset', JSON.stringify(obj))
+        //formData.set('destinationDOI', json.msg.doi)
+        formData.set('sourceDOI', this.sourceURL)
+        formData.set('inputSource', this.inputSource)
+        formData.set('sourceServer', this.doiServer)
+        formData.set('localFileList', JSON.stringify([...systemStore.localSelectedKeys.values()].flat().map(ele=>ele.filename)))
+        formData.set('remoteFileList', JSON.stringify([...systemStore.remoteSelectedKeys.values()].flat().map(ele=>ele.filename)))
+
+        systemStore.uploadedFiles.forEach(file => {
+            console.log(file)
+            formData.append('file', file);
+        });
+        axios({
+            url: API_URL.Option3Submission,
+            method: 'post',
+            data: formData,
+            config: {headers: {'Content-Type': 'multipart/form-data'}}
+        }).then(res => res.data)
+            .then(data => {
+                console.log(data)
+                //if (data.success === true) {
+                console.log("recovering")
+                //this.setState({returnedFiles: data.files})
+                if (this.createDataset) {
+                    const datasetObj = {
+                        datasetid: json.msg.dataset.id,
+                        server: server,
+                        userid: authStore.currentUser.userID
+                    }
+                    const jsonData = JSON.stringify(datasetObj);
+                    axios.post(API_URL.Get_DatasetInfo, jsonData, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        }
+                    ).then(r => r.data)
+                        .then(info => {
+                            let doi = info.data.authority ? info.data.authority + '/' + info.data.identifier : null
+
+                            form['newDataset'] = this.createDataset
+                            systemStore.handleFinalResultOpen(form, json.msg.adaid, doi, data.localFiles, data.remoteFiles)
+                            //this.finalResult_New.scrollIntoView({behavior: 'smooth'})
+                            this.isLoading = false
+                        }).catch(err => {
+                        if (err.response) {
+                            this.isLoading = false
+                            systemStore.handleFinalResultOpen(true)
+                        }
+                    })
+                } else {
+                    this.isLoading = false
+                    systemStore.handleFinalResultOpen({datasetURL: systemStore.returnedURL?systemStore.returnedURL: null}, this.selectedADAFolder, null, data.localFiles, data.remoteFiles)
+                    //this.finalResult_New.scrollIntoView({behavior: 'smooth'})
+                }
+
+            }).catch(err => {
+            console.log(err)
+            this.isLoading = false
+            this.openNotificationWithIcon('error', 'files', err)
+        })
+
     }
     openNotificationWithIcon = (type,fileName,error) => {
         if (type === 'success'){

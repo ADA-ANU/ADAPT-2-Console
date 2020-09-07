@@ -76,9 +76,22 @@ export default class newAdapt2 extends Component{
             //console.log("systemStore.doiValid", systemStore.doiValid, "systemStore.dataversePermissionValid", systemStore.dataversePermissionValid)
             //console.log("systemStore.destinationDOIValid", systemStore.destinationDOIValid, "systemStore.datasetPermissionValid", systemStore.datasetPermissionValid)
             if (adapt2Store.selection !==1){
-                if(adapt2Store.createDataset && !systemStore.dataversePermissionValid){
-                    return true
+                if(adapt2Store.selection ===2){
+                    if(adapt2Store.createDataset && !systemStore.dataversePermissionValid){
+                        return true
+                    }
+                    else return false
                 }
+                else if(adapt2Store.selection ===3){
+                    if([...systemStore.localSelectedKeys.values()].length ===0 && [...systemStore.remoteSelectedKeys.values()].length ===0){
+                        return true
+                    }
+                    else if(!adapt2Store.selectedADAFolder){
+                        return true
+                    }
+                    else return false
+                }
+
             }
             else {
                 return false

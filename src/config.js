@@ -26,7 +26,8 @@ const API_URL = {
     uploadFilesFromExsitingPage: ROOT + 'api/uploadFilesFromExsitingPage',
     getSubDVs: ROOT + 'api/getSubDVs/',
     createProdDS: ROOT + 'api/createProdDS',
-    Option2Submission: ROOT + 'api/adapt2Option2Submission'
+    Option2Submission: ROOT + 'api/adapt2Option2Submission',
+    Option3Submission: ROOT + 'api/adapt2Option3Submission'
 }
 
 // const PROD_API_URL = {
