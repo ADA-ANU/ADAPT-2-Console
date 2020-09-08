@@ -473,7 +473,33 @@ export class SystemStore{
         }
         return prefix
     }
+    @action resetAll(){
+        this.dataversePermissionValid = true
+        this.datasetPermissionValid = false
+        this.doiMessage=null
+        this.isDoiLoading = false
 
+        this.finalResultDataset = {}
+        this.finalResultAdaid = null
+        this.finalResultDOI = null
+        this.finalResultLocalFiles = []
+        this.finalResultRemoteFiles = []
+        this.adaFolderInfoErrorMsg = null
+
+        this.adaFolderFileList = []
+        this.duplicateFileList = []
+        this.sortedFileList = new Map()
+        this.localSelectedKeys = new Map()
+        this.remoteSelectedKeys = new Map()
+        this.testCheck = []
+
+        this.localCheckStatus = new Map()
+        this.remoteCheckStatus = new Map()
+        this.userUploadedFiles = []
+        this.uploadedFiles = []
+        this.returnedURL = null
+        this.existingShellDS = false
+    }
     @action removeSelectedDOIFiles(newFileList){
         this.localSelectedKeys = new Map()
         this.remoteSelectedKeys = new Map()

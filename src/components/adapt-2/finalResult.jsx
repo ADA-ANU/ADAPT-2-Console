@@ -62,7 +62,7 @@ export default class FinalResult extends Component{
             //     footer={null}
             //     width='30%'
             // >
-            <div>
+            <div id="finalResult">
                     <Result
                         status="success"
                         title="Submission Successful"
@@ -168,7 +168,7 @@ export default class FinalResult extends Component{
                                             }}
                                         >
                                             <div style={{paddingBottom:"2vh", paddingTop:'2vh'}}>
-                                                <Text style={{fontWeight: "bold"}}>Files Stored on D10:</Text>
+                                                <Text style={{fontWeight: "bold"}}>Preserved File List:</Text>
                                             </div>
 
 
@@ -197,7 +197,9 @@ export default class FinalResult extends Component{
                                                 fontSize: 16,
                                             }}
                                         >
-                                            Files Added to Dataset:
+                                            <div style={{paddingBottom:"2vh", paddingTop:'2vh'}}>
+                                                <Text style={{fontWeight: "bold"}}>Curated File List:</Text>
+                                            </div>
 
                                         </Text>:''
                                     }

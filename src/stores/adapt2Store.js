@@ -123,6 +123,21 @@ export class adapt2Store{
 
         this.selection = value
         this.selectedADAFolder = undefined
+        this.resetAll()
+        systemStore.resetAll()
+    }
+    @action resetAll(){
+        this.createDataset = false
+        this.doiServer = null
+        this.doi = null
+        this.sourceServer = null
+        this.localSwitch = false
+        this.remoteSwitch = false
+        this.sourceURL = undefined
+        this.inputSource = 1
+        //this.DSnFilesFormRef = null
+        this.selectedADAFolder = undefined
+        this.dvFormSelectedServer = undefined
     }
     @action handleSubmit(form){
         if(this.selection ===1){
@@ -296,6 +311,7 @@ export class adapt2Store{
                                             form['newDataset'] = this.createDataset
                                             systemStore.handleFinalResultOpen(form, json.msg.adaid, doi, data.localFiles, data.remoteFiles)
                                             //this.finalResult_New.scrollIntoView({behavior: 'smooth'})
+                                            this.adapt2Ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
                                             this.isLoading = false
                                         }).catch(err => {
                                         if (err.response) {
@@ -306,6 +322,7 @@ export class adapt2Store{
                                 } else {
                                     this.isLoading = false
                                     systemStore.handleFinalResultOpen(form, json.msg.adaid, null, data.localFiles)
+                                    this.adapt2Ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
                                     //this.finalResult_New.scrollIntoView({behavior: 'smooth'})
                                 }
 
@@ -424,7 +441,8 @@ export class adapt2Store{
 
                             form['newDataset'] = this.createDataset
                             systemStore.handleFinalResultOpen(form, this.selectedADAFolder, doi, data.localFiles, data.remoteFiles)
-                            //this.finalResult_New.scrollIntoView({behavior: 'smooth'})
+                            console.log("scroll")
+                            this.adapt2Ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
                             this.isLoading = false
                         }).catch(err => {
                         if (err.response) {
@@ -436,6 +454,9 @@ export class adapt2Store{
                     this.isLoading = false
                     systemStore.handleFinalResultOpen({datasetURL: systemStore.returnedURL?systemStore.returnedURL: null}, this.selectedADAFolder, null, data.localFiles, data.remoteFiles)
                     //this.finalResult_New.scrollIntoView({behavior: 'smooth'})
+                    //this.adapt2Ref.scrollIntoView({behavior: 'smooth'})
+                    this.adapt2Ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                    //this.scrollToMyRef()
                 }
 
             })

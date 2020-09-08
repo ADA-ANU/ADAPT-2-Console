@@ -125,7 +125,7 @@ export default class NewDVForm extends Component{
         //console.log(toJS(systemStore.dataverseSubjects))
         console.log(toJS(adapt2Store.testArray))
         return (
-            <>
+            <div id="dvForm">
                 <Form
                     id="datasetCreation"
                     ref={formRef}
@@ -408,7 +408,7 @@ export default class NewDVForm extends Component{
 
                 </Form>
                 <APIInput newDatasetSwitch={this.createDatasetOnChange}/>
-            </>
+            </div>
         )
     }
 }

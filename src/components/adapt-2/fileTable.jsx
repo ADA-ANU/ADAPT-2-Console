@@ -216,7 +216,7 @@ export default class FileTable extends Component{
         return (
             <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                 <Col span={10} offset={1}>
-                    <div>
+                    <div id="fileTable">
                         <Row style={{paddingBottom:'2vh'}}>
                             <Col>
                                 <span style={{fontSize:'medium',fontWeight:'bold'}}>Upload to Directory (Preservation):</span>

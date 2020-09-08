@@ -72,23 +72,15 @@ export default class Dashboard extends Component {
                                         selectedKeys={[routingStore? routingStore.history.location.pathname : '/']}
                                         style={{ lineHeight:'64px',height: '64px', borderBottom: '0px'}}
                                     >
-                                        <SubMenu icon={<SettingOutlined />} title="ADAPT-2">
-                                            <Menu.Item key='/dashboard'><Link to='/dashboard'>ADAPT-2 New</Link></Menu.Item>
-                                            <Menu.Item key='/dashboard/adapt2-existing'><Link to='/dashboard/adapt2-existing'>ADAPT-2 Existing</Link></Menu.Item>
-                                            {/*<Menu.Item key='/dashboard/forcode'><Link to='/dashboard/forcode'>FOR Code</Link></Menu.Item>*/}
-                                            {/*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*/}
-                                        </SubMenu>
+                                        {/*<SubMenu icon={<SettingOutlined />} title="ADAPT-2">*/}
+                                        {/*    <Menu.Item key='/dashboard'><Link to='/dashboard'>ADAPT-2 New</Link></Menu.Item>*/}
+                                        {/*    <Menu.Item key='/dashboard/adapt2-existing'><Link to='/dashboard/adapt2-existing'>ADAPT-2 Existing</Link></Menu.Item>*/}
+                                        {/*    /!*<Menu.Item key='/dashboard/forcode'><Link to='/dashboard/forcode'>FOR Code</Link></Menu.Item>*!/*/}
+                                        {/*    /!*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*!/*/}
+                                        {/*</SubMenu>*/}
+                                        <Menu.Item icon={<SettingOutlined />} key="/dashboard"><Link to='/dashboard'>New ADAPT2</Link></Menu.Item>
                                         <Menu.Item key="/dashboard/copy-tool"><Link to='/dashboard/copy-tool'>Copy Tool</Link></Menu.Item>
-                                        {
-                                            user.userEmail === "Mingjing.Peng@anu.edu.au"?
-                                                <Menu.Item key="/dashboard/newADAPT2"><Link to='/dashboard/adapt2-test'>New ADAPT2</Link></Menu.Item>
-                                                : null
-                                        }
-                                        {
-                                            user.userEmail === "Mingjing.Peng@anu.edu.au" || user.userEmail === "Marina.McGale@anu.edu.au"?
-                                                <Menu.Item key="/dashboard/test"><Link to='/dashboard/test'>Developers' playground</Link></Menu.Item>
-                                            :null
-                                        }
+
 
                                     </Menu>
                                 </Col>
@@ -113,14 +105,15 @@ export default class Dashboard extends Component {
                                             : '' : ''
                                     }
                                     {/*<Route exact path='/dashboard' component={Adapt2} />*/}
-                                    <Route exact path='/dashboard' component={Adapt2} />
-                                    <Route exact path='/dashboard/adapt2-existing' component={DataverseFiles} />
+                                    {/*<Route exact path='/dashboard' component={Adapt2} />*/}
+                                    {/*<Route exact path='/dashboard/adapt2-existing' component={DataverseFiles} />*/}
+                                    <Route exact path='/dashboard' component={newAdapt2} />
                                     <Route exact path='/dashboard/copy-tool' component={CopyTool} />
-                                    <Route exact path='/dashboard/adapt2-test' component={newAdapt2} />
-                                    {
-                                        user.userEmail === "Mingjing.Peng@anu.edu.au" || user.userEmail === "Marina.McGale@anu.edu.au"?
-                                            <Route exact path='/dashboard/test' component={test} />: null
-                                    }
+                                    {/*<Route exact path='/dashboard/adapt2-test' component={newAdapt2} />*/}
+                                    {/*{*/}
+                                    {/*    user.userEmail === "Mingjing.Peng@anu.edu.au" || user.userEmail === "Marina.McGale@anu.edu.au"?*/}
+                                    {/*        <Route exact path='/dashboard/test' component={test} />: null*/}
+                                    {/*}*/}
                                     {/*<Route exact path='/dashboard/test' component={test} />*/}
                         </Content>
                         <Footer>

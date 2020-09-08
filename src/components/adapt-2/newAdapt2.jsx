@@ -75,6 +75,7 @@ export default class newAdapt2 extends Component{
         const submitCheck = ()=>{
             //console.log("systemStore.doiValid", systemStore.doiValid, "systemStore.dataversePermissionValid", systemStore.dataversePermissionValid)
             //console.log("systemStore.destinationDOIValid", systemStore.destinationDOIValid, "systemStore.datasetPermissionValid", systemStore.datasetPermissionValid)
+            console.log(toJS([...systemStore.localSelectedKeys.values()]))
             if (adapt2Store.selection !==1){
                 if(adapt2Store.selection ===2){
                     if(adapt2Store.createDataset && !systemStore.dataversePermissionValid){
@@ -101,7 +102,7 @@ export default class newAdapt2 extends Component{
             }
         }
         console.log(adapt2Store.selection)
-        console.log(adapt2Store.adapt2Ref)
+        console.log(systemStore.showfinalResultDVFiles)
 
         return(
             <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}}>
@@ -124,11 +125,18 @@ export default class newAdapt2 extends Component{
                                 onClick={this.handleAnchorClick}
                                 offsetTop={150}
                             >
-                                <Link href="#sourceDS" title="Source Dataset"/>
-                                <Link href="#copyRange" title="Copy Range"/>
-                                <Link href="#fileList" title="File List"/>
+                                <Link href="#adaid" title="ADAID"/>
                                 {
-                                    systemStore.showfinalResultDVFiles?
+                                    adapt2Store.selection !==1?
+                                        <>
+                                        <Link href="#fileSource" title="File Source"/>
+                                        <Link href="#dvForm" title="Create Dataset"/>
+                                        <Link href="#fileTable" title="Select Files"/>
+                                        </>: null
+                                }
+
+                                {
+                                    systemStore.showfinalResult?
                                         <Link href="#finalResult" title="Final Result"/>: null
                                 }
                                 {/*<Link href="#components-anchor-demo-basic" title="Basic demo" />*/}
@@ -142,7 +150,7 @@ export default class newAdapt2 extends Component{
                                     key="submit"
                                     htmlType="submit"
                                     type="primary"
-                                    //onClick={()=>adapt2Store.handleOption1Submit()}
+                                    onClick={adapt2Store.selection ===1?()=>adapt2Store.handleSubmit(): null}
                                     loading={adapt2Store.isLoading}
                                     disabled={submitCheck()}
                                 >
@@ -161,7 +169,7 @@ export default class newAdapt2 extends Component{
                     <Row>
                         <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
-                            <div style={{paddingTop: '3vh', paddingBottom: '2vh', paddingLeft: '5vw'}}>
+                            <div id="adaid" style={{paddingTop: '3vh', paddingBottom: '2vh', paddingLeft: '5vw'}}>
                                 <Radio.Group
                                     onChange={this.handleRadioChange}
                                     value={adapt2Store.selection}

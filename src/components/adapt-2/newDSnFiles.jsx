@@ -323,7 +323,7 @@ export default class NewDSnFiles extends Component{
         }
 
         return (
-                <div>
+                <div id="fileSource">
                     {/*<a href="#API" className="anchor">#</a>*/}
                     <Form
                         id="dataverseFiles"
