@@ -78,7 +78,7 @@ export default class Dashboard extends Component {
                                         {/*    /!*<Menu.Item key='/dashboard/forcode'><Link to='/dashboard/forcode'>FOR Code</Link></Menu.Item>*!/*/}
                                         {/*    /!*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*!/*/}
                                         {/*</SubMenu>*/}
-                                        <Menu.Item icon={<SettingOutlined />} key="/dashboard"><Link to='/dashboard'>New ADAPT2</Link></Menu.Item>
+                                        <Menu.Item icon={<SettingOutlined />} key="/dashboard"><Link to='/dashboard'>ADAPT2</Link></Menu.Item>
                                         <Menu.Item key="/dashboard/copy-tool"><Link to='/dashboard/copy-tool'>Copy Tool</Link></Menu.Item>
 
 
