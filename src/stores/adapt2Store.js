@@ -353,6 +353,26 @@ export class adapt2Store{
         //const {fileList} = this.state;
         console.log(form)
         console.log(this.doiServer)
+        let obj={}
+        if (this.createDataset && !systemStore.existingShellDS) {
+            obj = {
+                //doi: doi,
+                newDataset: this.createDataset,
+                title: title,
+                //author: author,
+                author: `${lastName}, ${firstName}`,
+                authorFields: authorFields,
+                email: email,
+                description: description,
+                subject: subject,
+                //subjectIDs
+                server: server,
+                dataverse: dataverse,
+                localUploadSwitch: this.localSwitch,
+                remoteUploadSwitch: this.remoteSwitch,
+                userid: authStore.currentUser.userID
+            }
+        }
         //this.setState({adaID: json.msg.adaid})
         const formData = new FormData();
         formData.set('adaid', this.selectedADAFolder)
@@ -362,7 +382,7 @@ export class adapt2Store{
         formData.set('localUploadSwitch', this.localSwitch)
         formData.set('remoteUploadSwitch', this.remoteSwitch)
         formData.set('newDataset', this.createDataset)
-        //formData.set('dataset', JSON.stringify(obj))
+        formData.set('dataset', JSON.stringify(obj))
         //formData.set('destinationDOI', json.msg.doi)
         formData.set('sourceDOI', this.sourceURL)
         formData.set('inputSource', this.inputSource)
@@ -387,7 +407,7 @@ export class adapt2Store{
                 //this.setState({returnedFiles: data.files})
                 if (this.createDataset) {
                     const datasetObj = {
-                        datasetid: json.msg.dataset.id,
+                        datasetid: data.datasetid,
                         server: server,
                         userid: authStore.currentUser.userID
                     }
@@ -399,10 +419,11 @@ export class adapt2Store{
                         }
                     ).then(r => r.data)
                         .then(info => {
+                            console.log(info)
                             let doi = info.data.authority ? info.data.authority + '/' + info.data.identifier : null
 
                             form['newDataset'] = this.createDataset
-                            systemStore.handleFinalResultOpen(form, json.msg.adaid, doi, data.localFiles, data.remoteFiles)
+                            systemStore.handleFinalResultOpen(form, this.selectedADAFolder, doi, data.localFiles, data.remoteFiles)
                             //this.finalResult_New.scrollIntoView({behavior: 'smooth'})
                             this.isLoading = false
                         }).catch(err => {
@@ -417,11 +438,26 @@ export class adapt2Store{
                     //this.finalResult_New.scrollIntoView({behavior: 'smooth'})
                 }
 
-            }).catch(err => {
-            console.log(err)
-            this.isLoading = false
-            this.openNotificationWithIcon('error', 'files', err)
-        })
+            })
+            .catch(err=>{
+                this.isLoading = false
+                if (err.response) {
+                    console.log(err.response.data);
+                    console.log(err.response.status);
+                    console.log(err.response.headers);
+                    this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
+                }
+                else {
+                    this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
+                }
+
+
+            })
+            // .catch(err => {
+            // console.log(err)
+            // this.isLoading = false
+            // this.openNotificationWithIcon('error', 'files', err)
+            // })
 
     }
     openNotificationWithIcon = (type,fileName,error) => {
