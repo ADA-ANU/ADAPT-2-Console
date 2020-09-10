@@ -144,7 +144,7 @@ export default class newAdapt2 extends Component{
                         </Col>
                         <Col xs={{ span: 22, offset: 0 }} sm={{ span: 20, offset: 0 }} md={{ span: 18, offset: 1 }} lg={{ span: 16, offset: 1 }} xl={{ span: 14, offset: 1 }} xxl={{ span: 14, offset: 1 }}>
 
-                            <div style={{marginTop: '3%', paddingBottom: '3%', textAlign:'center'}}>
+                            <div style={{marginTop: '3%', paddingBottom: '3vh', textAlign:'center'}}>
                                 <Button
                                     form="datasetCreation"
                                     key="submit"
@@ -245,7 +245,7 @@ export default class newAdapt2 extends Component{
                     <Row>
                         <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
-                            <div style={{marginTop: '3%', paddingBottom: '3%', textAlign:'center'}}>
+                            <div style={{paddingTop: '5vh', paddingBottom: '3%', textAlign:'center'}}>
                                 <Button
                                     form="datasetCreation"
                                     key="submit"

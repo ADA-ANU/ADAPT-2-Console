@@ -708,12 +708,21 @@ export class SystemStore{
                 else {
                     //this.fileList = []
                     this.doiValid = false
+                    if(adapt2Store.copyMetadata){
+                        this.resetDVForm()
+                        adapt2Store.copyMetadata = false
+                    }
                     return false
                 }
             })).catch(action(err=>{
                 if (err.response) {
                     //this.fileList = []
                     this.doiValid = false
+                    if(adapt2Store.copyMetadata){
+                        this.resetDVForm()
+                        adapt2Store.copyMetadata = false
+                    }
+
                     if (err.response.status ===404){
                         this.doiMessage = 'DOI not found'
                         //this.resetKeys()
@@ -883,7 +892,7 @@ export class SystemStore{
         this.isADAFolderInfoLoading = true
         return axios.post(API_URL.getADAFolderInfo, data)
             .then(action(res=>{
-                console.log(res)
+                console.log(res.data)
                 if (res.status ===201){
                     this.existingShellDS = true
                     this.adaFolderInfoErrorMsg = null

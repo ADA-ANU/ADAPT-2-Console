@@ -32,12 +32,92 @@ export class adapt2Store{
     @observable selectedADAFolder = undefined
     @observable dvFormSelectedServer = undefined
     @observable dvFormRef = React.createRef()
+    @observable copyMetadata = false
+    @observable sourceMetadata = null
+    @observable isMetadataLoaading = false
     // constructor() {
     //
     //     this.adapt2Ref = React.createRef();
     //
     // }
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
+    @action updateCopyMetadata(value){
+        this.copyMetadata = value
+        if (value){
+            let userid = authStore.currentUser.userID
+            this.getDSInfoByDOI(this.doi, this.doiServer, userid)
+            this.createDataset = true
+        }
+        else {
+            console.log("clearAdaFolderInfo")
+            //systemStore.resetReturnedURL()
+            systemStore.resetDVForm()
+        }
+    }
+    @action getDSInfoByDOI(doi, server, userid){
+        const data = {
+            doi: doi,
+            server: server,
+            userid: userid
+        }
+        this.isMetadataLoaading = true
+        return axios.post(API_URL.Get_DSInfoByDOI, data)
+            .then(action(res=>{
+                console.log(res)
+                systemStore.presetDVForm(res.data)
+                // this.existingShellDS = true
+                // this.adaFolderInfoErrorMsg = null
+                // //console.log(res.data)
+                // this.adaFolderInfo = res.data
+                // this.returnedURL = res.data.url
+                // adapt2Store.handleNewDatasetSwitch(false)
+                // this.presetDVForm(res.data)
+                // //console.log(res.data.adaFolderContent)
+                // this.adaFolderFileList = res.data.adaFolderContent
+                // this.detectDuplicateFiles(res.data.adaFolderContent, this.localTargetKeys)
+
+            })).catch(action(err=>{
+
+                console.log(err)
+                systemStore.resetDVForm()
+                if (err.response) {
+                    console.log(err.response)
+                    if (err.response.status ===404){
+                        console.log("404")
+                        this.adaFolderInfoErrorMsg = err.response.data.msg?err.response.data.msg:'DOI not found'
+                        adapt2Store.handleNewDatasetSwitch(true)
+
+                    }
+                    else if (err.response.status ===401){
+                        this.adaFolderInfoErrorMsg = 'No permission to view'
+                        this.handleAPIInputErrorMsg(`Sorry, you don't have permission to view the content.`)
+                        this.handleAPIInputModal(true)
+
+                    }
+                    else if (err.response.status ===402){
+                        console.log(err.response)
+                        this.adaFolderInfoErrorMsg = 'No permission to view'
+                        let serverid = err.response.data.msg
+                        this.popupInputModalByServerID(serverid)
+
+                    }
+                    else if (err.response.status ===405){
+                        this.adaFolderInfoErrorMsg = 'Server info not found'
+
+                    }
+                    else {
+                        this.adaFolderInfoErrorMsg = `Error, ${err.response.data.msg}`
+                        // authStore.networkError = true
+                        // authStore.networkErrorMessage = err.response.data
+
+                    }
+                }
+
+            })).finally(()=>{
+                setTimeout(() => {
+                    this.isMetadataLoaading = false
+                }, 1000)})
+    }
     @action setDVFormServer(value){
         this.dvFormSelectedServer = value
     }
@@ -79,12 +159,19 @@ export class adapt2Store{
         systemStore.testCheck = []
         systemStore.localCheckStatus.clear()
         systemStore.remoteCheckStatus.clear()
+        systemStore.doiValid = false
+        if(this.copyMetadata){
+            systemStore.resetDVForm()
+            this.createDataset = false
+            this.copyMetadata = false
+        }
         this.doiServer = null
         this.sourceServer = null
         this.doi = null
         this.localSwitch = false
         this.remoteSwitch = false
         this.sourceURL = undefined
+        //this.copyMetadata = false
         if(this.DSnFilesFormRef){
             this.DSnFilesFormRef.current.setFieldsValue({
                 doi: undefined,
@@ -138,6 +225,7 @@ export class adapt2Store{
         //this.DSnFilesFormRef = null
         this.selectedADAFolder = undefined
         this.dvFormSelectedServer = undefined
+        this.copyMetadata = false
     }
     @action handleSubmit(form){
         if(this.selection ===1){
@@ -243,7 +331,10 @@ export class adapt2Store{
                 dataverse: dataverseID,
                 localUploadSwitch: this.localSwitch,
                 remoteUploadSwitch: this.remoteSwitch,
-                userid: authStore.currentUser.userID
+                userid: authStore.currentUser.userID,
+                copyMetadata: this.copyMetadata,
+                sourceDOI: this.doi,
+                sourceServer: this.doiServer
             }
         }
         console.log(obj)
@@ -274,6 +365,7 @@ export class adapt2Store{
                     formData.set('sourceDOI', this.sourceURL)
                     formData.set('inputSource', this.inputSource)
                     formData.set('sourceServer', this.doiServer)
+                    formData.set('copyMetadata', this.copyMetadata)
                     formData.set('localFileList', JSON.stringify([...systemStore.localSelectedKeys.values()].flat().map(ele=>ele.filename)))
                     formData.set('remoteFileList', JSON.stringify([...systemStore.remoteSelectedKeys.values()].flat().map(ele=>ele.filename)))
 

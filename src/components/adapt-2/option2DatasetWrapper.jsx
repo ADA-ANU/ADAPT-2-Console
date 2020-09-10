@@ -91,7 +91,7 @@ export default class Option2DatasetWrapper extends Component{
                                             unCheckedChildren="No"
                                             defaultChecked={false}
                                             onChange={this.handleSwitchOnChange}
-                                            disabled={systemStore.existingShellDS}
+                                            disabled={systemStore.existingShellDS || adapt2Store.copyMetadata}
                                         />
                                     </div>
                                 </Col>

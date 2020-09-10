@@ -137,7 +137,7 @@ export default class NewDSnFiles extends Component{
         }
     }
     doiOnChange = e =>{
-        const value = e.target.value
+        let value = e.target.value
         if( value.length >0){
             this.props.adapt2Store.handleSourceURLInput(value)
             this.setState({doiExisting:true})
@@ -146,7 +146,7 @@ export default class NewDSnFiles extends Component{
             //     server: undefined
             // })
 
-
+            value = value.split(" ").join('')
             if (value.indexOf('https://')===0){
                 let server = value.split('//')[1]
                 if (server.indexOf('/')>0){
@@ -164,7 +164,7 @@ export default class NewDSnFiles extends Component{
                             console.log("new list.......")
                             //this.props.systemStore.resetFileList()
                             const userid = toJS(this.props.authStore.currentUser).userID
-                            const newURL = value.split("%3A").join(":").split("%2F").join("/")
+                            const newURL = value.split("%3A").join(":").split("%2F").join("/").split(" ").join('')
                             let doi = newURL.split('doi:')[1]
                             //this.setState({doi: doi})
                             this.props.adapt2Store.setDoi(doi)
@@ -382,6 +382,33 @@ export default class NewDSnFiles extends Component{
                                         <Tag style={{marginLeft:'1vw'}} color={systemStore.doiValid ?"#87d068":"#f50"}>{systemStore.doiValid?"Valid":systemStore.doiMessage}</Tag>
                                         <Spin spinning={systemStore.isDoiLoading} delay={20} indicator={doiLoadingIcon} />
                                         </div>: null
+                                    }
+                                    {
+                                        adapt2Store.selection ===2?
+                                            <Form.Item
+                                                label="Copy Metadata ?"
+                                                name="metadata"
+                                                hasFeedback
+                                                rules={[
+                                                    {
+                                                        required: true,
+                                                        //required: localTargetKeys.length && remoteTargetKeys.length ===0?this.state.doiExisting ===false && this.state.serverExisting ===false ||this.state.doiExisting? true: false: false,
+                                                        //message: "Please enter DOI.",
+                                                    },
+
+                                                ]}
+                                            >
+                                                <div>
+                                                    <Switch
+                                                        checked={adapt2Store.copyMetadata}
+                                                        checkedChildren="Yes"
+                                                        unCheckedChildren="No"
+                                                        defaultChecked={false}
+                                                        onChange={e=>adapt2Store.updateCopyMetadata(e)}
+                                                        disabled={!systemStore.doiValid}
+                                                    />
+                                                </div>
+                                            </Form.Item>: null
                                     }
                                 </>: null
                         }

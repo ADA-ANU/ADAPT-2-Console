@@ -271,7 +271,7 @@ export default class NewDVForm extends Component{
                     >
                         <Input
                             placeholder="Enter title ..."
-                            disabled={!createDataset}
+                            disabled={!createDataset || adapt2Store.copyMetadata}
                         />
                     </Form.Item>
                     {/*<Form.Item*/}
@@ -294,14 +294,14 @@ export default class NewDVForm extends Component{
                         name="firstName"
                         rules={[
                             {
-                                required: createDataset,
+                                required: createDataset && !adapt2Store.copyMetadata,
                                 message: "Please enter author's first name.",
                             },
                         ]}
                     >
                         <Input
                             placeholder="Enter first name ..."
-                            disabled={!createDataset}
+                            disabled={!createDataset || adapt2Store.copyMetadata}
                         />
                     </Form.Item>
                     <Form.Item
@@ -309,14 +309,14 @@ export default class NewDVForm extends Component{
                         name="lastName"
                         rules={[
                             {
-                                required: createDataset,
+                                required: createDataset && !adapt2Store.copyMetadata,
                                 message: "Please enter author's last name.",
                             },
                         ]}
                     >
                         <Input
                             placeholder="Enter last name ..."
-                            disabled={!createDataset}
+                            disabled={!createDataset || adapt2Store.copyMetadata}
                         />
                     </Form.Item>
                     <DynamicField required={createDataset} values={adapt2Store.testArray}/>
@@ -325,7 +325,7 @@ export default class NewDVForm extends Component{
                         name="email"
                         rules={[
                             {
-                                required: createDataset,
+                                required: createDataset && !adapt2Store.copyMetadata,
                                 message: "Please enter email.",
                                 type: 'email'
                             },
@@ -333,7 +333,7 @@ export default class NewDVForm extends Component{
                     >
                         <Input
                             placeholder="Enter email ..."
-                            disabled={!createDataset}
+                            disabled={!createDataset || adapt2Store.copyMetadata}
                         />
                     </Form.Item>
                     <Form.Item
@@ -341,7 +341,7 @@ export default class NewDVForm extends Component{
                         name="description"
                         rules={[
                             {
-                                required: createDataset,
+                                required: createDataset && !adapt2Store.copyMetadata,
                                 message: "Please enter description.",
                             },
                         ]}
@@ -349,7 +349,7 @@ export default class NewDVForm extends Component{
                         <TextArea
                             placeholder="Enter description ..."
                             autoSize={{ minRows: 4, maxRows: 15 }}
-                            disabled={!createDataset}
+                            disabled={!createDataset || adapt2Store.copyMetadata}
                         />
                     </Form.Item>
                     <Form.Item
@@ -357,7 +357,7 @@ export default class NewDVForm extends Component{
                         name="subject"
                         rules={[
                             {
-                                required: createDataset,
+                                required: createDataset && !adapt2Store.copyMetadata,
                                 message: "Please select subject.",
                             },
                         ]}
@@ -369,7 +369,7 @@ export default class NewDVForm extends Component{
                             mode="multiple"
                             style={{ width: '100%' }}
                             placeholder="Select one or more subjects"
-                            disabled={!createDataset}
+                            disabled={!createDataset || adapt2Store.copyMetadata}
                             //defaultValue={['china']}
                             //onChange={this.handleSubjectChange}
                             optionLabelProp="label"
