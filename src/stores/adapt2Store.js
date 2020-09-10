@@ -362,6 +362,7 @@ export class adapt2Store{
                     formData.set('newDataset', this.createDataset)
                     formData.set('dataset', JSON.stringify(obj))
                     formData.set('destinationDOI', json.msg.doi)
+                    formData.set('adaidExists', json.msg.adaidExists)
                     formData.set('sourceDOI', this.sourceURL)
                     formData.set('inputSource', this.inputSource)
                     formData.set('sourceServer', this.doiServer)
