@@ -162,6 +162,7 @@ export default class NewDSnFiles extends Component{
                         this.props.adapt2Store.setDoiServer(temp[0].alias)
                         if (value.indexOf('doi')>0){
                             console.log("new list.......")
+                            this.props.adapt2Store.updateCopyMetadata(false)
                             //this.props.systemStore.resetFileList()
                             const userid = toJS(this.props.authStore.currentUser).userID
                             const newURL = value.split("%3A").join(":").split("%2F").join("/").split(" ").join('')
@@ -367,7 +368,7 @@ export default class NewDSnFiles extends Component{
                                     {
                                         // this.state.server?
                                         sourceServer?
-                                            <div style={{marginLeft:'21%', marginBottom:'1vh'}}><Tag color="default" style={{width: '3vw',textAlign:'center'}}>Server: </Tag>
+                                            <div style={{marginLeft:'15vw', marginBottom:'1vh'}}><Tag color="default" style={{width: '3vw',textAlign:'center'}}>Server: </Tag>
                                                 <span>{sourceServer}</span>
                                                 {doiServer?<Tag style={{marginLeft:'1vw'}} color={doiServer ==="Server not found."?"#f50":"#87d068"}>{doiServer}</Tag>
                                                     :null}
@@ -376,7 +377,7 @@ export default class NewDSnFiles extends Component{
 
                                     {
                                         doi?
-                                        <div style={{marginLeft:'21%', marginBottom:'2vh'}}>
+                                        <div style={{marginLeft:'15vw', marginBottom:'2vh'}}>
                                         <Tag color="default" style={{width: '3vw',textAlign:'center'}}>DOI: </Tag>
                                         <span>{doi}</span>
                                         <Tag style={{marginLeft:'1vw'}} color={systemStore.doiValid ?"#87d068":"#f50"}>{systemStore.doiValid?"Valid":systemStore.doiMessage}</Tag>

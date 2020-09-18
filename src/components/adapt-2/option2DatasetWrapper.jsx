@@ -84,7 +84,7 @@ export default class Option2DatasetWrapper extends Component{
                                     <span style={{fontSize:'medium',fontWeight:'bold'}}>3. Create Dataset for ADAID:</span>
                                 </Col>
                                 <Col>
-                                    <div style={{paddingLeft:'1vw'}}>
+                                    <div style={{paddingLeft:'3vw'}}>
                                         <Switch
                                             checked={adapt2Store.createDataset}
                                             checkedChildren="Yes"

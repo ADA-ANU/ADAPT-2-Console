@@ -31,7 +31,7 @@ export default class FinalResult extends Component{
         //const files = systemStore.finalResultFiles
         const localFiles = systemStore.finalResultLocalFiles
         const remoteFiles = systemStore.finalResultRemoteFiles
-        const { server, dataverse, title, firstName, lastName, authorFields, email, description, subject, uploadSwitch, newDataset, datasetURL, metaData } = dataset
+        const { server, dataverse, title, firstName, lastName, authorFields, email, description, subject, uploadSwitch, newDataset, datasetURL, metaData, copyTool } = dataset
 
         const serverList = toJS(authStore.serverList)
         let data =[]
@@ -99,6 +99,21 @@ export default class FinalResult extends Component{
                                             }}
                                         >
                                             Dataset Link: <a href={datasetURL} target="_blank">Click Here</a>
+
+                                        </Text>
+                                    </Paragraph>: null
+                            }
+                            {
+                                copyTool && copyTool ===true?
+                                    <Paragraph>
+                                        <Text
+                                            strong
+                                            style={{
+                                                fontSize: 16,
+                                            }}
+                                            mark
+                                        >
+                                            Please note that the new dataset doesn't come with guestbook or restriction info of the source dataset and you might need to add them to the new dataset manually on Dataverse.
 
                                         </Text>
                                     </Paragraph>: null

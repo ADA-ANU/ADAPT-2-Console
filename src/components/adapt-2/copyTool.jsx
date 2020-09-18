@@ -131,7 +131,7 @@ export default class CopyTool extends Component{
         axios.post(API_URL.createProdDS, json, {headers: {'Content-Type': 'application/json'}})
             .then(res=>res.data)
             .then(data=>{
-                this.props.systemStore.handleFinalResultOpen({datasetURL: data.datasetURL, metaData: data.metaData}, null, null, [], data.remoteFileList, 'dvFiles')
+                this.props.systemStore.handleFinalResultOpen({datasetURL: data.datasetURL, metaData: data.metaData, copyTool: true}, null, null, [], data.remoteFileList, 'dvFiles')
                 //this.resetState()
                 this.setState({
                     isLoading: false
