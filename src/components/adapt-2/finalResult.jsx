@@ -113,7 +113,7 @@ export default class FinalResult extends Component{
                                             }}
                                             mark
                                         >
-                                            Please note that the new dataset doesn't come with guestbook or restriction info of the source dataset and you might need to add them to the new dataset manually on Dataverse.
+                                            Please note that the new dataset doesn't come with guestbook or restriction info of the source dataset and the user might need to add them to the new dataset manually on Dataverse.
 
                                         </Text>
                                     </Paragraph>: null

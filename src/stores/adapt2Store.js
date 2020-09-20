@@ -402,6 +402,9 @@ export class adapt2Store{
                                             let doi = info.data.authority ? info.data.authority + '/' + info.data.identifier : null
 
                                             form['newDataset'] = this.createDataset
+                                            if(this.copyMetadata){
+                                                form['copyTool']= true
+                                            }
                                             systemStore.handleFinalResultOpen(form, json.msg.adaid, doi, data.localFiles, data.remoteFiles)
                                             //this.finalResult_New.scrollIntoView({behavior: 'smooth'})
                                             this.adapt2Ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
