@@ -162,7 +162,9 @@ export default class NewDSnFiles extends Component{
                         this.props.adapt2Store.setDoiServer(temp[0].alias)
                         if (value.indexOf('doi')>0){
                             console.log("new list.......")
-                            this.props.adapt2Store.updateCopyMetadata(false)
+                            if(this.props.adapt2Store.selection ===2){
+                                this.props.adapt2Store.updateCopyMetadata(false)
+                            }
                             //this.props.systemStore.resetFileList()
                             const userid = toJS(this.props.authStore.currentUser).userID
                             const newURL = value.split("%3A").join(":").split("%2F").join("/").split(" ").join('')
@@ -212,6 +214,7 @@ export default class NewDSnFiles extends Component{
             this.props.adapt2Store.setSourceServer(null)
             this.props.adapt2Store.setDoi(null)
             this.props.adapt2Store.setDoiServer(null)
+            //this.props.systemStore.resetDVForm()
             //this.fileFormRef.current.resetFields()
         }
     }
@@ -262,7 +265,7 @@ export default class NewDSnFiles extends Component{
         else{
             notification.close('duplicates')
         }
-        //console.log(fileList)
+        console.log(systemStore.existingShellDS)
         console.log(systemStore.duplicateFileList)
         console.log(systemStore.adaFolderFileList)
         //console.log(toJS(systemStore.lastFileList))

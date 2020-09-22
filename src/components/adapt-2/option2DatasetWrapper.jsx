@@ -71,7 +71,7 @@ export default class Option2DatasetWrapper extends Component{
     render() {
         const { systemStore, authStore, adapt2Store, handleForm } = this.props
         const { createDataset } = adapt2Store
-
+        console.log(systemStore.existingShellDS, systemStore.returnedURL)
 
 
         return(

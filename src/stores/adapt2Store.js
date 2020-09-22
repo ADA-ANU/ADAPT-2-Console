@@ -42,6 +42,7 @@ export class adapt2Store{
     // }
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
     @action updateCopyMetadata(value){
+        console.log("updateCopyMetadata", value)
         this.copyMetadata = value
         if (value){
             let userid = authStore.currentUser.userID

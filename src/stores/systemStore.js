@@ -706,6 +706,7 @@ export class SystemStore{
 
                 }
                 else {
+                    console.log("fetch failed...........................")
                     //this.fileList = []
                     this.doiValid = false
                     if(adapt2Store.copyMetadata){
@@ -715,6 +716,7 @@ export class SystemStore{
                     return false
                 }
             })).catch(action(err=>{
+                console.log("err..................................")
                 if (err.response) {
                     //this.fileList = []
                     this.doiValid = false
@@ -839,6 +841,7 @@ export class SystemStore{
         adapt2Store.setDVFormServer(undefined)
         this.returnedURL = null
         this.adaFolderInfoErrorMsg = null
+        //this.existingShellDS = false
         adapt2Store.dvFormRef.current.setFieldsValue({
             server: undefined,
             dataverse: undefined,
