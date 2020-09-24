@@ -12,12 +12,14 @@ import authStore from "./stores/authStore";
 import routingStore from './stores/routingStore'
 import systemStore from "./stores/systemStore";
 import adapt2Store from "./stores/adapt2Store";
+import bulkPublishStore from "./stores/bulkPublishStore"
 
 const stores = {
     routingStore: routingStore,
     authStore: authStore,
     systemStore: systemStore,
-    adapt2Store: adapt2Store
+    adapt2Store: adapt2Store,
+    bulkPublishStore: bulkPublishStore
 }
 
 const hashHistory = createHashHistory();

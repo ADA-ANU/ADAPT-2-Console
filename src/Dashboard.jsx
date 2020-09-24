@@ -17,6 +17,7 @@ import Adapt2 from "./components/adapt-2/adapt2";
 import DataverseFiles from "./components/adapt-2/dataverseFiles";
 import CopyTool from "./components/adapt-2/copyTool";
 import newAdapt2 from "./components/adapt-2/newAdapt2";
+import bulkPublish from "./components/bulk-publish/bulkPublish"
 import test from './components/adapt-2/test'
 const logo = require('./static/img/ADAlogo.jpg')
 import NotFound from "./404page";
@@ -80,7 +81,7 @@ export default class Dashboard extends Component {
                                         {/*</SubMenu>*/}
                                         <Menu.Item icon={<SettingOutlined />} key="/dashboard"><Link to='/dashboard'>ADAPT2</Link></Menu.Item>
                                         <Menu.Item key="/dashboard/copy-tool"><Link to='/dashboard/copy-tool'>Copy Tool</Link></Menu.Item>
-
+                                        {/* <Menu.Item key="/dashboard/bulk-publish"><Link to='/dashboard/bulk-publish'>Bulk Publish</Link></Menu.Item> */}
 
                                     </Menu>
                                 </Col>
@@ -109,6 +110,7 @@ export default class Dashboard extends Component {
                                     {/*<Route exact path='/dashboard/adapt2-existing' component={DataverseFiles} />*/}
                                     <Route exact path='/dashboard' component={newAdapt2} />
                                     <Route exact path='/dashboard/copy-tool' component={CopyTool} />
+                                    <Route exact path='/dashboard/bulk-publish' component={bulkPublish} />
                                     {/*<Route exact path='/dashboard/adapt2-test' component={newAdapt2} />*/}
                                     {/*{*/}
                                     {/*    user.userEmail === "Mingjing.Peng@anu.edu.au" || user.userEmail === "Marina.McGale@anu.edu.au"?*/}
