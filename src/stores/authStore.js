@@ -6,7 +6,7 @@ import adapt2Store from "./adapt2Store";
 class AuthStore {
     @observable currentUser = {};
     @observable loginErrorMessage = ''
-    @observable aafLoginUrl = process.env.REACT_APP_MODE === 'dev'? 'https://rapid.test.aaf.edu.au/jwt/authnrequest/research/sr3HM5tqO9SC3suYKNF9iQ': 'https://rapid.test.aaf.edu.au/jwt/authnrequest/research/hA1-nlUYKWaacoFmaC5tag'
+    @observable aafLoginUrl = process.env.REACT_APP_MODE === 'dev'? 'https://rapid.test.aaf.edu.au/jwt/authnrequest/research/sr3HM5tqO9SC3suYKNF9iQ': 'https://rapid.aaf.edu.au/jwt/authnrequest/research/bRob0wlU5A305bPWYyP6OA'
     @observable networkError = false
     @observable networkErrorMessage = ''
     @observable siteLoading = false
