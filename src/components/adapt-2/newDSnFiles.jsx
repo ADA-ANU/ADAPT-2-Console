@@ -211,6 +211,9 @@ export default class NewDSnFiles extends Component{
                 // doi: null,
                 //server: null
             })
+            if(this.props.adapt2Store.selection ===2){
+                this.props.adapt2Store.updateCopyMetadata(false)
+            }
             this.props.adapt2Store.setSourceServer(null)
             this.props.adapt2Store.setDoi(null)
             this.props.adapt2Store.setDoiServer(null)
