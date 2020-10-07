@@ -71,7 +71,7 @@ export default class bulkPublish extends Component{
                     <Row style={{paddingTop: '2vh'}}>
                         <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
-                            <div id="select" style={{paddingTop: '4vh', paddingBottom: '2vh', paddingLeft: '5vw'}}>
+                            <div id="select" style={{paddingTop: '4vh', paddingBottom: '2vh', paddingLeft: '6vw'}}>
                                 <Radio.Group
                                     onChange={this.handleRadioChange}
                                     value={bulkPublishStore.selection}

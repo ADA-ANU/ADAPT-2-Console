@@ -13,10 +13,15 @@ export class bulkPublishStore{
 
     @observable selection = 1
     @observable isLoading = false
+    @observable selectedServer = undefined
     
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
     @action SelectionOnChange(value){
         this.selection = value
+    }
+
+    @action serverOnChange(value){
+        this.selectedServer = value
     }
     openNotificationWithIcon = (type,fileName,error) => {
         if (type === 'success'){

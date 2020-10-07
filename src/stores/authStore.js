@@ -1,6 +1,7 @@
 import { observable, action, computed, reaction, createTransformer, toJS } from 'mobx';
 import API_URL from '../config'
 import adapt2Store from "./adapt2Store";
+import bulkPublishStore from "./bulkPublishStore"
 
 
 class AuthStore {
@@ -19,6 +20,7 @@ class AuthStore {
     @observable ctDVList = {}
     @observable ctSelectedServer = null
     @observable newDVList = {}
+    @observable bulkDVList = {}
     //@observable isLoading = false;
     //@observable errors = undefined;
     //@observable ws = undefined;
@@ -120,7 +122,7 @@ class AuthStore {
 
                 this.networkError = false
                 this.newDVList = json.msg
-                //this.initCTDVList = json.prod
+                this.bulkDVList = json.msg
                 this.ctDVList = json.msg
             }))
             .catch(err => {
@@ -149,6 +151,28 @@ class AuthStore {
                 console.log(json)
                 let data = this.newDVList[adapt2Store.dvFormSelectedServer].dataverses.concat(json)
                 this.newDVList[adapt2Store.dvFormSelectedServer].dataverses = data
+                return true
+            }))
+            .catch(err => {
+                this.networkError = true
+                this.networkErrorMessage = err
+            })
+    }
+
+    @action getSubDataversesForBulk(dvID){
+        return fetch(API_URL.getSubDVs + dvID + `/${bulkPublishStore.selectedServer}`)
+            .then(action( res=>{
+                if (res.status === 201){
+                    return res.json()
+                }
+                // else {
+                //     throw new Error('Unable to download dataverse list, please refresh the page to try again.')
+                // }
+            }))
+            .then(action(json=>{
+                console.log(json)
+                let data = this.bulkDVList[bulkPublishStore.selectedServer].dataverses.concat(json)
+                this.bulkDVList[bulkPublishStore.selectedServer].dataverses = data
                 return true
             }))
             .catch(err => {

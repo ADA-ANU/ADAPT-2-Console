@@ -5,7 +5,7 @@ import { Switch, Route, withRouter, Link } from 'react-router-dom';
 import './App.css';
 import 'antd/es/spin/style/css';
 import { Layout, Menu, Spin, Typography, Button, Tooltip, Alert, Row, Col, Badge, Dropdown } from 'antd';
-import { UserOutlined, SettingOutlined } from '@ant-design/icons';
+import { UserOutlined, SettingOutlined, CopyOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import ADAlogo from '../src/static/img/ADAlogo.jpg';
 import ANUlogo from '../src/static/img/ANUlogo.png';
 import Vertical_line from './static/img/vertical-line.js'
@@ -80,8 +80,8 @@ export default class Dashboard extends Component {
                                         {/*    /!*<Menu.Item key='/dashboard/users'><Link to='/dashboard/users'>User Management</Link></Menu.Item>*!/*/}
                                         {/*</SubMenu>*/}
                                         <Menu.Item icon={<SettingOutlined />} key="/dashboard"><Link to='/dashboard'>ADAPT2</Link></Menu.Item>
-                                        <Menu.Item key="/dashboard/copy-tool"><Link to='/dashboard/copy-tool'>Copy Tool</Link></Menu.Item>
-                                        {/* <Menu.Item key="/dashboard/bulk-publish"><Link to='/dashboard/bulk-publish'>Bulk Publish</Link></Menu.Item> */}
+                                        <Menu.Item icon={<CopyOutlined />} key="/dashboard/copy-tool"><Link to='/dashboard/copy-tool'>Copy Tool</Link></Menu.Item>
+                                        <Menu.Item icon={<CloudUploadOutlined />} key="/dashboard/bulk-publish"><Link to='/dashboard/bulk-publish'>Bulk Publish</Link></Menu.Item>
 
                                     </Menu>
                                 </Col>
