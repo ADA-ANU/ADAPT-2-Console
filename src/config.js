@@ -28,7 +28,8 @@ const API_URL = {
     createProdDS: ROOT + 'api/createProdDS',
     Option2Submission: ROOT + 'api/adapt2Option2Submission',
     Option3Submission: ROOT + 'api/adapt2Option3Submission',
-    Get_DSInfoByDOI: ROOT + 'api/getMetadataByDOI'
+    Get_DSInfoByDOI: ROOT + 'api/getMetadataByDOI',
+    getSubDSs: ROOT + 'api/getSubDSs'
 }
 
 // const PROD_API_URL = {

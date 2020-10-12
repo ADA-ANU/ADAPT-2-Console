@@ -22,9 +22,11 @@ import {
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons';
 import axios from 'axios'
 import { toJS } from 'mobx'
+import APIInput from "../adapt-2/apiInput";
 const { Dragger } = Upload;
 const { Panel } = Collapse;
 const { Link } = Anchor;
+
 
 @inject('routingStore', 'systemStore', 'authStore', 'bulkPublishStore')
 @observer
@@ -56,8 +58,9 @@ export default class BulkOption1 extends Component{
         // const dvName = value[0]
         const dvID = value
         const dvName = label
+        this.props.bulkPublishStore.dvOnChange(dvID)
         this.props.systemStore.checkDVPermission(serverValue, dvID, dvName, 'ADD_DS', true)
-        
+        this.props.bulkPublishStore.getSubDSs(serverValue, dvID)
     }
 
     onLoadData = treeNode =>{
@@ -76,9 +79,71 @@ export default class BulkOption1 extends Component{
     render() {
         const { systemStore, authStore, bulkPublishStore } = this.props
         const { selectedServer } = this.state
+        console.log([...bulkPublishStore.publishType.keys()])
         const serverList = authStore.serverList
         const treeData = Object.keys(authStore.bulkDVList).length>0 && bulkPublishStore.selectedServer?authStore.bulkDVList[bulkPublishStore.selectedServer].dataverses: []
+        const columns = [
+            {
+                title: 'Publish',
+                render: (text, row, index) => {
+                    return (
+                        <Select
+                            allowClear
+                            value={bulkPublishStore.publishType.get(row.id)}
+                            style={{ width: 120 }}
+                            onChange={(value)=>bulkPublishStore.handlePublishType(row.id, value)}
+                            placeholder="Select type"
+                        >
+                            <Select.Option value="major">Major</Select.Option>
+                            <Select.Option value="minor">Minor</Select.Option>
+                        </Select>
+                    )
+                  },
+            },
+            {
+                title: 'Dataset Title',
+                dataIndex: 'title',
+            },
+            {
+                title: 'Latest Version',
+                dataIndex: 'version',
+            },
         
+            {
+                title: 'DOI',
+                dataIndex: 'doi',
+            }
+        ];
+        const rowSelection = {
+            selectedRowKeys: [...bulkPublishStore.publishType.keys()],
+            // onChange: (selectedRowKeys, selectedRows) => {
+            //     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+            //     //this.setState({ selectedRowKeys });
+            //     //systemStore.copyToolFileListOnChange(selectedRowKeys, selectedRows)
+            //     bulkPublishStore.handleClick(selectedRowKeys, selectedRows)
+            // },
+            onSelect: (record, selected) =>{
+                console.log(record, selected)
+                bulkPublishStore.handleClick(record, selected)
+            },
+            selections: [
+                
+                {
+                    key: 'allMajor',
+                    text: 'All Major',
+                    onSelect: changableRowKeys => {
+                        // let newSelectedRowKeys = [];
+                        // newSelectedRowKeys = changableRowKeys.filter((key, index) => {
+                        //     if (index % 2 !== 0) {
+                        //         return false;
+                        //     }
+                        //     return true;
+                        // });
+                        // this.setState({ selectedRowKeys: newSelectedRowKeys });
+                    },
+                }
+            ]
+        };
         return(
             <div style={{background: 'white', paddingTop:'3vh', paddingBottom:'2vh'}}>
                 <div style={{ margin: 'auto'}}>
@@ -159,13 +224,33 @@ export default class BulkOption1 extends Component{
                                         >
                                         </TreeSelect>
                                     </Form.Item>
+                                    <Row style={{marginTop:'6vh', marginBottom:'2vh'}}>
+                                        <Col style={{ width: '90%', margin: 'auto'}} >
+                                            <div id="fileList" style={{textAlign: 'center', paddingTop:'2vh', paddingBottom:'2vh'}}>
+                                                <span>Unpublished datasets: </span>
+                                                
+                                            </div>
+
+                                            <Table
+                                                rowSelection={{
+                                                    type: 'checkbox',
+                                                    ...rowSelection,
+                                                }}
+                                                columns={columns}
+                                                dataSource={bulkPublishStore.subDSs}
+                                                loading={bulkPublishStore.isLoading}
+                                                rowKey={'id'}
+                                            />
+
+                                        </Col>
+                                    </Row>
                                 </Form>
                             </div>
 
                         </Col>
                     </Row>
                 </div>
-
+                <APIInput />
             </div>
         )
     }
