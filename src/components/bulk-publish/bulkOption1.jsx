@@ -68,7 +68,7 @@ export default class BulkOption1 extends Component{
         // const dvName = value[0]
         const dvID = value
         const dvName = label
-        this.props.bulkPublishStore.dvOnChange(dvID)
+        this.props.bulkPublishStore.dvOnChange(dvID, label)
         this.props.systemStore.checkDVPermission(serverValue, dvID, dvName, 'ADD_DS', true)
         this.props.bulkPublishStore.getSubDSs(serverValue, dvID)
     }
@@ -145,6 +145,17 @@ export default class BulkOption1 extends Component{
                 console.log(record, selected)
                 bulkPublishStore.handleClick(record, selected)
             },
+            onSelectAll: (selected, selectedRows, changeRows) => {
+                if (selected) {
+                    for(let row of selectedRows){
+                        if(!bulkPublishStore.publishType.has(row.id)){  
+                            bulkPublishStore.publishType.set(row.id, "major")
+                        }
+                    }
+                } else {
+                    bulkPublishStore.publishType.clear()
+                }
+              },
             selections: [
                 {
                     key: 'allMajor',

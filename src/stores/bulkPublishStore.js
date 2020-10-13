@@ -15,6 +15,7 @@ export class bulkPublishStore{
     @observable isLoading = false
     @observable selectedServer = undefined
     @observable selectedDVID = undefined
+    @observable selectedDVName = undefined
     //@observable subDSs = new Map()
     @observable publishType = new Map()
     @observable subDSMap = new Map()
@@ -35,8 +36,9 @@ export class bulkPublishStore{
         this.reset()
     }
 
-    @action dvOnChange(value){
+    @action dvOnChange(value, label){
         this.selectedDVID = value
+        this.selectedDVName = label
         this.reset()
     }
 
@@ -123,7 +125,8 @@ export class bulkPublishStore{
         const data = {
             userID: authStore.currentUser.userID,
             server: this.selectedServer,
-            publishArray: this.publishType
+            publishArray: this.publishType,
+            dvName: this.selectedDVName
         }
         const jsonData = JSON.stringify(data);
         axios.post(API_URL.publishOption1, jsonData, {
