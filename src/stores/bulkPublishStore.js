@@ -15,22 +15,37 @@ export class bulkPublishStore{
     @observable isLoading = false
     @observable selectedServer = undefined
     @observable selectedDVID = undefined
-    @observable subDSs = []
+    //@observable subDSs = new Map()
     @observable publishType = new Map()
+    @observable subDSMap = new Map()
     
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
+    @action reset(){
+        //this.subDSs = []
+        this.publishType = new Map()
+        this.subDSMap = new Map()
+    }
     @action SelectionOnChange(value){
         this.selection = value
+        this.reset()
     }
 
     @action serverOnChange(value){
         this.selectedServer = value
+        this.reset()
     }
 
     @action dvOnChange(value){
         this.selectedDVID = value
+        this.reset()
     }
 
+    submitCheck(){
+        if (this.selection ===1){
+            if(!this.selectedServer || !this.selectedDVID || [...this.publishType.keys()].length===0) return true
+            else return false
+        }
+    }
     @action getSubDSs(server, dvID){
         this.isLoading = true
         const data = {
@@ -46,7 +61,11 @@ export class bulkPublishStore{
             }
         ).then(action(res=>{
             console.log(res.data)
-            this.subDSs = res.data
+            
+            for(let ds of res.data){
+                this.subDSMap.set(ds.id, {id: ds.id, title: ds.title, doi: ds.doi, version: ds.version})
+            }
+            //this.subDSs = res.data
             //systemStore.handleFinalResultOpen({}, res.data.msg.adaid)
             //this.adapt2Ref.scrollIntoView({behavior:'smooth'})
             //this.scrollToMyRef()
@@ -72,9 +91,9 @@ export class bulkPublishStore{
         console.log(dsID, type)
         //this.publishType.set(dsID, type)
         if(type){
-            // if(this.publishType.has(dsID)){
-            //     this.publishType.delete(dsID)
-            // }
+            if(this.publishType.has(dsID)){
+                this.publishType.delete(dsID)
+            }
             this.publishType.set(dsID, type)
         }
         else{
@@ -84,14 +103,58 @@ export class bulkPublishStore{
 
     @action handleClick(record, selected){
         if(selected){
-            // if(this.publishType.has(record.id)){
-            //     this.publishType.delete(record.id)
-            // }
+            if(this.publishType.has(record.id)){
+                this.publishType.delete(record.id)
+            }
             this.publishType.set(record.id, "major")
         }
         else {
             this.publishType.delete(record.id)
         }
+    }
+
+    @action handleSubmit(){
+        if(this.selection ===1){
+            this.handleSubmit_Option1()
+        }
+    }
+    @action handleSubmit_Option1(){
+        this.isLoading = true
+        const data = {
+            userID: authStore.currentUser.userID,
+            server: this.selectedServer,
+            publishArray: this.publishType
+        }
+        const jsonData = JSON.stringify(data);
+        axios.post(API_URL.publishOption1, jsonData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then(action(res=>{
+            console.log(res.data)
+            for(let ds of res.data){
+                console.log(ds)
+                if(ds.id){
+                    let dataset = this.subDSMap.get(parseInt(ds.id))
+                    console.log(dataset)
+                    dataset['result'] = ds.status
+                    this.subDSMap.set(parseInt(ds.id), dataset)
+                }
+            }
+        })).catch(err=>{
+            if (err.response) {
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+                this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
+            }
+            else {
+                this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
+            }
+        }).finally(action(()=>{
+            this.isLoading = false
+        }))
     }
     openNotificationWithIcon = (type,fileName,error) => {
         if (type === 'success'){

@@ -64,6 +64,13 @@ export default class bulkPublish extends Component{
             lineHeight: '30px',
         };
         console.log(bulkPublishStore.selection)
+        const formID = ()=>{
+            if(bulkPublishStore.selection ===1) return "bulkPublish_1"
+            else if(bulkPublishStore.selection ===2) return "bulkPublish_2"
+            else if(bulkPublishStore.selection ===3) return "bulkPublish_3"
+            else return undefined
+        }
+        
         return(
             <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}}>
                 <div style={{ margin: 'auto'}}>
@@ -115,21 +122,21 @@ export default class bulkPublish extends Component{
 
                             <div style={{paddingTop: '5vh', paddingBottom: '3%', textAlign:'center'}}>
                                 <Button
-                                    form="datasetCreation"
+                                    form={formID()}
                                     key="submit"
                                     htmlType="submit"
                                     type="primary"
                                     //onClick={adapt2Store.selection ===1?()=>adapt2Store.handleSubmit(): null}
-                                    //loading={adapt2Store.isLoading}
-                                    //disabled={}
+                                    loading={bulkPublishStore.isLoading}
+                                    disabled={bulkPublishStore.submitCheck()}
                                 >
-                                    {bulkPublish.isLoading ? 'Uploading' : 'Publish'}
+                                    {bulkPublishStore.isLoading ? 'Publishing' : 'Publish'}
                                 </Button>
                             </div>
                         </Col>
                     </Row>
                     {/*ref => {adapt2Store.adapt2Ref = ref}*/}
-                    <div id="finalResult" >
+                    {/* <div id="finalResult" >
                         {
                             systemStore.showfinalResult?(
 
@@ -141,7 +148,7 @@ export default class bulkPublish extends Component{
 
                             ):null
                         }
-                    </div>
+                    </div> */}
                 </div>
 
             </div>
