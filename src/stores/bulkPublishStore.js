@@ -122,12 +122,21 @@ export class bulkPublishStore{
     }
     @action handleSubmit_Option1(){
         this.isLoading = true
+        let newPublish = new Map(this.publishType)
+        for (const [key, value] of newPublish.entries()){
+            const data = this.subDSMap.get(key)
+            const newValue = {type: value, doi: data.doi, version: data.version, title: data.title}
+            newPublish.set(key, newValue)
+        }
+        // console.log(newPublish)
+        // console.log(this.publishType)
         const data = {
             userID: authStore.currentUser.userID,
             server: this.selectedServer,
-            publishArray: this.publishType,
+            publishArray: Object.fromEntries(newPublish.entries()),
             dvName: this.selectedDVName
         }
+        console.log(data.publishArray)
         const jsonData = JSON.stringify(data);
         axios.post(API_URL.publishOption1, jsonData, {
                 headers: {
@@ -136,7 +145,7 @@ export class bulkPublishStore{
             }
         ).then(action(res=>{
             console.log(res.data)
-            for(let ds of res.data){
+            for(let ds of res.data.data){
                 console.log(ds)
                 if(ds.id){
                     let dataset = this.subDSMap.get(parseInt(ds.id))

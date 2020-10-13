@@ -91,7 +91,7 @@ export default class BulkOption1 extends Component{
     render() {
         const { systemStore, authStore, bulkPublishStore } = this.props
         const { selectedServer } = this.state
-        //console.log(bulkPublishStore.publishType)
+        console.log(bulkPublishStore.subDSMap.get(2474)?bulkPublishStore.subDSMap.get(2474).result: null)
         const serverList = authStore.serverList
         const treeData = Object.keys(authStore.bulkDVList).length>0 && bulkPublishStore.selectedServer?authStore.bulkDVList[bulkPublishStore.selectedServer].dataverses: []
         const columns = [
