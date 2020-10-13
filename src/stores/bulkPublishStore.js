@@ -136,7 +136,7 @@ export class bulkPublishStore{
             publishArray: Object.fromEntries(newPublish.entries()),
             dvName: this.selectedDVName
         }
-        console.log(data.publishArray)
+        //console.log(data.publishArray)
         const jsonData = JSON.stringify(data);
         axios.post(API_URL.publishOption1, jsonData, {
                 headers: {
