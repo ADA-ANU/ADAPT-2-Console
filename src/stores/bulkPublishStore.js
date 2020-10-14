@@ -19,6 +19,9 @@ export class bulkPublishStore{
     //@observable subDSs = new Map()
     @observable publishType = new Map()
     @observable subDSMap = new Map()
+    @observable selectedServerO2 = undefined
+    @observable textMajor = []
+    @observable textMinor = []
     
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
     @action reset(){
@@ -34,6 +37,19 @@ export class bulkPublishStore{
     @action serverOnChange(value){
         this.selectedServer = value
         this.reset()
+    }
+
+    @action serverOnChangeO2(value){
+        this.selectedServerO2 = value
+        this.resetO2()
+    }
+
+    @action textOnChangeO2(value, type){
+        if(type ==='major') this.textMajor = value
+        else this.textMinor = value
+    }
+    @action resetO2(){
+
     }
 
     @action dvOnChange(value, label){

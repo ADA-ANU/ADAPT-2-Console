@@ -22,6 +22,8 @@ import { UploadOutlined, InboxOutlined, InfoCircleOutlined } from '@ant-design/i
 import axios from 'axios'
 import { toJS } from 'mobx'
 import BulkOption1 from "./bulkOption1"
+import BulkOption2 from "./bulkOption2"
+import BulkOption3 from "./bulkOption3"
 const { Dragger } = Upload;
 const { Panel } = Collapse;
 const { Link } = Anchor;
@@ -109,11 +111,11 @@ export default class bulkPublish extends Component{
                         bulkPublishStore.selection ===1?
                             <BulkOption1 />: null
                     }
-                    {/* {
+                    {
                         bulkPublishStore.selection ===2?
                             <BulkOption2 />: null
                     }
-                    {
+                    {/* {
                         bulkPublishStore.selection ===3?
                             <BulkOption3 />: null
                     } */}
