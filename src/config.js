@@ -30,7 +30,8 @@ const API_URL = {
     Option3Submission: ROOT + 'api/adapt2Option3Submission',
     Get_DSInfoByDOI: ROOT + 'api/getMetadataByDOI',
     getSubDSs: ROOT + 'api/getSubDSs',
-    publishOption1: ROOT + 'api/publishOption1'
+    publishOption1: ROOT + 'api/publishOption1',
+    publishOption2: ROOT + 'api/publishOption2'
 }
 
 // const PROD_API_URL = {

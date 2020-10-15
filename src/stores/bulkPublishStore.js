@@ -22,6 +22,7 @@ export class bulkPublishStore{
     @observable selectedServerO2 = undefined
     @observable textMajor = []
     @observable textMinor = []
+    @observable publishingDOIs = new Map()
     
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
     @action reset(){
@@ -44,9 +45,38 @@ export class bulkPublishStore{
         this.resetO2()
     }
 
-    @action textOnChangeO2(value, type){
-        if(type ==='major') this.textMajor = value
-        else this.textMinor = value
+    @action textOnChangeO2(array, type){
+        
+        const format = array.replace(/(?:(?!\n)\s)/g, '').split(/\r?\n/)
+        if(format[0] === ''){
+            this.publishingDOIs.delete(type)
+        }
+        else{
+            let dois = []
+            for (let doi of format){
+                if(this.hasDuplicates(dois.map(ele=>ele.doi), doi, type)){
+                    console.log("duplicate found: ", doi)
+                    this.openNotificationWithIcon('duplicate', 'files', `Duplicate found: ${doi}.`)
+                }
+                else dois.push({doi: doi, type: type})
+            }
+            this.publishingDOIs.set(type, dois)
+        }
+    }
+    hasDuplicates(array, ele, type) {
+        if(array.filter(item => item == ele).length >0) return true
+        else{
+            if(type ==='major'){
+                //console.log(this.publishingDOIs.get('minor') && this.publishingDOIs.get('minor'))
+                if(this.publishingDOIs.get('minor') && this.publishingDOIs.get('minor').filter(item => item.doi == ele).length >0) return true
+                else return false
+            }
+            else{
+                //console.log(this.publishingDOIs.get('major') && this.publishingDOIs.get('major'))
+                if(this.publishingDOIs.get('major') && this.publishingDOIs.get('major').filter(item => item.doi == ele).length >0) return true
+                else return false
+            }
+        }
     }
     @action resetO2(){
 
@@ -135,6 +165,9 @@ export class bulkPublishStore{
         if(this.selection ===1){
             this.handleSubmit_Option1()
         }
+        else if(this.selection ===2){
+            this.handleSubmit_Option2()
+        }
     }
     @action handleSubmit_Option1(){
         this.isLoading = true
@@ -184,6 +217,50 @@ export class bulkPublishStore{
             this.isLoading = false
         }))
     }
+
+    @action handleSubmit_Option2(){
+        this.isLoading = true
+        const data = {
+            userID: authStore.currentUser.userID,
+            server: this.selectedServerO2,
+            publishArray: Object.fromEntries(this.publishingDOIs.entries()),
+            // majorArray: this.textMajor,
+            // minorArray: this.textMinor
+        }
+        //console.log(data.publishArray)
+        const jsonData = JSON.stringify(data);
+        axios.post(API_URL.publishOption2, jsonData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then(action(res=>{
+            console.log(res.data)
+            for(let data of res.data.data){
+                console.log(data)
+                if(data.doi){
+                    let dois = this.publishingDOIs.get(data.type)
+                    dois.find(ele=>ele.doi === data.doi)['result'] = data.status
+                    console.log(dois)
+                    this.publishingDOIs.set(data.type, dois)
+                    console.log(this.publishingDOIs.get(data.type))
+                }
+            }
+        })).catch(err=>{
+            if (err.response) {
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+                this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
+            }
+            else {
+                this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
+            }
+        }).finally(action(()=>{
+            this.isLoading = false
+        }))
+    }
+
     openNotificationWithIcon = (type,fileName,error) => {
         if (type === 'success'){
             notification[type]({
@@ -192,9 +269,17 @@ export class bulkPublishStore{
                     `You have successfully uploaded file ${fileName}`,
             });
         }
-        else {
+        else if(type === 'error'){
             notification[type]({
                 message: 'Submission Failed',
+                description:
+                    `${error}`,
+                duration: 0,
+            });
+        }
+        else {
+            notification['error']({
+                message: 'Warning',
                 description:
                     `${error}`,
                 duration: 0,

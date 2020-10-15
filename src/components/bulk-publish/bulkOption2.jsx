@@ -39,6 +39,8 @@ const OkSvg = () => (
     </svg>
   );
 //const OKIcon = props => <Icon component={okSvg} {...props} />;
+
+
 @inject('routingStore', 'systemStore', 'authStore', 'bulkPublishStore')
 @observer
 export default class BulkOption2 extends Component{
@@ -63,21 +65,39 @@ export default class BulkOption2 extends Component{
     onFinish=()=>{
         this.props.bulkPublishStore.handleSubmit()
     }
-    textMajorOnchange=(e)=>{
-        console.log(e.target.value.split(/\r?\n/))
-        const array = e.target.value.split(/\r?\n/)
-        this.props.bulkPublishStore.textOnChangeO2(array, 'major')
+    textOnchange=(e, type)=>{
+        console.log(e.target.value)
+        
+        this.props.bulkPublishStore.textOnChangeO2(e.target.value, type)
     }
-    textMinorOnchange=(e)=>{
-        console.log(e.target.value.split(/\r?\n/))
-        const array = e.target.value.split(/\r?\n/)
-        this.props.bulkPublishStore.textOnChangeO2(array, 'minor')
-    }
+    
     render() {
         const { systemStore, authStore, bulkPublishStore } = this.props
-        
         const serverList = authStore.serverList
-        
+        const columns = [
+            {
+                title: 'Dataset DOI',
+                dataIndex: 'doi',
+            },
+            {
+                title: 'Publish Type',
+                dataIndex: 'type',
+                render: (text, row, index) =>{
+                    return text.toUpperCase();
+                }
+            },
+            {
+                title: 'Published S/F?',
+                dataIndex: 'result',
+                // render: (text, row, index) => {
+                //     return (
+                //         //bulkPublishStore.publishingDOIs.get(row.).result?bulkPublishStore.subDSMap.get(row.id).result==="OK"?<OkSvg />: bulkPublishStore.subDSMap.get(row.id).result:"Not yet published"
+
+                //     )
+                //   },
+            }
+        ];
+        console.log([...bulkPublishStore.publishingDOIs.values()].flat())
         
         return(
             <div style={{background: 'white', paddingTop:'3vh', paddingBottom:'2vh'}}>
@@ -85,7 +105,6 @@ export default class BulkOption2 extends Component{
                     
                     <Row>
                         <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
-
                             <div style={{paddingTop: '3vh', paddingBottom: '2vh'}}>
                                 <Form
                                     id="bulkPublish_2"
@@ -135,8 +154,9 @@ export default class BulkOption2 extends Component{
                                         <Col span={24} style={{paddingTop: '3vh'}}>
                                             <TextArea 
                                                 rows={8}
+                                                //value={bulkPublishStore.textMajor}
                                                 placeholder="E.g. doi:10.4225/87/O4AIPZ"
-                                                onChange={this.textMajorOnchange}
+                                                onChange={e=>this.textOnchange(e, 'major')}
                                             />
                                         </Col>
                                     </Row>
@@ -149,11 +169,20 @@ export default class BulkOption2 extends Component{
                                         <Col span={24} style={{paddingTop: '3vh'}}>
                                             <TextArea 
                                                 rows={8}
+                                                //value={bulkPublishStore.textMinor}
                                                 placeholder="E.g. doi:10.4225/87/O4AIPZ"
-                                                onChange={this.textMinorOnchange}
+                                                onChange={e=>this.textOnchange(e, 'minor')}
                                             />
                                         </Col>
                                     </Row>
+                                </Col>
+                                <Col span={16} offset={4} style={{paddingTop: '5vh'}}>
+                                    <Table
+                                        columns={columns}
+                                        dataSource={[...bulkPublishStore.publishingDOIs.values()].flat()}
+                                        loading={bulkPublishStore.isLoading}
+                                        rowKey={'doi'}
+                                    />
                                 </Col>
                             </Row>
                         </Col>
