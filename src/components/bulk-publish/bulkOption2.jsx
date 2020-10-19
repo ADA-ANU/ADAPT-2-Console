@@ -78,10 +78,13 @@ export default class BulkOption2 extends Component{
             {
                 title: 'Dataset DOI',
                 dataIndex: 'doi',
+                width: '30%',
+                ellipsis: true,
             },
             {
                 title: 'Publish Type',
                 dataIndex: 'type',
+                width: '14%',
                 render: (text, row, index) =>{
                     return text.toUpperCase();
                 }
@@ -89,6 +92,11 @@ export default class BulkOption2 extends Component{
             {
                 title: 'Published S/F?',
                 dataIndex: 'result',
+                render: (text, row, index) => {
+                    return (
+                        text?text==="OK"?<OkSvg />:text:"Not yet published"
+                    )
+                }
                 // render: (text, row, index) => {
                 //     return (
                 //         //bulkPublishStore.publishingDOIs.get(row.).result?bulkPublishStore.subDSMap.get(row.id).result==="OK"?<OkSvg />: bulkPublishStore.subDSMap.get(row.id).result:"Not yet published"
@@ -105,7 +113,7 @@ export default class BulkOption2 extends Component{
                     
                     <Row>
                         <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
-                            <div style={{paddingTop: '3vh', paddingBottom: '2vh'}}>
+                            <div style={{paddingTop: '5vh', paddingBottom: '2vh'}}>
                                 <Form
                                     id="bulkPublish_2"
                                     ref={this.bulkRef2}
@@ -176,14 +184,18 @@ export default class BulkOption2 extends Component{
                                         </Col>
                                     </Row>
                                 </Col>
-                                <Col span={16} offset={4} style={{paddingTop: '5vh'}}>
-                                    <Table
-                                        columns={columns}
-                                        dataSource={[...bulkPublishStore.publishingDOIs.values()].flat()}
-                                        loading={bulkPublishStore.isLoading}
-                                        rowKey={'doi'}
-                                    />
-                                </Col>
+                                {
+                                    [...bulkPublishStore.publishingDOIs.values()].flat().length>0?
+                                        <Col span={18} offset={3} style={{paddingTop: '5vh'}}>
+                                            <Table
+                                                columns={columns}
+                                                dataSource={[...bulkPublishStore.publishingDOIs.values()].flat()}
+                                                loading={bulkPublishStore.isLoading}
+                                                rowKey={'doi'}
+                                            />
+                                        </Col>: null
+                                }
+                                
                             </Row>
                         </Col>
                     </Row>

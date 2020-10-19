@@ -129,13 +129,20 @@ export default class BulkOption1 extends Component{
             },
             {
                 title: 'Published S/F?',
+                dataIndex: 'result',
                 render: (text, row, index) => {
                     return (
-                        
-                        bulkPublishStore.subDSMap.get(row.id).result?bulkPublishStore.subDSMap.get(row.id).result==="OK"?<OkSvg />: bulkPublishStore.subDSMap.get(row.id).result:"Not yet published"
-                        
+                        text?text==="OK"?<OkSvg />:text:"Not yet published"
                     )
-                  },
+                }
+                // render: (text, row, index) => {
+                //     console.log(text)
+                //     return (
+                        
+                //         bulkPublishStore.subDSMap.get(row.id).result?bulkPublishStore.subDSMap.get(row.id).result==="OK"?<OkSvg />: bulkPublishStore.subDSMap.get(row.id).result:"Not yet published"
+                        
+                //     )
+                //   },
             }
         ];
         const rowSelection = {

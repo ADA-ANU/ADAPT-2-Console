@@ -23,6 +23,8 @@ export class bulkPublishStore{
     @observable textMajor = []
     @observable textMinor = []
     @observable publishingDOIs = new Map()
+    @observable publishingDOIsO3 = new Map()
+    @observable doisO3 = []
     
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
     @action reset(){
@@ -48,7 +50,8 @@ export class bulkPublishStore{
     @action textOnChangeO2(array, type){
         
         const format = array.replace(/(?:(?!\n)\s)/g, '').split(/\r?\n/)
-        if(format[0] === ''){
+        console.log(format)
+        if(format.length ===1 && format[0] === ''){
             this.publishingDOIs.delete(type)
         }
         else{
@@ -58,9 +61,57 @@ export class bulkPublishStore{
                     console.log("duplicate found: ", doi)
                     this.openNotificationWithIcon('duplicate', 'files', `Duplicate found: ${doi}.`)
                 }
-                else dois.push({doi: doi, type: type})
+                else {
+                    dois.push({doi: doi, type: type})
+                }
             }
             this.publishingDOIs.set(type, dois)
+        }
+    }
+
+    @action textOnChangeO3(array, type){
+        
+        const format = array.replace(/(?:(?!\n)\s)/g, '').split(/\r?\n/)
+        console.log(format)
+        if(format.length ===1 && format[0] === ''){
+            this.publishingDOIsO3.delete(type)
+        }
+        else{
+            let dois = []
+            for (let link of format){
+                const url = link.split("%3A").join(":").split("%2F").join("/").replace('&version=DRAFT', "")
+                let server = undefined
+                let doi = undefined
+                console.log(url)
+                if(url.includes("https://")){
+                    let serverTemp = url.split("https://")[1]
+                    let doiTemp = url.split("https://")[1]
+                    if(serverTemp.includes('/dataset.xhtml?')){
+                        serverTemp = serverTemp.split('/dataset.xhtml?')[0]
+                        doiTemp = doiTemp.split('/dataset.xhtml?')[1]
+                        //console.log(server, doi)
+                        if(serverTemp.includes('.')){
+                            server = serverTemp.split('.')[0]
+                            //server = authStore.serverList.filter(serv=>serv.url ===ser)
+                        }
+                        if(doiTemp.includes('doi:')){
+                            doi = `doi:${doiTemp.split('doi:')[1]}`
+                        }
+                    }
+                    console.log(server, doi)
+                    if(server && doi){
+                        if(this.option3HasDuplicates(dois, doi, type)){
+                            console.log("duplicate found: ", doi)
+                            this.openNotificationWithIcon('duplicate', 'files', `Duplicate found: ${doi}.`)
+                        }
+                        else {
+                            dois.push({type: type, server: server, doi: doi})
+                            this.publishingDOIsO3.set(type, dois)
+                        }
+                    }
+                }
+            }
+            // this.publishingDOIsO3.set(type, dois)
         }
     }
     hasDuplicates(array, ele, type) {
@@ -74,6 +125,23 @@ export class bulkPublishStore{
             else{
                 //console.log(this.publishingDOIs.get('major') && this.publishingDOIs.get('major'))
                 if(this.publishingDOIs.get('major') && this.publishingDOIs.get('major').filter(item => item.doi == ele).length >0) return true
+                else return false
+            }
+        }
+    }
+    option3HasDuplicates(array, doi, type){
+        //return this.publishingDOIsO3.has(doi)
+        // return dois.includes(doi)
+        if(array.filter(item => item.doi == doi).length >0) return true
+        else{
+            if(type ==='major'){
+                //console.log(this.publishingDOIs.get('minor') && this.publishingDOIs.get('minor'))
+                if(this.publishingDOIsO3.get('minor') && this.publishingDOIsO3.get('minor').filter(item => item.doi == doi).length >0) return true
+                else return false
+            }
+            else{
+                //console.log(this.publishingDOIs.get('major') && this.publishingDOIs.get('major'))
+                if(this.publishingDOIsO3.get('major') && this.publishingDOIsO3.get('major').filter(item => item.doi == doi).length >0) return true
                 else return false
             }
         }
@@ -168,6 +236,10 @@ export class bulkPublishStore{
         else if(this.selection ===2){
             this.handleSubmit_Option2()
         }
+        else if(this.selection ===3){
+            this.handleSubmit_Option3()
+        }
+        else return
     }
     @action handleSubmit_Option1(){
         this.isLoading = true
@@ -261,6 +333,44 @@ export class bulkPublishStore{
         }))
     }
 
+    @action handleSubmit_Option3(){
+        this.isLoading = true
+        const data = {
+            userID: authStore.currentUser.userID,
+            publishArray: Object.fromEntries(this.publishingDOIsO3.entries()),
+        }
+        //console.log(data.publishArray)
+        const jsonData = JSON.stringify(data);
+        axios.post(API_URL.publishOption3, jsonData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then(action(res=>{
+            console.log(res.data)
+            for(let data of res.data.data){
+                console.log(data)
+                if(data.doi){
+                    let dois = this.publishingDOIsO3.get(data.type)
+                    dois.find(ele=>ele.doi === data.doi)['result'] = data.status
+                    this.publishingDOIsO3.set(data.type, dois)
+                }
+            }
+        })).catch(err=>{
+            if (err.response) {
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+                this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
+            }
+            else {
+                this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
+            }
+        }).finally(action(()=>{
+            this.isLoading = false
+        }))
+    }
+
     openNotificationWithIcon = (type,fileName,error) => {
         if (type === 'success'){
             notification[type]({
@@ -278,7 +388,7 @@ export class bulkPublishStore{
             });
         }
         else {
-            notification['error']({
+            notification['warning']({
                 message: 'Warning',
                 description:
                     `${error}`,

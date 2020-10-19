@@ -31,7 +31,8 @@ const API_URL = {
     Get_DSInfoByDOI: ROOT + 'api/getMetadataByDOI',
     getSubDSs: ROOT + 'api/getSubDSs',
     publishOption1: ROOT + 'api/publishOption1',
-    publishOption2: ROOT + 'api/publishOption2'
+    publishOption2: ROOT + 'api/publishOption2',
+    publishOption3: ROOT + 'api/publishOption3'
 }
 
 // const PROD_API_URL = {
