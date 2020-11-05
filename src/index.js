@@ -13,13 +13,15 @@ import routingStore from './stores/routingStore'
 import systemStore from "./stores/systemStore";
 import adapt2Store from "./stores/adapt2Store";
 import bulkPublishStore from "./stores/bulkPublishStore"
+import hccdaStore from './stores/hccdaStore'
 
 const stores = {
     routingStore: routingStore,
     authStore: authStore,
     systemStore: systemStore,
     adapt2Store: adapt2Store,
-    bulkPublishStore: bulkPublishStore
+    bulkPublishStore: bulkPublishStore,
+    hccdaStore: hccdaStore
 }
 
 const hashHistory = createHashHistory();

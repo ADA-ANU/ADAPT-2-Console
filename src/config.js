@@ -32,7 +32,8 @@ const API_URL = {
     getSubDSs: ROOT + 'api/getSubDSs',
     publishOption1: ROOT + 'api/publishOption1',
     publishOption2: ROOT + 'api/publishOption2',
-    publishOption3: ROOT + 'api/publishOption3'
+    publishOption3: ROOT + 'api/publishOption3',
+    getHCCDAdata: ROOT + 'api/hccdaParams',
 }
 
 // const PROD_API_URL = {

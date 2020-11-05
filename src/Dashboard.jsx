@@ -5,7 +5,7 @@ import { Switch, Route, withRouter, Link } from 'react-router-dom';
 import './App.css';
 import 'antd/es/spin/style/css';
 import { Layout, Menu, Spin, Typography, Button, Tooltip, Alert, Row, Col, Badge, Dropdown } from 'antd';
-import { UserOutlined, SettingOutlined, CopyOutlined, CloudUploadOutlined } from '@ant-design/icons';
+import { UserOutlined, SettingOutlined, CopyOutlined, CloudUploadOutlined, PictureOutlined } from '@ant-design/icons';
 import ADAlogo from '../src/static/img/ADAlogo.jpg';
 import ANUlogo from '../src/static/img/ANUlogo.png';
 import Vertical_line from './static/img/vertical-line.js'
@@ -21,6 +21,7 @@ import bulkPublish from "./components/bulk-publish/bulkPublish"
 import test from './components/adapt-2/test'
 const logo = require('./static/img/ADAlogo.jpg')
 import NotFound from "./404page";
+import hccdaImages from './components/hccda-images/hccdaImages';
 const { SubMenu } = Menu;
 const { Header, Content, Footer } = Layout;
 const { Title } = Typography;
@@ -82,6 +83,7 @@ export default class Dashboard extends Component {
                                         <Menu.Item icon={<SettingOutlined />} key="/dashboard"><Link to='/dashboard'>ADAPT2</Link></Menu.Item>
                                         <Menu.Item icon={<CopyOutlined />} key="/dashboard/copy-tool"><Link to='/dashboard/copy-tool'>Copy Tool</Link></Menu.Item>
                                         <Menu.Item icon={<CloudUploadOutlined />} key="/dashboard/bulk-publish"><Link to='/dashboard/bulk-publish'>Bulk Publish</Link></Menu.Item>
+                                        <Menu.Item icon={<PictureOutlined />} key="/dashboard/hccda-images"><Link to='/dashboard/hccda-images'>HCCDA Images</Link></Menu.Item>
 
                                     </Menu>
                                 </Col>
@@ -111,7 +113,7 @@ export default class Dashboard extends Component {
                                     <Route exact path='/dashboard' component={newAdapt2} />
                                     <Route exact path='/dashboard/copy-tool' component={CopyTool} />
                                     <Route exact path='/dashboard/bulk-publish' component={bulkPublish} />
-                                    {/*<Route exact path='/dashboard/adapt2-test' component={newAdapt2} />*/}
+                                    <Route exact path='/dashboard/hccda-images' component={hccdaImages} />
                                     {/*{*/}
                                     {/*    user.userEmail === "Mingjing.Peng@anu.edu.au" || user.userEmail === "Marina.McGale@anu.edu.au"?*/}
                                     {/*        <Route exact path='/dashboard/test' component={test} />: null*/}
