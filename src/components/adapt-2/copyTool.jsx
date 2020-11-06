@@ -780,7 +780,7 @@ export default class CopyTool extends Component{
 
                         <Row style={{marginBottom:'5vh'}} >
                             <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
-                                <div style={{textAlign: 'center', paddingBottom:'3vh'}}>
+                                <div style={{textAlign: 'center', paddingBottom:'3vh', marginTop: '3vh'}}>
                                     <Button type="primary" htmlType="submit" disabled={submitCheck()} loading={isLoading}>
                                         COPY
                                     </Button>

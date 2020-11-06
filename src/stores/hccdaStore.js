@@ -54,6 +54,29 @@ export class hccdaStore{
         }))
     }
 
+    @action handleSubmit(){
+        this.isLoading = true
+        axios.get(API_URL.getHccdaImages)
+        .then(action(res=>{
+            console.log(res.data)
+            this.data = res.data.states
+            this.types = res.data.types
+        })).catch(err=>{
+            if (err.response) {
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+                this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
+            }
+            else {
+                this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
+            }
+
+
+        }).finally(action(()=>{
+            this.isLoading = false
+        }))
+    }
     
     openNotificationWithIcon = (type,fileName,error) => {
         if (type === 'success'){

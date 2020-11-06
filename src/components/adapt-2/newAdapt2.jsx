@@ -154,7 +154,7 @@ export default class newAdapt2 extends Component{
                                     loading={adapt2Store.isLoading}
                                     disabled={submitCheck()}
                                 >
-                                    {adapt2Store.isLoading ? 'Uploading' : 'Get ADAID'}
+                                    {!adapt2Store.isLoading? adapt2Store.selection ===3? 'Go': 'Get ADAID': "Uploading"}
                                 </Button>
                             </div>
                         </Col>
@@ -255,7 +255,7 @@ export default class newAdapt2 extends Component{
                                     loading={adapt2Store.isLoading}
                                     disabled={submitCheck()}
                                 >
-                                    {adapt2Store.isLoading ? 'Uploading' : 'Get ADAID'}
+                                    {!adapt2Store.isLoading? adapt2Store.selection ===3? 'Go': 'Get ADAID': "Uploading"}
                                 </Button>
                             </div>
                         </Col>

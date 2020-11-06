@@ -40,7 +40,7 @@ export default class hccdaImages extends Component{
         };
     }
 
-
+    hccdaFormRef = React.createRef();
     // onFinish = values => {
     //
     //     console.log('Received values of form: ', values);
@@ -61,6 +61,12 @@ export default class hccdaImages extends Component{
     handleSubmit=(form)=>{
         console.log(form)
     }
+    handleStateOnChange=(val)=>{
+        this.props.hccdaStore.dropDownOnChange(val, 'state')
+        this.hccdaFormRef.current.setFieldsValue({
+            year: undefined,
+        })
+    }
 
     render() {
         const { systemStore, authStore, hccdaStore } = this.props
@@ -76,7 +82,7 @@ export default class hccdaImages extends Component{
                             <Form
                                 name="hccda"
                                 {...formItemLayout}
-                                //onFinish={onFinish}
+                                ref={this.hccdaFormRef}
                             >
                                 <Form.Item
                                     name="state"
@@ -86,7 +92,7 @@ export default class hccdaImages extends Component{
                                 >
                                     <Select 
                                         placeholder="Please select a state"
-                                        onChange={val=>hccdaStore.dropDownOnChange(val, 'state')}
+                                        onChange={this.handleStateOnChange}
                                     >
                                         {
                                             hccdaStore.data? 
@@ -145,11 +151,11 @@ export default class hccdaImages extends Component{
                                     key="submit"
                                     htmlType="submit"
                                     type="primary"
-                                    //onClick={adapt2Store.selection ===1?()=>adapt2Store.handleSubmit(): null}
+                                    onClick={()=>hccdaStore.handleSubmit()}
                                     loading={hccdaStore.isLoading}
                                     //disabled={bulkPublishStore.submitCheck()}
                                 >
-                                    {hccdaStore.isLoading ? 'Publishing' : 'Publish'}
+                                    {hccdaStore.isLoading ? 'Please wait' : 'Go'}
                                 </Button>
                             </div>
                         </Col>
