@@ -17,6 +17,8 @@ export class hccdaStore{
     @observable state = undefined
     @observable year = undefined
     @observable type = undefined
+    @observable imageCheckMsg = undefined
+    @observable imageExisting = false
     
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
     @action reset(){
@@ -25,10 +27,26 @@ export class hccdaStore{
         this.subDSMap = new Map()
     }
     @action dropDownOnChange(value, name){
-        if(name === 'state') this.state = value
-        else if(name === 'year') this.year = value
-        else if(name === 'type') this.type = value
+        if(name === 'state') {
+            this.state = value
+            if (this.year && this.type){
+                this.checkHccdaImages()
+            }
+        }
+        else if(name === 'year') {
+            this.year = value
+            if (this.state && this.type){
+                this.checkHccdaImages()
+            }
+        }
+        else if(name === 'type') {
+            this.type = value
+            if (this.year && this.state){
+                this.checkHccdaImages()
+            }
+        }
         else openNotificationWithIcon('warning', '', 'Invalid input')
+
     }
     @action getData(){
         this.isLoading = true
@@ -54,13 +72,70 @@ export class hccdaStore{
         }))
     }
 
-    @action handleSubmit(){
+    @action checkHccdaImages(){
         this.isLoading = true
-        axios.get(API_URL.getHccdaImages)
+        const data = {
+            state: this.state,
+            year: this.year,
+            suffix: this.type,
+        }
+        //console.log(data.publishArray)
+        //const jsonData = JSON.stringify(data);
+        axios.post(API_URL.checkHccdaImages, data, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
         .then(action(res=>{
             console.log(res.data)
-            this.data = res.data.states
-            this.types = res.data.types
+            if(res.data.existing){
+                this.imageExisting = true
+                this.imageCheckMsg = `Requested file existing at ${res.data.path}`
+            }
+            else if(this.type ==='1'){
+                this.imageExisting = false
+                this.imageCheckMsg = `Requested file doesn't exist, it will be generated and then uploaded to Dataverse Test`
+            }
+            else {
+                this.imageExisting = false
+                this.imageCheckMsg = `Requested file doesn't exist, it will be generated and then placed in HCCDA folder on D10`
+            }
+            
+        })).catch(err=>{
+            if (err.response) {
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+                this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
+            }
+            else {
+                this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
+            }
+
+
+        }).finally(action(()=>{
+            this.isLoading = false
+        }))
+    }
+
+    @action handleSubmit(){
+        this.isLoading = true
+        const data = {
+            state: this.state,
+            year: this.year,
+            suffix: this.type,
+            userid: authStore.currentUser.userID
+        }
+        //console.log(data.publishArray)
+        //const jsonData = JSON.stringify(data);
+        axios.post(API_URL.getHccdaImages, data, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(action(res=>{
+            console.log(res.data)
+            this.imageCheckMsg = undefined
         })).catch(err=>{
             if (err.response) {
                 console.log(err.response.data);

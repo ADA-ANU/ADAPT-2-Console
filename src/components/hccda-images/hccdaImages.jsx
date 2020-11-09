@@ -16,15 +16,16 @@ import {
     Radio,
     Form,
     Divider,
-    Table, Select
+    Table, Select, Tag, Spin
 } from 'antd';
-import { UploadOutlined, InboxOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { UploadOutlined, InboxOutlined, LoadingOutlined } from '@ant-design/icons';
 import axios from 'axios'
 import { toJS } from 'mobx'
 const { Dragger } = Upload;
 const { Panel } = Collapse;
 const { Link } = Anchor;
 
+const loadingIcon = <LoadingOutlined style={{ fontSize: 20 }} spin />;
 const formItemLayout = {
     labelCol: { span: 5 },
     wrapperCol: { span: 15, offset: 1 },
@@ -61,11 +62,14 @@ export default class hccdaImages extends Component{
     handleSubmit=(form)=>{
         console.log(form)
     }
-    handleStateOnChange=(val)=>{
-        this.props.hccdaStore.dropDownOnChange(val, 'state')
-        this.hccdaFormRef.current.setFieldsValue({
-            year: undefined,
-        })
+    handleSelectionOnChange=(val, type)=>{
+        this.props.hccdaStore.dropDownOnChange(val, type)
+        if(type === 'state'){
+            this.hccdaFormRef.current.setFieldsValue({
+                year: undefined,
+            })
+            this.props.hccdaStore.dropDownOnChange(undefined, 'year')
+        }
     }
 
     render() {
@@ -79,64 +83,79 @@ export default class hccdaImages extends Component{
                         <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
                             <div id="select" style={{paddingTop: '4vh', paddingBottom: '2vh'}}>
-                            <Form
-                                name="hccda"
-                                {...formItemLayout}
-                                ref={this.hccdaFormRef}
-                            >
-                                <Form.Item
-                                    name="state"
-                                    label="State"
-                                    hasFeedback
-                                    rules={[{ required: true, message: 'Please select the state!' }]}
+                                <Form
+                                    name="hccda"
+                                    {...formItemLayout}
+                                    ref={this.hccdaFormRef}
                                 >
-                                    <Select 
-                                        placeholder="Please select a state"
-                                        onChange={this.handleStateOnChange}
+                                    <Form.Item
+                                        name="state"
+                                        label="State"
+                                        hasFeedback
+                                        rules={[{ required: true, message: 'Please select the state!' }]}
                                     >
-                                        {
-                                            hccdaStore.data? 
-                                                Object.keys(hccdaStore.data).map(state=>
-                                                    <Select.Option key={state} value={state}>{state}</Select.Option>
-                                                    )
-                                                :null
-                                        }
-                                    </Select>
-                                </Form.Item>
-                                <Form.Item
-                                    name="year"
-                                    label="Year"
-                                    hasFeedback
-                                    rules={[{ required: true, message: 'Please select the year!' }]}
-                                >
-                                    <Select placeholder="Please select a year">
-                                        {
-                                            hccdaStore.data && hccdaStore.state?
-                                                hccdaStore.data[hccdaStore.state].map(year=>
-                                                    <Select.Option key={year} value={year}>{year}</Select.Option>
-                                                    )
-                                                :null
-                                        }
-                                    </Select>
-                                </Form.Item>
-                                <Form.Item
-                                    name="type"
-                                    label="Image Type"
-                                    hasFeedback
-                                    rules={[{ required: true, message: 'Please select the image type!' }]}
-                                >
-                                    <Select placeholder="Please select an image type">
-                                        {
-                                            hccdaStore.types?
-                                                Object.keys(hccdaStore.types).map(key=>
-                                                    <Select.Option key={key} value={key}>{hccdaStore.types[key]}</Select.Option>
-                                                    )
-                                                :null
-                                        }
-                                    </Select>
-                                </Form.Item>
-                            </Form>
-
+                                        <Select 
+                                            placeholder="Please select a state"
+                                            onChange={val=>this.handleSelectionOnChange(val, 'state')}
+                                        >
+                                            {
+                                                hccdaStore.data? 
+                                                    Object.keys(hccdaStore.data).map(state=>
+                                                        <Select.Option key={state} value={state}>{state}</Select.Option>
+                                                        )
+                                                    :null
+                                            }
+                                        </Select>
+                                    </Form.Item>
+                                    <Form.Item
+                                        name="year"
+                                        label="Year"
+                                        hasFeedback
+                                        rules={[{ required: true, message: 'Please select the year!' }]}
+                                    >
+                                        <Select 
+                                            placeholder="Please select a year"
+                                            onChange={val=>this.handleSelectionOnChange(val, 'year')}
+                                        >
+                                            {
+                                                hccdaStore.data && hccdaStore.state?
+                                                    hccdaStore.data[hccdaStore.state].map(year=>
+                                                        <Select.Option key={year} value={year}>{year}</Select.Option>
+                                                        )
+                                                    :null
+                                            }
+                                        </Select>
+                                    </Form.Item>
+                                    <Form.Item
+                                        name="type"
+                                        label="Image Type"
+                                        hasFeedback
+                                        rules={[{ required: true, message: 'Please select the image type!' }]}
+                                    >
+                                        <Select 
+                                            placeholder="Please select an image type"
+                                            onChange={val=>this.handleSelectionOnChange(val, 'type')}
+                                        >
+                                            {
+                                                hccdaStore.types?
+                                                    Object.keys(hccdaStore.types).map(key=>
+                                                        <Select.Option key={key} value={key}>{hccdaStore.types[key]}</Select.Option>
+                                                        )
+                                                    :null
+                                            }
+                                        </Select>
+                                    </Form.Item>
+                                </Form>
+                                {
+                                    !hccdaStore.isLoading? hccdaStore.imageCheckMsg?
+                                        <div style={{textAlign: 'center', marginBottom: '3vh'}}>
+                                                <Tag style={{fontSize: '110%'}} color={hccdaStore.imageExisting ?"success":"warning"}>{hccdaStore.imageCheckMsg}</Tag>
+                                        </div>:
+                                        null:
+                                        <div style={{marginLeft:'30%', marginBottom:'5vh'}}>
+                                            <Spin spinning={hccdaStore.isLoading} indicator={loadingIcon} />
+                                        </div>  
+                                }
                             </div>
 
                         </Col>
