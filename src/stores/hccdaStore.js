@@ -36,7 +36,7 @@ export class hccdaStore{
         }
         else if(name === 'year') {
             this.year = value
-            if (this.state && this.type){
+            if (value && this.state && this.type){
                 this.checkHccdaImages()
             }
         }
