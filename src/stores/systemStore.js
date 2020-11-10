@@ -141,7 +141,7 @@ export class SystemStore{
         else {
             this.showfinalResult = true
         }
-
+        console.log(remoteFiles)
         this.finalResultDataset = dataset
         this.finalResultAdaid = adaid
         this.finalResultDOI = doi

@@ -19,6 +19,7 @@ export class hccdaStore{
     @observable type = undefined
     @observable imageCheckMsg = undefined
     @observable imageExisting = false
+    @observable hccdaRef = React.createRef();
     
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
     @action reset(){
@@ -90,7 +91,7 @@ export class hccdaStore{
             console.log(res.data)
             if(res.data.existing){
                 this.imageExisting = true
-                this.imageCheckMsg = `Requested file existing at ${res.data.path}`
+                this.imageCheckMsg = `Requested file exists at ${res.data.path}`
             }
             else if(this.type ==='1'){
                 this.imageExisting = false
@@ -136,6 +137,9 @@ export class hccdaStore{
         .then(action(res=>{
             console.log(res.data)
             this.imageCheckMsg = undefined
+            const remoteFiles = this.type ==='1'?[res.data.file]: undefined
+            systemStore.handleFinalResultOpen(res.data, undefined, undefined, undefined, remoteFiles)
+            this.hccdaRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
         })).catch(err=>{
             if (err.response) {
                 console.log(err.response.data);

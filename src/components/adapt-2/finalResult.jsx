@@ -31,8 +31,8 @@ export default class FinalResult extends Component{
         //const files = systemStore.finalResultFiles
         const localFiles = systemStore.finalResultLocalFiles
         const remoteFiles = systemStore.finalResultRemoteFiles
-        const { server, dataverse, title, firstName, lastName, authorFields, email, description, subject, uploadSwitch, newDataset, datasetURL, metaData, copyTool } = dataset
-
+        const { server, dataverse, title, firstName, lastName, authorFields, email, description, subject, uploadSwitch, newDataset, datasetURL, metaData, copyTool, file, remotePath, localPath } = dataset
+        //console.log(remoteFiles)
         const serverList = toJS(authStore.serverList)
         let data =[]
         let serverURL = null
@@ -104,6 +104,35 @@ export default class FinalResult extends Component{
                                     </Paragraph>: null
                             }
                             {
+                                remotePath?
+                                    <Paragraph>
+                                            <Text
+                                                strong
+                                                style={{
+                                                    fontSize: 16,
+                                                }}
+                                            >
+                                                Dataset Link: <a href={remotePath} target="_blank">Click Here</a>
+
+                                            </Text>
+                                        </Paragraph>: null
+                            }
+                            {
+                                localPath?
+                                    <Paragraph>
+                                            <Text
+                                                strong
+                                                style={{
+                                                    fontSize: 16,
+                                                }}
+                                            >
+                                                File Location: {localPath}
+
+                                            </Text>
+                                        </Paragraph>: null
+                            }
+    
+                            {
                                 copyTool && copyTool ===true?
                                     <Paragraph>
                                         <Text
@@ -113,7 +142,7 @@ export default class FinalResult extends Component{
                                             }}
                                             mark
                                         >
-                                            Please note that the new dataset doesn't come with guestbook or restriction info of the source dataset and the user might need to add them to the new dataset manually on Dataverse.
+                                            Please note that the new dataset doesn't come with the guestbook or the restriction data of the source dataset and the user might need to add them to the destination dataset manually on Dataverse.
 
                                         </Text>
                                     </Paragraph>: null

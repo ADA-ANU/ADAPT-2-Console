@@ -16,8 +16,9 @@ import {
     Radio,
     Form,
     Divider,
-    Table, Select, Tag, Spin
+    Table, Select, Tag, Spin, Popconfirm
 } from 'antd';
+import FinalResult from "../adapt-2/finalResult";
 import { UploadOutlined, InboxOutlined, LoadingOutlined } from '@ant-design/icons';
 import axios from 'axios'
 import { toJS } from 'mobx'
@@ -30,6 +31,7 @@ const formItemLayout = {
     labelCol: { span: 5 },
     wrapperCol: { span: 15, offset: 1 },
 };
+const msg = 'Requested file already exists, are you sure to proceed?'
 
 @inject('routingStore', 'systemStore', 'authStore', 'hccdaStore')
 @observer
@@ -74,7 +76,7 @@ export default class hccdaImages extends Component{
 
     render() {
         const { systemStore, authStore, hccdaStore } = this.props
-        console.log(hccdaStore.types)
+        //console.log(hccdaStore.types)
         return(
             <div style={{background: 'white', paddingTop:'2%', paddingBottom:'2vh'}}>
                 <div style={{ margin: 'auto'}}>
@@ -87,6 +89,7 @@ export default class hccdaImages extends Component{
                                     name="hccda"
                                     {...formItemLayout}
                                     ref={this.hccdaFormRef}
+                                    onFinish={()=>hccdaStore.handleSubmit()}
                                 >
                                     <Form.Item
                                         name="state"
@@ -153,7 +156,7 @@ export default class hccdaImages extends Component{
                                         </div>:
                                         null:
                                         <div style={{marginLeft:'30%', marginBottom:'5vh'}}>
-                                            <Spin spinning={hccdaStore.isLoading} indicator={loadingIcon} />
+                                            <Spin size="middle" spinning={hccdaStore.isLoading} />
                                         </div>  
                                 }
                             </div>
@@ -165,36 +168,65 @@ export default class hccdaImages extends Component{
                         <Col xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
 
                             <div style={{paddingTop: '5vh', paddingBottom: '3%', textAlign:'center'}}>
-                                <Button
-                                    form={'hccda'}
-                                    key="submit"
-                                    htmlType="submit"
-                                    type="primary"
-                                    onClick={()=>hccdaStore.handleSubmit()}
-                                    loading={hccdaStore.isLoading}
-                                    //disabled={bulkPublishStore.submitCheck()}
-                                >
-                                    {hccdaStore.isLoading ? 'Please wait' : 'Go'}
-                                </Button>
+                                {
+                                    hccdaStore.imageExisting?
+                                        <Popconfirm 
+                                            placement="top" 
+                                            title={msg}
+                                            //onConfirm={()=>hccdaStore.handleSubmit()}
+                                            okButtonProps={{
+                                                form:'hccda',
+                                                key:"submit",
+                                                htmlType:"submit",
+                                                type:"primary",
+                                                loading: hccdaStore.isLoading
+                                             }}
+                                            okText="Yes" 
+                                            cancelText="No"
+                                        >
+                                            <Button
+                                                form={'hccda'}
+                                                key="submit"
+                                                htmlType="submit"
+                                                type="primary"
+                                                //onClick={()=>hccdaStore.handleSubmit()}
+                                                loading={hccdaStore.isLoading}
+                                                disabled={hccdaStore.isLoading}
+                                            >
+                                                {hccdaStore.isLoading ? 'Please wait' : 'Go'}
+                                            </Button>
+                                        </Popconfirm>
+                                        :
+                                        <Button
+                                            form={'hccda'}
+                                            key="submit"
+                                            htmlType="submit"
+                                            type="primary"
+                                            //onClick={()=>hccdaStore.handleSubmit()}
+                                            loading={hccdaStore.isLoading}
+                                            disabled={hccdaStore.isLoading}
+                                        >
+                                            {hccdaStore.isLoading ? 'Please wait' : 'Go'}
+                                        </Button>
+                                }
+                                
                             </div>
                         </Col>
                     </Row>
-                    {/*ref => {adapt2Store.adapt2Ref = ref}*/}
-                    {/* <div id="finalResult" >
+                </div>
+                <div id="finalResult" ref={hccdaStore.hccdaRef}>
                         {
                             systemStore.showfinalResult?(
 
                                 <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
-                                    <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 14, offset: 5 }}>
+                                    <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
                                         <FinalResult clearResult={this.clearResult} />
                                     </Col>
                                 </Row>
 
                             ):null
                         }
-                    </div> */}
                 </div>
-
             </div>
         )
     }
