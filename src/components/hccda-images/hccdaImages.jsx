@@ -155,7 +155,7 @@ export default class hccdaImages extends Component{
                                                 <Tag style={{fontSize: '110%'}} color={hccdaStore.imageExisting ?"success":"warning"}>{hccdaStore.imageCheckMsg}</Tag>
                                         </div>:
                                         null:
-                                        <div style={{marginLeft:'30%', marginBottom:'5vh'}}>
+                                        <div style={{marginBottom:'5vh', textAlign: 'center'}}>
                                             <Spin size="middle" spinning={hccdaStore.isLoading} />
                                         </div>  
                                 }
