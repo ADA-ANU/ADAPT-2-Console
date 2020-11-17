@@ -130,6 +130,7 @@ export class hccdaStore{
         //console.log(data.publishArray)
         //const jsonData = JSON.stringify(data);
         axios.post(API_URL.getHccdaImages, data, {
+            timeout: 1400000,
             headers: {
                 'Content-Type': 'application/json',
             }

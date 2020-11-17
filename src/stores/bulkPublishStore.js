@@ -260,6 +260,7 @@ export class bulkPublishStore{
         //console.log(data.publishArray)
         const jsonData = JSON.stringify(data);
         axios.post(API_URL.publishOption1, jsonData, {
+                timeout: 1400000,
                 headers: {
                     'Content-Type': 'application/json',
                 }
@@ -302,6 +303,7 @@ export class bulkPublishStore{
         //console.log(data.publishArray)
         const jsonData = JSON.stringify(data);
         axios.post(API_URL.publishOption2, jsonData, {
+                timeout: 1400000,
                 headers: {
                     'Content-Type': 'application/json',
                 }
@@ -342,6 +344,7 @@ export class bulkPublishStore{
         //console.log(data.publishArray)
         const jsonData = JSON.stringify(data);
         axios.post(API_URL.publishOption3, jsonData, {
+                timeout: 1400000,
                 headers: {
                     'Content-Type': 'application/json',
                 }

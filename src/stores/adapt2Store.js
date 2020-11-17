@@ -257,6 +257,7 @@ export class adapt2Store{
         const json = JSON.stringify(obj);
         this.isLoading = true
         axios.post(API_URL.AdaID, json, {
+                timeout: 1400000,
                 headers: {
                     'Content-Type': 'application/json',
                 }
@@ -379,7 +380,7 @@ export class adapt2Store{
                         url: API_URL.Option2Submission,
                         method: 'post',
                         data: formData,
-                        config: {headers: {'Content-Type': 'multipart/form-data'}}
+                        config: {timeout: 1400000,headers: {'Content-Type': 'multipart/form-data'}}
                     }).then(res => res.data)
                         .then(data => {
                             console.log(data)
@@ -512,7 +513,7 @@ export class adapt2Store{
             url: API_URL.Option3Submission,
             method: 'post',
             data: formData,
-            config: {headers: {'Content-Type': 'multipart/form-data'}}
+            config: {timeout: 1400000, headers: {'Content-Type': 'multipart/form-data'}}
         }).then(res => res.data)
             .then(data => {
                 console.log(data)
