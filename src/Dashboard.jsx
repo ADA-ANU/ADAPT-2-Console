@@ -5,7 +5,7 @@ import { Switch, Route, withRouter, Link } from 'react-router-dom';
 import './App.css';
 import 'antd/es/spin/style/css';
 import { Layout, Menu, Spin, Typography, Button, Tooltip, Alert, Row, Col, Badge, Dropdown } from 'antd';
-import { UserOutlined, SettingOutlined, CopyOutlined, CloudUploadOutlined, PictureOutlined } from '@ant-design/icons';
+import { UserOutlined, SettingOutlined, CopyOutlined, CloudUploadOutlined, PictureOutlined, KeyOutlined } from '@ant-design/icons';
 import ADAlogo from '../src/static/img/ADAlogo.jpg';
 import ANUlogo from '../src/static/img/ANUlogo.png';
 import Vertical_line from './static/img/vertical-line.js'
@@ -19,6 +19,7 @@ import CopyTool from "./components/adapt-2/copyTool";
 import newAdapt2 from "./components/adapt-2/newAdapt2";
 import bulkPublish from "./components/bulk-publish/bulkPublish"
 import test from './components/adapt-2/test'
+import APIManager from './components/adapt-2/apiManager'
 const logo = require('./static/img/ADAlogo.jpg')
 import NotFound from "./404page";
 import hccdaImages from './components/hccda-images/hccdaImages';
@@ -46,13 +47,16 @@ export default class Dashboard extends Component {
     render() {
         const {routingStore, systemStore, authStore} = this.props
         const user = toJS(authStore.currentUser)
-        //console.log(user)
+        console.log(authStore.serverList)
         const menu = (
             <Menu>
-                <Menu.Item key="0">
-                    <span style={{cursor:'pointer'}} onClick={()=>{authStore.logout()}}>Log out</span>
-
+                <Menu.Item key="0" icon={<KeyOutlined />}>
+                    {/* <span style={{cursor:'pointer'}} onClick={()=>{authStore.logout()}}>Manage API Keys</span> */}
+                    <APIManager />
                 </Menu.Item>
+                {/* <Menu.Item key="1">
+                    <span style={{cursor:'pointer'}} onClick={()=>{authStore.logout()}}>Log out</span>
+                </Menu.Item> */}
             </Menu>
         )
         return(

@@ -35,7 +35,8 @@ const API_URL = {
     publishOption3: ROOT + 'api/publishOption3',
     getHCCDAdata: ROOT + 'api/hccdaParams',
     getHccdaImages: ROOT + 'api/hccdaImages',
-    checkHccdaImages: ROOT + 'api/checkHccdaImages'
+    checkHccdaImages: ROOT + 'api/checkHccdaImages',
+    updateUserAPI: ROOT + 'api/updateUserAPI'
 }
 
 // const PROD_API_URL = {

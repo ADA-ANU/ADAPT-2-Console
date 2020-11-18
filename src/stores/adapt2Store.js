@@ -35,12 +35,53 @@ export class adapt2Store{
     @observable copyMetadata = false
     @observable sourceMetadata = null
     @observable isMetadataLoaading = false
+    @observable apiManagerVisible = false
+    @observable apiKeys = new Map()
+    @observable isUpdating = false
     // constructor() {
     //
     //     this.adapt2Ref = React.createRef();
     //
     // }
     scrollToMyRef = () => window.scrollTo(0, this.adapt2Ref.current.offsetTop)
+
+    @action handleApiManagerVisible(val){
+        this.apiManagerVisible = val
+    }
+    @action updateUserAPIs(apis){
+        const obj = {
+            userid: authStore.currentUser.userID,
+            apis: apis
+        }
+        //const json = JSON.stringify(obj);
+        this.isUpdating = true
+        axios.post(API_URL.updateUserAPI, obj, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        ).then(action(res=>{
+            console.log(res.data)
+            //systemStore.handleFinalResultOpen({}, res.data.msg.adaid)
+            //this.adapt2Ref.scrollIntoView({behavior:'smooth'})
+            //this.scrollToMyRef()
+            //this.adapt2Ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        })).catch(err=>{
+            if (err.response) {
+                console.log(err.response.data);
+                console.log(err.response.status);
+                console.log(err.response.headers);
+                this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
+            }
+            else {
+                this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
+            }
+
+
+        }).finally(action(()=>{
+            this.isUpdating = false
+        }))
+    }
     @action updateCopyMetadata(value){
         console.log("updateCopyMetadata", value)
         this.copyMetadata = value
@@ -55,6 +96,7 @@ export class adapt2Store{
             systemStore.resetDVForm()
         }
     }
+
     @action getDSInfoByDOI(doi, server, userid){
         const data = {
             doi: doi,
