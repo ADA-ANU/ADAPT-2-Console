@@ -29,13 +29,13 @@ export default class Login extends Component{
                 <Row style={{height:'100vh'}} align='middle'>
                     <Col span={24}>
                     <div style={{background: '#fff', textAlign: 'center'}}>
-                        <Row style={{}}>
+                        <Row justify="center" style={{}}>
                         {/*<div style={{paddingTop: '10%'}}>*/}
-                            <Col  xs={{ span: 20, offset: 2 }} sm={{ span: 20, offset: 2 }} md={{ span: 16, offset: 4 }} lg={{ span: 16, offset: 4 }} xl={{ span: 12, offset: 6 }} xxl={{ span: 4, offset: 10 }}>
-                                <div >
-                                    <img className="logo" style={{ lineHeight: 'inherit'}} src={ADAlogo}/>
+                            {/* <Col  xs={{ span: 20, offset: 2 }} sm={{ span: 20, offset: 2 }} md={{ span: 16, offset: 4 }} lg={{ span: 16, offset: 4 }} xl={{ span: 12, offset: 6 }} xxl={{ span: 4, offset: 4}}> */}
+                                <div style={{margin:'auto', textAlign:'center'}}>
+                                    <img className="logo" style={{ height: '64px', lineHeight: '76px'}} src={ADAlogo}/>
                                 </div>
-                            </Col>
+                            {/* </Col> */}
                         {/*</div>*/}
                         </Row>
                         <Row style={{paddingTop: '1%'}}>
