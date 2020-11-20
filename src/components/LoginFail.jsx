@@ -5,7 +5,7 @@ import '../App.css';
 import 'antd/es/spin/style/css';
 import { Layout, Menu, Spin, Typography, Button, Tooltip, Alert, Row, Col } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-import ADAlogo from '../static/img/ADAlogo.jpg';
+import ADAlogo from '../static/img/ADA-logo.png';
 import aaf_login from '../static/img/aaf_login.png'
 
 @inject('routingStore', 'systemStore', 'authStore')

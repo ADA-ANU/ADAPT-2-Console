@@ -6,7 +6,7 @@ import './App.css';
 import 'antd/es/spin/style/css';
 import { Layout, Menu, Spin, Typography, Button, Tooltip, Alert, Row, Col, Badge, Dropdown } from 'antd';
 import { UserOutlined, SettingOutlined, CopyOutlined, CloudUploadOutlined, PictureOutlined, KeyOutlined } from '@ant-design/icons';
-import ADAlogo from '../src/static/img/ADAlogo.jpg';
+import ADAlogo from '../src/static/img/ADA-logo.png';
 import ANUlogo from '../src/static/img/ANUlogo.png';
 import Vertical_line from './static/img/vertical-line.js'
 import DVlogo from '../src/static/img/DVlogo.png'
@@ -20,7 +20,7 @@ import newAdapt2 from "./components/adapt-2/newAdapt2";
 import bulkPublish from "./components/bulk-publish/bulkPublish"
 import test from './components/adapt-2/test'
 import APIManager from './components/adapt-2/apiManager'
-const logo = require('./static/img/ADAlogo.jpg')
+//const logo = require('./static/img/ADAlogo.jpg')
 import NotFound from "./404page";
 import hccdaImages from './components/hccda-images/hccdaImages';
 const { SubMenu } = Menu;
@@ -127,7 +127,7 @@ export default class Dashboard extends Component {
                         <Footer>
                             <hr />
                             <Row justify="center" style={{paddingTop:'2vh'}}>
-                                <img onClick={()=>{this.props.history.push('/adapt2')}} className="logo" style={{ height: '64px', lineHeight: '76px',marginTop: '10px'}} src={ADAlogo}/>
+                                <img className="logo" style={{ height: '64px', lineHeight: '76px',marginTop: '10px'}} src={ADAlogo}/>
                                 <img className="logo" style={{ height: '84px', lineHeight: '96px', }} src={Vertical_line}/>
                                 <img className="logo" style={{ height: '64px', lineHeight: '76px',marginTop: '10px'}} src={ANUlogo}/>
                                 <img className="logo" style={{ height: '84px', lineHeight: '76px',}} src={Vertical_line}/>
