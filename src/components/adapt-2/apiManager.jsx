@@ -156,8 +156,8 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel, APIs, isLoading, er
                                     rules={[
                                         {
                                             type: 'string',
-                                            pattern: '^[0-9A-Za-z\\-]+$',
-                                            message: 'This field must be a valid Dataverse API key.'
+                                            pattern: '^[0-9a-z]{8}-[[0-9a-z]{4}-[[0-9a-z]{4}-[[0-9a-z]{4}-[[0-9a-z]{12}$',
+                                            message: 'This field must be a valid Dataverse API key, which looks like xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
                                         }
                                     ]}
                                 >

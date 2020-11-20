@@ -62,6 +62,8 @@ export class adapt2Store{
             }
         ).then(action(res=>{
             console.log(res.data)
+            this.handleApiManagerVisible(false)
+            this.openNotificationWithIcon2('success',`Successfully updated your APIs.`)
             //systemStore.handleFinalResultOpen({}, res.data.msg.adaid)
             //this.adapt2Ref.scrollIntoView({behavior:'smooth'})
             //this.scrollToMyRef()
@@ -71,10 +73,10 @@ export class adapt2Store{
                 console.log(err.response.data);
                 console.log(err.response.status);
                 console.log(err.response.headers);
-                this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
+                this.openNotificationWithIcon2('error',`${err.response.data}, please refresh the page and retry.`)
             }
             else {
-                this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
+                this.openNotificationWithIcon2('error', `${err}, please refresh the page and retry.`)
             }
 
 
@@ -621,6 +623,24 @@ export class adapt2Store{
             // })
 
     }
+    openNotificationWithIcon2 = (type,msg) => {
+        if (type === 'success'){
+            notification[type]({
+                message: 'Successful',
+                description:
+                    msg,
+            });
+        }
+        else {
+            notification[type]({
+                message: 'Submission Failed',
+                description:
+                    msg,
+                duration: 0,
+            });
+        }
+
+    };
     openNotificationWithIcon = (type,fileName,error) => {
         if (type === 'success'){
             notification[type]({
