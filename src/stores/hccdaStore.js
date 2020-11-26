@@ -61,7 +61,10 @@ export class hccdaStore{
                 console.log(err.response.data);
                 console.log(err.response.status);
                 console.log(err.response.headers);
-                this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
+                if(err.response.status === 503){
+                    this.openNotificationWithIcon('nofile','files', `No files were found in HCCDA directory on D10. Raw error: ${err.response.data}.`)
+                }
+                else this.openNotificationWithIcon('error','files', `${err.response.data}, please refresh the page and retry.`)
             }
             else {
                 this.openNotificationWithIcon('error','files', `${err}, please refresh the page and retry.`)
@@ -169,6 +172,14 @@ export class hccdaStore{
         else if(type === 'error'){
             notification[type]({
                 message: 'Submission Failed',
+                description:
+                    `${error}`,
+                duration: 0,
+            });
+        }
+        else if(type === 'nofile'){
+            notification['error']({
+                message: 'Files not found',
                 description:
                     `${error}`,
                 duration: 0,
