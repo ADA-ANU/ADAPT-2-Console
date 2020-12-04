@@ -197,10 +197,11 @@ export default class newAdapt2 extends Component{
                                                 <div style={{paddingLeft: '1vw'}}>
                                                     <Select
                                                         value={adapt2Store.selectedADAFolder}
-                                                        style={{ width: '100%' }}
+                                                        style={{ width: '9vw' }}
                                                         placeholder="select a ADA folder"
                                                         allowClear
                                                         size={"small"}
+                                                        showSearch={true}
                                                         disabled={adapt2Store.selection !== 3}
                                                         //defaultValue={['china']}
                                                         onChange={e=>adapt2Store.adaFolderOnChange(e)}
