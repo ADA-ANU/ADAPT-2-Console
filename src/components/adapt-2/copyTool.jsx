@@ -416,7 +416,7 @@ export default class CopyTool extends Component{
         const copyRange = systemStore.copyRange
         console.log(authStore.serverList)
         const serverList = toJS(authStore.serverList).filter(ele=>{
-            console.log(ele)
+            //console.log(ele)
             return ele.id !== 1 && ele.id !==5
         })
         console.log(serverList)
