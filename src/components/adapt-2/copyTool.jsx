@@ -414,7 +414,12 @@ export default class CopyTool extends Component{
         const { authStore, systemStore, files, formReset } = this.props
         const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, destinationDOIMessage } = this.state
         const copyRange = systemStore.copyRange
-        const serverList = toJS(authStore.serverList)
+        console.log(authStore.serverList)
+        const serverList = toJS(authStore.serverList).filter(ele=>{
+            console.log(ele)
+            return ele.id !== 1 && ele.id !==5
+        })
+        console.log(serverList)
         const datasource = systemStore.fileList
         const user = toJS(authStore.currentUser)
         const treeData = Object.keys(authStore.ctDVList).length>0 && authStore.ctSelectedServer?authStore.ctDVList[authStore.ctSelectedServer].dataverses: []
