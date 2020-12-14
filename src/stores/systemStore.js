@@ -5,7 +5,7 @@ import axios from 'axios'
 import {inject, observer} from "mobx-react";
 import authStore from "./authStore";
 import adapt2Store from "./adapt2Store";
-
+import React from 'react';
 
 export class SystemStore{
     @observable networkError = false
@@ -58,16 +58,32 @@ export class SystemStore{
     @observable uploadedFiles = []
     @observable returnedURL = null
     @observable existingShellDS = false
-
-
-
+    @observable copyToolRef = undefined
+    @observable destinationURL = undefined
 
     constructor() {
         this.init()
     }
     //
     @action async init(){
+        this.copyToolRef = React.createRef()
         await this.getDataverseSubjects()
+    }
+    @action handleDestinationURLonChange(val){
+        this.destinationURL = val
+    }
+    @action copyToolRetry(failList, dsURL){
+        this.destinationURL = dsURL
+        this.setCopyRange(3)
+        setTimeout(() => {
+            this.copyToolRef.current.setFieldsValue({
+                copyRange: 3,
+                destinationDSURL: dsURL
+            })
+          }, 100);
+          
+        console.log("updating destination url")
+          //this.copyToolRef.current.validateFields()
     }
     @action setLocalKeys(key){
         this.localTargetKeys = key

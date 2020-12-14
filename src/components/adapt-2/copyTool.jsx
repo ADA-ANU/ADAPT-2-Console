@@ -92,7 +92,8 @@ export default class CopyTool extends Component{
         this.props.systemStore.resetUploadedFileList()
     }
     finalResult_CopyTool=React.createRef()
-    copyToolFormRef = React.createRef();
+    copyToolFormRef = this.props.systemStore.copyToolRef
+    //React.createRef();
 
 
 
@@ -131,7 +132,8 @@ export default class CopyTool extends Component{
         axios.post(API_URL.createProdDS, json, {timeout: 1400000, headers: {'Content-Type': 'application/json'}})
             .then(res=>res.data)
             .then(data=>{
-                this.props.systemStore.handleFinalResultOpen({datasetURL: data.datasetURL, metaData: data.metaData, copyTool: true}, null, null, [], data.remoteFileList, 'dvFiles')
+                console.log(data)
+                this.props.systemStore.handleFinalResultOpen({datasetURL: data.datasetURL, metaData: data.metaData, copyTool: true}, null, null, [], data.result, 'dvFiles')
                 //this.resetState()
                 this.setState({
                     isLoading: false
@@ -414,7 +416,8 @@ export default class CopyTool extends Component{
         const { authStore, systemStore, files, formReset } = this.props
         const { doi, doiMessage, isLoading, selectedRowKeys, selectedADAFolder, fileList, destinationDOIMessage } = this.state
         const copyRange = systemStore.copyRange
-        console.log(authStore.serverList)
+        //console.log(authStore.serverList)
+        console.log(systemStore.destinationURL)
         const serverList = toJS(authStore.serverList).filter(ele=>{
             //console.log(ele)
             return ele.id !== 1 && ele.id !==5
@@ -739,6 +742,15 @@ export default class CopyTool extends Component{
                                                 label="Dataset URL"
                                                 name="destinationDSURL"
                                                 hasFeedback
+                                                getValueProps= {(value) => {
+                                                    let a = {
+                                                        "target":{
+                                                            "value": systemStore.destinationURL
+                                                        }
+                                                    }
+                                                    console.log("trying...........")
+                                                    this.destinationDOIOnChange(a)
+                                                  }}
                                                 rules={[
                                                     {
                                                         required: this.state.doiExisting ===false && this.state.serverExisting ===false ||this.state.doiExisting,

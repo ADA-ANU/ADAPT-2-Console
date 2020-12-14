@@ -1,7 +1,7 @@
 import React, {Component, useState} from 'react';
 import API_URL from '../../config'
 import 'antd/es/spin/style/css';
-import {Result, Button, Typography, Form, Input, Popover, Modal, Collapse, Tag, List, Descriptions, Badge} from 'antd';
+import {Result, Button, Typography, Form, Input, Popover, Modal, Collapse, Tag, List, Descriptions, Badge, Row, Col} from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import {inject, observer} from "mobx-react";
 import {toJS} from "mobx";
@@ -9,7 +9,7 @@ import axios from 'axios'
 const { Panel } = Collapse;
 const { Paragraph, Text } = Typography;
 
-@inject('routingStore', 'systemStore', 'authStore')
+@inject('routingStore', 'systemStore', 'authStore', 'adapt2Store')
 @observer
 
 export default class FinalResult extends Component{
@@ -23,7 +23,7 @@ export default class FinalResult extends Component{
 
     }
     render(){
-        const { systemStore, authStore } = this.props
+        const { systemStore, authStore, adapt2Store } = this.props
         //dataset, adaid, files, doi
         const dataset = systemStore.finalResultDataset
         const adaid = systemStore.finalResultAdaid
@@ -34,6 +34,8 @@ export default class FinalResult extends Component{
         const { server, dataverse, title, firstName, lastName, authorFields, email, description, subject, uploadSwitch, newDataset, datasetURL, metaData, copyTool, file, remotePath, localPath } = dataset
         //console.log(remoteFiles)
         const serverList = toJS(authStore.serverList)
+        const successList = remoteFiles.filter(ele=>ele.status ==='success')
+        const failList = remoteFiles.filter(ele=>ele.status ==='failed')
         let data =[]
         let serverURL = null
         for (let serve of serverList){
@@ -64,8 +66,8 @@ export default class FinalResult extends Component{
             // >
             <div id="finalResult">
                     <Result
-                        status="success"
-                        title="Submission Successful"
+                        status={failList && failList.length >0?"warning":"success"}
+                        title={failList && failList.length >0?`${failList.length} ${failList.length >1?"files": "file"} failed to be uploaded`:"Submission Successful"}
                         subTitle="Please check your submission details below."
                         // extra={[
                         //     <Button type="primary" key="console" onClick={this.handleCloseFinalResult}>
@@ -142,7 +144,7 @@ export default class FinalResult extends Component{
                                             }}
                                             mark
                                         >
-                                            Please note that the new dataset doesn't come with the guestbook or the restriction data of the source dataset and the user might need to add them to the destination dataset manually on Dataverse.
+                                            Please note that the new dataset doesn't come with the guestbook or the restriction data of the source dataset and therefore user might need to add them to the destination dataset manually on Dataverse.
 
                                         </Text>
                                     </Paragraph>: null
@@ -235,7 +237,7 @@ export default class FinalResult extends Component{
                                 <br />
                                 <ol>
                                     {
-                                        remoteFiles && remoteFiles.length>0?<Text
+                                        successList && successList.length>0 || failList && failList.length>0?<Text
                                             strong
                                             style={{
                                                 fontSize: 16,
@@ -248,15 +250,58 @@ export default class FinalResult extends Component{
                                         </Text>:''
                                     }
                                     {
-                                        remoteFiles && remoteFiles.length>0?remoteFiles.map((file, index)=>{
+                                        successList && successList.length>0?successList.map((file, index)=>{
 
                                                 return(
-                                                    <li key={index}><p>{file}</p>
+                                                    <li key={index}><p>{file.filename}</p>
                                                     </li>
                                                 )
                                             }
 
                                         ):''
+                                    }
+                                </ol>
+                                <ol>
+                                    {
+                                        failList && failList.length>0?
+                                        <>
+                                            <Row align="middle">
+                                                <Col span={5}>
+                                                    <Text
+                                                        strong
+                                                        style={{
+                                                            fontSize: 16,
+                                                        }}
+                                                    >
+                                                        <div style={{paddingBottom:"2vh", paddingTop:'2vh'}}>
+                                                            <Text style={{fontWeight: "bold"}}>Uploading failed:</Text>
+                                                        </div>
+                                                    </Text>
+                                                </Col>
+                                                <Col span={5} offset={1}>
+                                                    <Button 
+                                                        danger
+                                                        onClick={()=>{systemStore.copyToolRetry([1,2], datasetURL)}}
+                                                    >Retry</Button>
+                                                </Col>
+                                            </Row>
+                                            {
+                                                failList.map((file, index)=>{
+                                                    return(
+                                                        <li key={index}>
+                                                            <Text 
+                                                                mark
+                                                                style={{
+                                                                    fontSize: 14,
+                                                                }}
+                                                            >
+                                                                {file.filename} ({file.msg})
+                                                            </Text>
+                                                        </li>
+                                                    )
+                                                }
+                                            )}
+                                        </>:''
                                     }
                                 </ol>
                             </Paragraph>

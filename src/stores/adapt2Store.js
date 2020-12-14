@@ -48,6 +48,7 @@ export class adapt2Store{
     @action handleApiManagerVisible(val){
         this.apiManagerVisible = val
     }
+    
     @action updateUserAPIs(apis){
         const obj = {
             userid: authStore.currentUser.userID,
