@@ -742,15 +742,20 @@ export default class CopyTool extends Component{
                                                 label="Dataset URL"
                                                 name="destinationDSURL"
                                                 hasFeedback
-                                                getValueProps= {(value) => {
-                                                    let a = {
-                                                        "target":{
-                                                            "value": systemStore.destinationURL
-                                                        }
-                                                    }
-                                                    console.log("trying...........")
-                                                    this.destinationDOIOnChange(a)
-                                                  }}
+                                                // getValueProps= {(value) => {
+                                                //     if(value !==undefined){
+                                                //         console.log("trying...........", value)
+                                                //         let a = {
+                                                //             "target":{
+                                                //                 "value": value
+                                                //             }
+                                                //         }
+                                                //         this.destinationDOIOnChange(a, 'retry')
+                                                //         //return value
+                                                //     }
+                                                //     return {value}
+                                                //   }
+                                                // }
                                                 rules={[
                                                     {
                                                         required: this.state.doiExisting ===false && this.state.serverExisting ===false ||this.state.doiExisting,
@@ -812,7 +817,7 @@ export default class CopyTool extends Component{
 
                                 <Row style={{marginTop:'2vh', marginBottom:'2vh'}}>
                                     <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 1 }} sm={{ span: 20, offset: 2 }} md={{ span: 18, offset: 3 }} lg={{ span: 16, offset: 4 }} xl={{ span: 14, offset: 5 }} xxl={{ span: 12, offset: 6 }}>
-                                        <FinalResult clearResult={this.clearResult} />
+                                        <FinalResult clearResult={this.clearResult} destinationDOIOnChange={this.destinationDOIOnChange}/>
                                     </Col>
                                 </Row>
 

@@ -59,7 +59,10 @@ export class SystemStore{
     @observable returnedURL = null
     @observable existingShellDS = false
     @observable copyToolRef = undefined
-    @observable destinationURL = undefined
+    @observable destinationDOIExisting = false
+    @observable destinationDOIMessage = undefined
+    @observable destinationDOI = undefined
+    @observable destinationServer = undefined
 
     constructor() {
         this.init()
@@ -69,18 +72,21 @@ export class SystemStore{
         this.copyToolRef = React.createRef()
         await this.getDataverseSubjects()
     }
-    @action handleDestinationURLonChange(val){
-        this.destinationURL = val
+    @action handleDestinationInfo(val, type){
+        if(type ==='exist') this.destinationDOIExisting = val
+        else if(type ==='doiMessage') this.destinationDOIMessage = val
+        else if(type ==='doi') this.destinationDOI = val
+        else if(type ==='destinationServer') this.destinationServer = val
     }
     @action copyToolRetry(failList, dsURL){
-        this.destinationURL = dsURL
+        //this.destinationURL = dsURL
         this.setCopyRange(3)
         setTimeout(() => {
             this.copyToolRef.current.setFieldsValue({
                 copyRange: 3,
                 destinationDSURL: dsURL
             })
-          }, 100);
+          }, 0);
           
         console.log("updating destination url")
           //this.copyToolRef.current.validateFields()

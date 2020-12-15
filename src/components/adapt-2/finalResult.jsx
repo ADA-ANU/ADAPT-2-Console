@@ -23,7 +23,7 @@ export default class FinalResult extends Component{
 
     }
     render(){
-        const { systemStore, authStore, adapt2Store } = this.props
+        const { systemStore, authStore, adapt2Store, destinationDOIOnChange } = this.props
         //dataset, adaid, files, doi
         const dataset = systemStore.finalResultDataset
         const adaid = systemStore.finalResultAdaid
@@ -281,7 +281,17 @@ export default class FinalResult extends Component{
                                                 <Col span={5} offset={1}>
                                                     <Button 
                                                         danger
-                                                        onClick={()=>{systemStore.copyToolRetry([1,2], datasetURL)}}
+                                                        onClick={()=>{
+                                                            systemStore.copyToolRetry([1,2], datasetURL)
+                                                            if(destinationDOIOnChange){
+                                                                let e = {
+                                                                    "target":{
+                                                                        "value": datasetURL
+                                                                    }
+                                                                }
+                                                                destinationDOIOnChange(e)
+                                                            }
+                                                        }}
                                                     >Retry</Button>
                                                 </Col>
                                             </Row>
