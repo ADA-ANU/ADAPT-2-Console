@@ -432,7 +432,7 @@ export default class CopyTool extends Component{
         //console.log(toJS(treeData))
         //console.log(toJS(datasource))
         console.log(copyRange)
-        console.log(toJS(systemStore.selectedRowNames))
+        console.log(toJS(systemStore.selectedRowKeys))
         const rowSelection = {
             selectedRowKeys: systemStore.selectedRowKeys,
             onChange: (selectedRowKeys, selectedRows) => {

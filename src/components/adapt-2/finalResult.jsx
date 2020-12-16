@@ -282,7 +282,7 @@ export default class FinalResult extends Component{
                                                     <Button 
                                                         danger
                                                         onClick={()=>{
-                                                            systemStore.copyToolRetry([1,2], datasetURL)
+                                                            systemStore.copyToolRetry(failList, datasetURL)
                                                             if(destinationDOIOnChange){
                                                                 let e = {
                                                                     "target":{

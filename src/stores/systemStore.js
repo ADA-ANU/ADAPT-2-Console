@@ -72,14 +72,10 @@ export class SystemStore{
         this.copyToolRef = React.createRef()
         await this.getDataverseSubjects()
     }
-    @action handleDestinationInfo(val, type){
-        if(type ==='exist') this.destinationDOIExisting = val
-        else if(type ==='doiMessage') this.destinationDOIMessage = val
-        else if(type ==='doi') this.destinationDOI = val
-        else if(type ==='destinationServer') this.destinationServer = val
-    }
+    
     @action copyToolRetry(failList, dsURL){
         //this.destinationURL = dsURL
+        console.log(failList)
         this.setCopyRange(3)
         setTimeout(() => {
             this.copyToolRef.current.setFieldsValue({
@@ -87,7 +83,11 @@ export class SystemStore{
                 destinationDSURL: dsURL
             })
           }, 0);
-          
+        let rowKeys = []
+        for(let file of failList){
+            rowKeys.push(file.fileID)
+        }
+        this.selectedRowKeys= rowKeys
         console.log("updating destination url")
           //this.copyToolRef.current.validateFields()
     }
