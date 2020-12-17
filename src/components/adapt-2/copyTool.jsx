@@ -557,7 +557,7 @@ export default class CopyTool extends Component{
                                 </Anchor>
                             </Col>
                             <Col style={{boxShadow:'0 1px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.1)'}} xs={{ span: 22, offset: 0 }} sm={{ span: 20, offset: 0 }} md={{ span: 18, offset: 1 }} lg={{ span: 16, offset: 1 }} xl={{ span: 14, offset: 1 }} xxl={{ span: 14, offset: 1 }}>
-                                <div id="sourceDS" style={{textAlign: 'center', paddingTop:'2vh'}}>
+                                <div id="sourceDS" style={{textAlign: 'center', paddingTop:'2vh'}} ref={ref => {systemStore.copyToolSourceURL = ref}}>
                                     <span>Source Dataset: </span>
                                     <Divider />
                                 </div>

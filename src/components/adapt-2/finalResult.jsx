@@ -32,10 +32,10 @@ export default class FinalResult extends Component{
         const localFiles = systemStore.finalResultLocalFiles
         const remoteFiles = systemStore.finalResultRemoteFiles
         const { server, dataverse, title, firstName, lastName, authorFields, email, description, subject, uploadSwitch, newDataset, datasetURL, metaData, copyTool, file, remotePath, localPath } = dataset
-        //console.log(remoteFiles)
+        console.log(remoteFiles)
         const serverList = toJS(authStore.serverList)
-        const successList = remoteFiles.filter(ele=>ele.status ==='success')
-        const failList = remoteFiles.filter(ele=>ele.status ==='failed')
+        const successList = remoteFiles?remoteFiles.filter(ele=>ele.status ==='success'):undefined
+        const failList = remoteFiles?remoteFiles.filter(ele=>ele.status ==='failed'):undefined
         let data =[]
         let serverURL = null
         for (let serve of serverList){

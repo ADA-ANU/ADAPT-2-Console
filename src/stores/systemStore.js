@@ -63,6 +63,7 @@ export class SystemStore{
     @observable destinationDOIMessage = undefined
     @observable destinationDOI = undefined
     @observable destinationServer = undefined
+    @observable copyToolSourceURL = undefined
 
     constructor() {
         this.init()
@@ -70,6 +71,7 @@ export class SystemStore{
     //
     @action async init(){
         this.copyToolRef = React.createRef()
+        this.copyToolSourceURL = React.createRef()
         await this.getDataverseSubjects()
     }
     
@@ -84,11 +86,15 @@ export class SystemStore{
             })
           }, 0);
         let rowKeys = []
+        let rowNames = []
         for(let file of failList){
             rowKeys.push(file.fileID)
+            rowNames.push(file.filename)
         }
         this.selectedRowKeys= rowKeys
+        this.selectedRowNames= rowNames
         console.log("updating destination url")
+        this.copyToolSourceURL.scrollIntoView({behavior:'smooth'})
           //this.copyToolRef.current.validateFields()
     }
     @action setLocalKeys(key){
@@ -1011,6 +1017,7 @@ export class SystemStore{
                 }
             })).catch(action(err=>{
                 this.dataversePermissionValid = false
+                console.log(err.response.data)
                 if (err.response) {
                     if (err.response.status ===401){
                         console.log("permission 401 error")
@@ -1026,6 +1033,9 @@ export class SystemStore{
                             }
                         }
 
+                    }
+                    else if(err.response.status ===503){
+                        this.dataversePermissionValid = true
                     }
 
                 }
