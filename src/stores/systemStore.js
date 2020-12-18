@@ -489,10 +489,13 @@ export class SystemStore{
     }
     @action regainCopyToolSelectedRowKeys(){
         let rowKeys = []
+        let rowNames = []
         for(let file of this.fileList){
             rowKeys.push(file.id)
+            rowNames.push(file.filename)
         }
         this.selectedRowKeys = rowKeys
+        this.selectedRowNames = rowNames
     }
     @action getPrefix(filename){
         let prefix = filename.slice(0,2)
