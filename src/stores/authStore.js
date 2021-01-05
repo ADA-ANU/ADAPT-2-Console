@@ -109,7 +109,7 @@ class AuthStore {
 
     @action getAllDataverse(){
 
-        return fetch(API_URL.Get_DataverseLists)
+        return fetch(API_URL.Get_DataverseLists + this.currentUser.userID)
             .then(action(res => {
                 if (res.status === 201){
                     return res.json()
@@ -119,7 +119,7 @@ class AuthStore {
                 }
             }))
             .then(action(json=>{
-
+                console.log(json.msg)
                 this.networkError = false
                 this.newDVList = json.msg
                 this.bulkDVList = json.msg

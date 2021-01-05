@@ -15,7 +15,7 @@ const API_URL = {
     AdaID: ROOT + 'api/adaID',
     Create_ADAdataset: ROOT + 'api/createADAdataset',
     Get_DatasetInfo: ROOT + 'api/getDatasetInfo',
-    Get_DataverseLists: ROOT + 'api/getDataverseLists',
+    Get_DataverseLists: ROOT + 'api/getDataverseLists/',
     Download_Dataset_Files: ROOT+'api/downloadDatasetFiles',
     Get_Dataset_FileList_ByDOI:ROOT+'api/getDatasetFileListByDOI',
     Get_Subjects: ROOT +'api/getSubjects',

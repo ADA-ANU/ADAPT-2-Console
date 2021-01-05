@@ -117,7 +117,7 @@ export default class NewDVForm extends Component{
         const serverList = toJS(authStore.serverList)
         const user = toJS(authStore.currentUser)
         const dataverses = toJS(authStore.newDVList)
-        const treeData = Object.keys(authStore.newDVList).length>0 && adapt2Store.dvFormSelectedServer?authStore.newDVList[adapt2Store.dvFormSelectedServer].dataverses: []
+        const treeData = Object.keys(authStore.newDVList).length>0 && adapt2Store.dvFormSelectedServer &&authStore.newDVList[adapt2Store.dvFormSelectedServer] &&authStore.newDVList[adapt2Store.dvFormSelectedServer].dataverses.length>0?authStore.newDVList[adapt2Store.dvFormSelectedServer].dataverses: []
         console.log(user)
         console.log(serverList)
         console.log(this.state.selectedDataverse)
