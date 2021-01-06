@@ -2,6 +2,7 @@ import { observable, action, computed, reaction, createTransformer, toJS } from 
 import API_URL from '../config'
 import adapt2Store from "./adapt2Store";
 import bulkPublishStore from "./bulkPublishStore"
+import {notification} from "antd";
 
 
 class AuthStore {
@@ -21,6 +22,7 @@ class AuthStore {
     @observable ctSelectedServer = null
     @observable newDVList = {}
     @observable bulkDVList = {}
+    @observable fetchingDataverseList = false
     //@observable isLoading = false;
     //@observable errors = undefined;
     //@observable ws = undefined;
@@ -108,7 +110,7 @@ class AuthStore {
     }
 
     @action getAllDataverse(){
-
+        this.fetchingDataverseList = true
         return fetch(API_URL.Get_DataverseLists + this.currentUser.userID)
             .then(action(res => {
                 if (res.status === 201){
@@ -124,18 +126,58 @@ class AuthStore {
                 this.newDVList = json.msg
                 this.bulkDVList = json.msg
                 this.ctDVList = json.msg
+                this.fetchingDataverseList = false
+                this.checkDataverseListStatus(json.msg, "dvForm")
+                this.checkDataverseListStatus(json.msg, "ctForm")
             }))
             .catch(err => {
+                console.log("wrong")
                 this.networkError = true
                 this.networkErrorMessage = err
             })
     }
+    
+    @action checkDataverseListStatus(list, type){
+        if(Object.keys(list).length>0 && type && type ==='dvForm'){
+            if(adapt2Store.dvFormSelectedServer){
+                if(list[adapt2Store.dvFormSelectedServer].status ==="ERROR"){
+                    this.openNotificationWithIcon('error',list[adapt2Store.dvFormSelectedServer].msg?`No dataverse shown in the list as ${list[adapt2Store.dvFormSelectedServer].msg}.`: `Dataverse Error.`)
+                }
+            }
+        }
+        if(Object.keys(list).length>0 && type && type ==='ctForm'){
+            if(this.ctSelectedServer){
+                if(list[this.ctSelectedServer].status ==="ERROR"){
+                    this.openNotificationWithIcon('error',list[this.ctSelectedServer].msg?`No dataverse shown in the list as ${list[this.ctSelectedServer].msg}.`: `Dataverse Error.`)
+                }
+            }
+        }
+    }
+    openNotificationWithIcon = (type,msg) => {
+        if (type === 'success'){
+            notification[type]({
+                message: 'Successful',
+                description:
+                    msg,
+            });
+        }
+        else {
+            notification[type]({
+                message: 'Error',
+                description:
+                    msg,
+                duration: 0,
+            });
+        }
+
+    };
     @action resetProdSubDVs(){
         //this.ctDVList = this.initCTDVList
         this.ctSelectedServer = null
     }
     @action setCTServer(server){
         this.ctSelectedServer = server
+        this.checkDataverseListStatus(this.ctDVList, "ctForm")
     }
     @action getSubDataversesForAdapt2(dvID){
         return fetch(API_URL.getSubDVs + dvID + `/${adapt2Store.dvFormSelectedServer}`)

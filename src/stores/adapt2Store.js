@@ -166,6 +166,7 @@ export class adapt2Store{
     }
     @action setDVFormServer(value){
         this.dvFormSelectedServer = value
+        authStore.checkDataverseListStatus(authStore.newDVList, 'dvForm')
     }
     @action adaFolderOnChange(value){
         console.log(value)

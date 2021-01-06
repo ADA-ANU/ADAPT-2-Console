@@ -724,6 +724,7 @@ export default class CopyTool extends Component{
                                                     optionFilterProp="children"
                                                     onChange={this.dataverseOnChange}
                                                     loadData={this.onLoadData}
+                                                    loading={authStore.fetchingDataverseList}
                                                     filterTreeNode={(value, node)=>node.title.toLowerCase().indexOf(value.toLowerCase())>=0}
                                                     // onFocus={this.dataverseOnFocus}
                                                     // onBlur={this.dataverseOnBlur}
