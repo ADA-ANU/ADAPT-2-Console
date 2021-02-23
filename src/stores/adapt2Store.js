@@ -265,6 +265,12 @@ export class adapt2Store {
     this.resetAll();
     systemStore.resetAll();
   }
+  @action resetSelection() {
+    this.selection = undefined;
+  }
+  @action setSelection() {
+    this.selection = 1;
+  }
   @action resetAll() {
     this.createDataset = false;
     this.doiServer = null;
@@ -563,7 +569,7 @@ export class adapt2Store {
               "error",
               "files",
               `${
-                err.response.data ? err.response.data : err
+                err.response.data ? err.response.data.msg : err
               }, please refresh the page and retry.`
             );
           }
