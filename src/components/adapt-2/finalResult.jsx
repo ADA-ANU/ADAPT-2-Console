@@ -288,7 +288,7 @@ export default class FinalResult extends Component {
                   >
                     <div style={{ paddingBottom: "2vh", paddingTop: "2vh" }}>
                       <Text style={{ fontWeight: "bold" }}>
-                        Preserved File List:
+                        Preserved Files:
                       </Text>
                     </div>
                   </Text>
@@ -319,9 +319,7 @@ export default class FinalResult extends Component {
                     }}
                   >
                     <div style={{ paddingBottom: "2vh", paddingTop: "2vh" }}>
-                      <Text style={{ fontWeight: "bold" }}>
-                        Curated File List:
-                      </Text>
+                      <Text style={{ fontWeight: "bold" }}>Curated Files:</Text>
                     </div>
                   </Text>
                 ) : (
