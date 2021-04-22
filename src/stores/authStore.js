@@ -74,8 +74,10 @@ class AuthStore {
             return this.getServerList(json.user.userID).then(
               action((res) => {
                 this.siteLoading = false;
+                console.log(res);
                 return this.getAllDataverse().then(
-                  action((res) => {
+                  action((r) => {
+                    console.log(r);
                     return true;
                   })
                 );

@@ -46,6 +46,7 @@ export default class FinalResult extends Component {
     const doi = systemStore.finalResultDOI;
     //const files = systemStore.finalResultFiles
     const localFiles = systemStore.finalResultLocalFiles;
+    console.log(localFiles);
     const remoteFiles = systemStore.finalResultRemoteFiles;
     const {
       server,
@@ -297,8 +298,11 @@ export default class FinalResult extends Component {
                 )}
                 {localFiles && localFiles.length > 0
                   ? localFiles.map((file, index) => {
-                      let beforePath = file.path.split("/")[1];
-                      let afterPath = `./${beforePath}/${file.originalname}`;
+                      let beforePath = [...file.path.split("/")];
+                      beforePath.shift();
+
+                      let afterPath = `./${beforePath.join("/")}`;
+
                       return (
                         <li key={index}>
                           <p>{file.originalname}</p>
