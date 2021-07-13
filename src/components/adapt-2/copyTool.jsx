@@ -111,12 +111,8 @@ export default class CopyTool extends Component {
     this.props.systemStore.handleFinalResultDVFilesClose();
     //console.log(form)
     const { dataverse, copyRange, destinationServer, destinationDSURL } = form;
-    const {
-      doi,
-      doiMessage,
-      destinationDOI,
-      destinationDOIMessage,
-    } = this.state;
+    const { doi, doiMessage, destinationDOI, destinationDOIMessage } =
+      this.state;
     //console.log(this.state)
     console.log(this.props.systemStore.selectedRowNames);
     const obj = {
@@ -457,13 +453,8 @@ export default class CopyTool extends Component {
     </Popover>
   );
   render() {
-    const {
-      authStore,
-      systemStore,
-      files,
-      formReset,
-      adapt2Store,
-    } = this.props;
+    const { authStore, systemStore, files, formReset, adapt2Store } =
+      this.props;
     const {
       doi,
       doiMessage,
@@ -691,13 +682,13 @@ export default class CopyTool extends Component {
                         this.state.doiExisting,
                       message: "Please enter DOI.",
                     },
-                    {
-                      //\/.*
-                      type: "string",
-                      pattern:
-                        "(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi.*\\.*$(?![\\w])",
-                      message: "Please enter a valid doi url.",
-                    },
+                    // {
+                    //   //\/.*
+                    //   type: "string",
+                    //   pattern:
+                    //     "(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi.*\\.*$(?![\\w])",
+                    //   message: "Please enter a valid doi url.",
+                    // },
                   ]}
                 >
                   <Input

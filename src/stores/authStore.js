@@ -231,9 +231,10 @@ class AuthStore {
       .then(
         action((json) => {
           console.log(json);
-          let data = this.newDVList[
-            adapt2Store.dvFormSelectedServer
-          ].dataverses.concat(json);
+          let data =
+            this.newDVList[adapt2Store.dvFormSelectedServer].dataverses.concat(
+              json
+            );
           this.newDVList[adapt2Store.dvFormSelectedServer].dataverses = data;
           return true;
         })
@@ -261,9 +262,10 @@ class AuthStore {
       .then(
         action((json) => {
           console.log(json);
-          let data = this.bulkDVList[
-            bulkPublishStore.selectedServer
-          ].dataverses.concat(json);
+          let data =
+            this.bulkDVList[bulkPublishStore.selectedServer].dataverses.concat(
+              json
+            );
           this.bulkDVList[bulkPublishStore.selectedServer].dataverses = data;
           return true;
         })
@@ -289,9 +291,8 @@ class AuthStore {
       .then(
         action((json) => {
           console.log(json);
-          let data = this.ctDVList[this.ctSelectedServer].dataverses.concat(
-            json
-          );
+          let data =
+            this.ctDVList[this.ctSelectedServer].dataverses.concat(json);
           this.ctDVList[this.ctSelectedServer].dataverses = data;
           return true;
         })
@@ -319,35 +320,35 @@ class AuthStore {
       });
   }
 
-  @action getADAFolderList() {
-    return fetch(API_URL.Ada_FolderList, { credentials: "include" })
-      .then(
-        action((res) => {
-          if (res.status === 201) {
-            return res.json();
-          } else {
-            throw new Error(
-              "Unable to get ADA folder list, please refresh the page to try again."
-            );
-          }
-        })
-      )
-      .then(
-        action((json) => {
-          this.adaFolderList = json;
-        })
-      )
-      .catch((err) => {
-        this.networkError = true;
-        this.networkErrorMessage = err;
-      });
-  }
+  // @action getADAFolderList() {
+  //   return fetch(API_URL.Ada_FolderList, { credentials: "include" })
+  //     .then(
+  //       action((res) => {
+  //         if (res.status === 201) {
+  //           return res.json();
+  //         } else {
+  //           throw new Error(
+  //             "Unable to get ADA folder list, please refresh the page to try again."
+  //           );
+  //         }
+  //       })
+  //     )
+  //     .then(
+  //       action((json) => {
+  //         this.adaFolderList = json;
+  //       })
+  //     )
+  //     .catch((err) => {
+  //       this.networkError = true;
+  //       this.networkErrorMessage = err;
+  //     });
+  // }
 
   @action async init() {
     this.siteLoading = true;
     console.log("loading site");
     await this.loadSite();
-    await this.getADAFolderList();
+    //await this.getADAFolderList();
     await this.authenticate();
 
     console.log("finished");
