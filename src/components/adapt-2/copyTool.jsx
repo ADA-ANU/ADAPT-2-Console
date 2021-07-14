@@ -682,13 +682,13 @@ export default class CopyTool extends Component {
                         this.state.doiExisting,
                       message: "Please enter DOI.",
                     },
-                    // {
-                    //   //\/.*
-                    //   type: "string",
-                    //   pattern:
-                    //     "(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi.*\\.*$(?![\\w])",
-                    //   message: "Please enter a valid doi url.",
-                    // },
+                    {
+                      //\/.*
+                      type: "string",
+                      pattern:
+                        "(?<![\\w])https:\\/\\/(?:dataverse|anu-dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi.*\\.*$(?![\\w])",
+                      message: "Please enter a valid doi url.",
+                    },
                   ]}
                 >
                   <Input
@@ -953,7 +953,7 @@ export default class CopyTool extends Component {
                           //\/.*
                           type: "string",
                           pattern:
-                            "(?<![\\w])https:\\/\\/(?:dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi.*\\.*$(?![\\w])",
+                            "(?<![\\w])https:\\/\\/(?:dataverse|anu-dataverse|dataverse-dev|deposit|dataverse-test)\\.ada.edu.au\\/dataset\\.xhtml\\?persistentId=doi.*\\.*$(?![\\w])",
                           message: "Please enter a valid doi url.",
                         },
                       ]}
